@@ -6,8 +6,6 @@ import enumeratum.{Enum, EnumEntry}
 import scala.collection.immutable.IndexedSeq
 
 sealed abstract class FilterWheelPosition(override val entryName: String) extends EnumEntry {
-  def name: String = entryName
-
   def nextPosition(target: FilterWheelPosition): FilterWheelPosition = nextPosition(step(target))
 
   def nextPosition(step: Int): FilterWheelPosition = {
