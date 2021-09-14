@@ -21,7 +21,7 @@ class ImagerFilterTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServe
   }
 
   test("Assembly should be locatable using Location Service") {
-    val connection = AkkaConnection(ComponentId(Prefix("IRIS.imager.filter"), ComponentType.Assembly))
+    val connection   = AkkaConnection(ComponentId(Prefix("IRIS.imager.filter"), ComponentType.Assembly))
     val akkaLocation = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
 
     akkaLocation.connection shouldBe connection
