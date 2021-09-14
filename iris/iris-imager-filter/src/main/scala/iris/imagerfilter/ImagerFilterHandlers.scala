@@ -19,7 +19,8 @@ class ImagerFilterHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
   import cswCtx._
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
   private val log                           = loggerFactory.getLogger
-  private val imageActor                    = ctx.spawnAnonymous(FilterWheelActor.behavior(cswCtx))
+  private val filterWheelConfiguration      = FilterWheelConfiguration(ctx.system)
+  private val imageActor                    = ctx.spawnAnonymous(FilterWheelActor.behavior(cswCtx, filterWheelConfiguration))
 
   override def initialize(): Unit = {
     log.info("Initializing imager.filter...")

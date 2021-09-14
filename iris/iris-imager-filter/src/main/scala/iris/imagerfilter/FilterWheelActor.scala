@@ -9,18 +9,18 @@ import iris.imagerfilter.models.FilterWheelPosition
 sealed trait FilterWheelCommand
 
 object FilterWheelCommand {
-  case class Wheel1(target: FilterWheelPosition)                         extends FilterWheelCommand
-  case class MoveOneStep(target: FilterWheelPosition, intervalInMs: Int) extends FilterWheelCommand
+  case class Wheel1(target: FilterWheelPosition)      extends FilterWheelCommand
+  case class MoveOneStep(target: FilterWheelPosition) extends FilterWheelCommand
 }
 
-class FilterWheelActor(cswContext: CswContext) {
+class FilterWheelActor(cswContext: CswContext, configuration: FilterWheelConfiguration) {
   private lazy val timeServiceScheduler = cswContext.timeServiceScheduler
 
   def behavior(current: FilterWheelPosition): Behavior[FilterWheelCommand] = {
     Behaviors.receive { (ctx, msg) =>
       msg match {
-        case FilterWheelCommand.Wheel1(target)                    => move(current, target, 500, ctx.self)
-        case FilterWheelCommand.MoveOneStep(target, intervalInMs) => move(current, target, intervalInMs, ctx.self)
+        case FilterWheelCommand.Wheel1(target)      => move(current, target, ctx.self)
+        case FilterWheelCommand.MoveOneStep(target) => move(current, target, ctx.self)
       }
     }
   }
@@ -28,12 +28,11 @@ class FilterWheelActor(cswContext: CswContext) {
   private def move(
       current: FilterWheelPosition,
       target: FilterWheelPosition,
-      intervalInMS: Int,
       self: ActorRef[FilterWheelCommand]
   ): Behavior[FilterWheelCommand] = {
     def moveOneStep() =
-      timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plusMillis(intervalInMS))) {
-        self ! FilterWheelCommand.MoveOneStep(target, intervalInMS)
+      timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plus(configuration.wheelDelay))) {
+        self ! FilterWheelCommand.MoveOneStep(target)
       }
 
     if (current == target) Behaviors.same
@@ -47,6 +46,6 @@ class FilterWheelActor(cswContext: CswContext) {
 object FilterWheelActor {
   private val InitialPosition = FilterWheelPosition.F1
 
-  def behavior(cswContext: CswContext): Behavior[FilterWheelCommand] =
-    new FilterWheelActor(cswContext).behavior(InitialPosition)
+  def behavior(cswContext: CswContext, configuration: FilterWheelConfiguration): Behavior[FilterWheelCommand] =
+    new FilterWheelActor(cswContext, configuration).behavior(InitialPosition)
 }
