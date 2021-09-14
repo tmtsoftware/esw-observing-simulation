@@ -51,15 +51,21 @@ class ImagerFilterHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
   private def handleSelect(runId: Id, setup: Setup) =
     SelectCommand.getWheel1TargetPosition(setup) match {
       case Right(targetPosition) =>
+        log.info(s"Moving filter wheel to target position: $targetPosition")
         imageActor ! FilterWheelCommand.MoveWheel1(targetPosition, runId)
         Started(runId)
-      case Left(commandIssue) => Invalid(runId, commandIssue)
+      case Left(commandIssue) =>
+        log.error(s"Failed to retrieve target position, reason: ${commandIssue.reason}")
+        Invalid(runId, commandIssue)
     }
 
   private def handleSetup(runId: Id, setup: Setup) =
     setup.commandName match {
       case SelectCommand.Name => handleSelect(runId, setup)
-      case CommandName(name)  => Invalid(runId, UnsupportedCommandIssue(s"Setup command: $name not supported."))
+      case CommandName(name) =>
+        val errMsg = s"Setup command: $name not supported."
+        log.error(errMsg)
+        Invalid(runId, UnsupportedCommandIssue(errMsg))
     }
 
 }

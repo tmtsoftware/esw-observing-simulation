@@ -19,7 +19,7 @@ import scala.concurrent.duration.DurationInt
 
 object DemoApp {
   private implicit lazy val system: ActorSystem[Nothing] = ActorSystemFactory.remote(Behaviors.empty, "main")
-  private implicit lazy val timeout: Timeout             = Timeout(20.seconds)
+  private implicit lazy val timeout: Timeout             = Timeout(1.minute)
 
   private lazy val locationService     = HttpLocationServiceFactory.makeLocalClient
   private val imagerAssemblyConnection = AkkaConnection(ComponentId(Prefix(IRIS, "imager.filter"), Assembly))
@@ -31,10 +31,16 @@ object DemoApp {
     val cs             = CommandServiceFactory.make(imagerAssembly)
 
     val wheel1Setup     = Setup(Prefix("IRIS.darknight"), SelectCommand.Name, None).add(SelectCommand.Wheel1Key.set("f7"))
-    val initialResponse = Await.result(cs.submit(wheel1Setup), 10.seconds)
-
+    val initialResponse = Await.result(cs.submit(wheel1Setup), 1.minute)
     println(initialResponse)
-    val finalResponse = Await.result(cs.queryFinal(initialResponse.runId), 25.seconds)
+
+    val initialResponse2 = Await.result(cs.submit(wheel1Setup), 1.minute)
+    println(initialResponse2)
+
+    val finalResponse2 = Await.result(cs.queryFinal(initialResponse2.runId), 1.minute)
+    println(finalResponse2)
+
+    val finalResponse = Await.result(cs.queryFinal(initialResponse.runId), 1.minute)
     println(finalResponse)
   }
 }

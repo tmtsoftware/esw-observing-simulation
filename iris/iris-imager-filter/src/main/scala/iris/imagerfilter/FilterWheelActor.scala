@@ -1,9 +1,10 @@
 package iris.imagerfilter
 
-import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.actor.typed.{ActorRef, Behavior}
 import csw.framework.models.CswContext
-import csw.params.commands.CommandResponse.Completed
+import csw.params.commands.CommandIssue.AssemblyBusyIssue
+import csw.params.commands.CommandResponse.{Completed, Invalid}
 import csw.params.core.models.Id
 import csw.time.core.models.UTCTime
 import iris.imagerfilter.FilterWheelCommand.MoveStep
@@ -17,35 +18,48 @@ object FilterWheelCommand {
 }
 
 class FilterWheelActor(cswContext: CswContext, configuration: FilterWheelConfiguration) {
-  private lazy val timeServiceScheduler = cswContext.timeServiceScheduler
-  private lazy val crm                  = cswContext.commandResponseManager
+  private val timeServiceScheduler = cswContext.timeServiceScheduler
+  private val crm                  = cswContext.commandResponseManager
 
   def idle(current: FilterWheelPosition): Behavior[FilterWheelCommand] =
-    Behaviors.receiveMessage {
-      case FilterWheelCommand.MoveWheel1(target, id) => moving(id, current, target, current.step(target))
-      case FilterWheelCommand.MoveStep               => Behaviors.unhandled
+    Behaviors.receive { (ctx, msg) =>
+      val log = getLogger(ctx)
+      msg match {
+        case FilterWheelCommand.MoveWheel1(target, id) => moving(id, current, target, current.step(target))
+        case cmd @ FilterWheelCommand.MoveStep =>
+          log.error(s"Cannot accept command: $cmd in [idle] state")
+          Behaviors.unhandled
+      }
     }
 
-  private def moving(runId: Id, current: FilterWheelPosition, target: FilterWheelPosition, step: Int): Behavior[FilterWheelCommand] = {
-    if (current == target) {
-      crm.updateCommand(Completed(runId))
-      idle(current)
-    }
-    else {
-      Behaviors.setup { ctx =>
+  private def moving(runId: Id, current: FilterWheelPosition, target: FilterWheelPosition, step: Int): Behavior[FilterWheelCommand] =
+    Behaviors.setup { ctx =>
+      val log = getLogger(ctx)
+      log.info(s"Filter wheels current position is: $current")
+
+      if (current == target) {
+        log.info(s"Filter wheels target position: $current reached")
+        crm.updateCommand(Completed(runId))
+        idle(current)
+      }
+      else {
         scheduleMoveStep(ctx.self)
         Behaviors.receiveMessage {
-          case FilterWheelCommand.MoveStep         => moving(current.nextPosition(step), target, step)
-          case FilterWheelCommand.MoveWheel1(_, _) => Behaviors.unhandled
+          case FilterWheelCommand.MoveStep => moving(runId, current.nextPosition(step), target, step)
+          case cmd @ FilterWheelCommand.MoveWheel1(_, runId) =>
+            val errMsg = s"Cannot accept command: $cmd in [moving] state"
+            log.error(errMsg)
+            crm.updateCommand(Invalid(runId, AssemblyBusyIssue(errMsg)))
+            Behaviors.unhandled
         }
       }
     }
-  }
 
   private def scheduleMoveStep(self: ActorRef[FilterWheelCommand]) =
     timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plus(configuration.wheelDelay))) {
       self ! MoveStep
     }
+  private def getLogger(ctx: ActorContext[FilterWheelCommand]) = cswContext.loggerFactory.getLogger(ctx)
 }
 
 object FilterWheelActor {
