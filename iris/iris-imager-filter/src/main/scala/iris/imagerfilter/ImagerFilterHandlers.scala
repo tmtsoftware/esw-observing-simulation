@@ -51,7 +51,7 @@ class ImagerFilterHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
   private def handleSelect(runId: Id, setup: Setup) =
     SelectCommand.getWheel1TargetPosition(setup) match {
       case Right(targetPosition) =>
-        imageActor ! FilterWheelCommand.MoveWheel1(targetPosition)
+        imageActor ! FilterWheelCommand.MoveWheel1(targetPosition, runId)
         Started(runId)
       case Left(commandIssue) => Invalid(runId, commandIssue)
     }
