@@ -9,8 +9,7 @@ import iris.imagerfilter.models.FilterWheelPosition
 sealed trait FilterWheelCommand
 
 object FilterWheelCommand {
-  case class Wheel1(target: FilterWheelPosition)      extends FilterWheelCommand
-  case class MoveOneStep(target: FilterWheelPosition) extends FilterWheelCommand
+  case class MoveWheel1(target: FilterWheelPosition) extends FilterWheelCommand
 }
 
 class FilterWheelActor(cswContext: CswContext, configuration: FilterWheelConfiguration) {
@@ -19,8 +18,7 @@ class FilterWheelActor(cswContext: CswContext, configuration: FilterWheelConfigu
   def behavior(current: FilterWheelPosition): Behavior[FilterWheelCommand] = {
     Behaviors.receive { (ctx, msg) =>
       msg match {
-        case FilterWheelCommand.Wheel1(target)      => move(current, target, ctx.self)
-        case FilterWheelCommand.MoveOneStep(target) => move(current, target, ctx.self)
+        case FilterWheelCommand.MoveWheel1(target) => move(current, target, ctx.self)
       }
     }
   }
@@ -32,7 +30,7 @@ class FilterWheelActor(cswContext: CswContext, configuration: FilterWheelConfigu
   ): Behavior[FilterWheelCommand] = {
     def moveOneStep() =
       timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plus(configuration.wheelDelay))) {
-        self ! FilterWheelCommand.MoveOneStep(target)
+        self ! FilterWheelCommand.MoveWheel1(target)
       }
 
     if (current == target) Behaviors.same
