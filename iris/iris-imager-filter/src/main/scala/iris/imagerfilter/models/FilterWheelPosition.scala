@@ -1,5 +1,6 @@
 package iris.imagerfilter.models
 
+import csw.params.core.models.Choices
 import enumeratum.{Enum, EnumEntry}
 
 import scala.collection.immutable.IndexedSeq
@@ -28,6 +29,8 @@ sealed abstract class FilterWheelPosition(override val entryName: String) extend
 
 object FilterWheelPosition extends Enum[FilterWheelPosition] {
   override def values: IndexedSeq[FilterWheelPosition] = findValues
+
+  lazy val choices: Choices = Choices.from(FilterWheelPosition.values.map(_.entryName): _*)
 
   case object F1  extends FilterWheelPosition("f1")
   case object F2  extends FilterWheelPosition("f2")

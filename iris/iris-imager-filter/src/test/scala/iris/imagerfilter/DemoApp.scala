@@ -27,20 +27,24 @@ object DemoApp {
   System.setProperty("INTERFACE_NAME", "en0")
 
   def main(args: Array[String]): Unit = {
-    val imagerAssembly = Await.result(locationService.resolve(imagerAssemblyConnection, 5.seconds), 6.seconds).get
-    val cs             = CommandServiceFactory.make(imagerAssembly)
+    try {
+      val imagerAssembly = Await.result(locationService.resolve(imagerAssemblyConnection, 5.seconds), 6.seconds).get
+      val cs             = CommandServiceFactory.make(imagerAssembly)
 
-    val wheel1Setup     = Setup(Prefix("IRIS.darknight"), SelectCommand.Name, None).add(SelectCommand.Wheel1Key.set("f7"))
-    val initialResponse = Await.result(cs.submit(wheel1Setup), 1.minute)
-    println(initialResponse)
+      val targetPosition  = "f7"
+      val wheel1Setup     = Setup(Prefix("IRIS.darknight"), SelectCommand.Name, None).add(SelectCommand.Wheel1Key.set(targetPosition))
+      val initialResponse = Await.result(cs.submit(wheel1Setup), 1.minute)
+      println(initialResponse)
 
-    val initialResponse2 = Await.result(cs.submit(wheel1Setup), 1.minute)
-    println(initialResponse2)
+      val initialResponse2 = Await.result(cs.submit(wheel1Setup), 1.minute)
+      println(initialResponse2)
 
-    val finalResponse2 = Await.result(cs.queryFinal(initialResponse2.runId), 1.minute)
-    println(finalResponse2)
+      val finalResponse2 = Await.result(cs.queryFinal(initialResponse2.runId), 1.minute)
+      println(finalResponse2)
 
-    val finalResponse = Await.result(cs.queryFinal(initialResponse.runId), 1.minute)
-    println(finalResponse)
+      val finalResponse = Await.result(cs.queryFinal(initialResponse.runId), 1.minute)
+      println(finalResponse)
+    }
+    finally system.terminate()
   }
 }
