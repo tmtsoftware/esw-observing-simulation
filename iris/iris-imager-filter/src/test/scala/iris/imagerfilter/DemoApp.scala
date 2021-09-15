@@ -3,16 +3,22 @@ package iris.imagerfilter
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
 import akka.util.Timeout
+import csw.command.api.scaladsl.CommandService
 import csw.command.client.CommandServiceFactory
-import csw.location.api.models.ComponentId
-import csw.location.api.models.ComponentType.Assembly
-import csw.location.api.models.Connection.AkkaConnection
+import csw.event.client.EventServiceFactory
+import csw.event.client.models.EventStores.RedisStore
 import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.params.commands.Setup
+import csw.params.commands.{ControlCommand, Setup}
+import csw.params.core.models.Id
+import csw.params.events.Event
 import csw.prefix.models.Prefix
 import csw.prefix.models.Subsystem.IRIS
+import iris.imagerfilter.Constants.ImagerFilterAssemblyConnection
 import iris.imagerfilter.commands.SelectCommand
+import iris.imagerfilter.events.ImagerPositionEvent
+import iris.imagerfilter.models.FilterWheelPosition
+import iris.imagerfilter.models.FilterWheelPosition._
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
@@ -22,29 +28,65 @@ object DemoApp {
   private implicit lazy val timeout: Timeout             = Timeout(1.minute)
 
   private lazy val locationService     = HttpLocationServiceFactory.makeLocalClient
-  private val imagerAssemblyConnection = AkkaConnection(ComponentId(Prefix(IRIS, "imager.filter"), Assembly))
+  private lazy val redisStore          = RedisStore()
+  private lazy val eventServiceFactory = new EventServiceFactory(redisStore)
+  private lazy val eventService        = eventServiceFactory.make(locationService)
+  private lazy val eventSubscriber     = eventService.defaultSubscriber
+
+  private val sequencerPrefix = Prefix(IRIS, "darknight")
 
   System.setProperty("INTERFACE_NAME", "en0")
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     try {
-      val imagerAssembly = Await.result(locationService.resolve(imagerAssemblyConnection, 5.seconds), 6.seconds).get
-      val cs             = CommandServiceFactory.make(imagerAssembly)
+      val imagerAssembly = Await.result(locationService.resolve(ImagerFilterAssemblyConnection, 5.seconds), 6.seconds).get
+      val commandService = CommandServiceFactory.make(imagerAssembly)
 
-      val targetPosition  = "f7"
-      val wheel1Setup     = Setup(Prefix("IRIS.darknight"), SelectCommand.Name, None).add(SelectCommand.Wheel1Key.set(targetPosition))
-      val initialResponse = Await.result(cs.submit(wheel1Setup), 1.minute)
-      println(initialResponse)
-
-      val initialResponse2 = Await.result(cs.submit(wheel1Setup), 1.minute)
-      println(initialResponse2)
-
-      val finalResponse2 = Await.result(cs.queryFinal(initialResponse2.runId), 1.minute)
-      println(finalResponse2)
-
-      val finalResponse = Await.result(cs.queryFinal(initialResponse.runId), 1.minute)
-      println(finalResponse)
+      subscribeToImagerPositionEvents()
+      moveCommandScenario(commandService, F3)
+//      concurrentMoveCommandsScenario(commandService, F3)
     }
-    finally system.terminate()
+    finally shutdown()
+
+  private def moveCommandScenario(commandService: CommandService, target: FilterWheelPosition): Unit = {
+    val wheel1Setup = Setup(sequencerPrefix, SelectCommand.Name, None).add(SelectCommand.Wheel1Key.set(target.entryName))
+    val initial     = submitCommand(commandService, wheel1Setup)
+    queryFinal(commandService, initial.runId)
+  }
+
+  private def concurrentMoveCommandsScenario(commandService: CommandService, target: FilterWheelPosition): Unit = {
+    val wheel1Setup = Setup(sequencerPrefix, SelectCommand.Name, None).add(SelectCommand.Wheel1Key.set(target.entryName))
+    val initial1    = submitCommand(commandService, wheel1Setup)
+    val initial2    = submitCommand(commandService, wheel1Setup)
+    queryFinal(commandService, initial1.runId)
+    queryFinal(commandService, initial2.runId)
+  }
+
+  private def submitCommand(commandService: CommandService, command: ControlCommand) = {
+    val response = Await.result(commandService.submit(command), timeout.duration)
+    println(s"INITIAL RESPONSE: $response")
+    response
+  }
+
+  private def queryFinal(cs: CommandService, runId: Id) = {
+    val response = Await.result(cs.queryFinal(runId), timeout.duration)
+    println(s"FINAL RESPONSE: $response")
+    response
+  }
+
+  private def subscribeToImagerPositionEvents() =
+    eventSubscriber
+      .subscribe(Set(ImagerPositionEvent.ImagerPositionEventKey))
+      .runForeach(e => printImagerPositionEvent(e))
+
+  private def printImagerPositionEvent(event: Event) = for {
+    current <- event.paramType.get(ImagerPositionEvent.CurrentPositionKey).flatMap(_.get(0))
+    target  <- event.paramType.get(ImagerPositionEvent.TargetPositionKey).flatMap(_.get(0))
+    dark    <- event.paramType.get(ImagerPositionEvent.DarkKey).flatMap(_.get(0))
+  } yield println(s"$current, $target, $dark")
+
+  private def shutdown(): Unit = {
+    redisStore.redisClient.shutdown()
+    system.terminate()
   }
 }

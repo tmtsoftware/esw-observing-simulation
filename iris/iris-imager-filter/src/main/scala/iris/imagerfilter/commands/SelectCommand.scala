@@ -3,12 +3,11 @@ package iris.imagerfilter.commands
 import csw.params.commands.CommandIssue.{MissingKeyIssue, ParameterValueOutOfRangeIssue}
 import csw.params.commands.{CommandIssue, CommandName, Setup}
 import csw.params.core.generics.GChoiceKey
-import csw.params.core.generics.KeyType.ChoiceKey
 import iris.imagerfilter.models.FilterWheelPosition
 
 object SelectCommand {
   val Name: CommandName     = CommandName("SELECT")
-  val Wheel1Key: GChoiceKey = ChoiceKey.make("wheel1", FilterWheelPosition.choices)
+  val Wheel1Key: GChoiceKey = FilterWheelPosition.makeChoiceKey("wheel1")
 
   private def getTargetPosition(setup: Setup, key: GChoiceKey): Either[CommandIssue, FilterWheelPosition] = {
     val cmdName = setup.commandName.name

@@ -1,5 +1,7 @@
 package iris.imagerfilter.models
 
+import csw.params.core.generics.GChoiceKey
+import csw.params.core.generics.KeyType.ChoiceKey
 import csw.params.core.models.Choices
 import enumeratum.{Enum, EnumEntry}
 
@@ -28,7 +30,8 @@ sealed abstract class FilterWheelPosition(override val entryName: String) extend
 object FilterWheelPosition extends Enum[FilterWheelPosition] {
   override def values: IndexedSeq[FilterWheelPosition] = findValues
 
-  lazy val choices: Choices = Choices.from(FilterWheelPosition.values.map(_.entryName): _*)
+  private lazy val choices: Choices              = Choices.from(FilterWheelPosition.values.map(_.entryName): _*)
+  def makeChoiceKey(keyName: String): GChoiceKey = ChoiceKey.make(keyName, choices)
 
   case object F1  extends FilterWheelPosition("f1")
   case object F2  extends FilterWheelPosition("f2")
