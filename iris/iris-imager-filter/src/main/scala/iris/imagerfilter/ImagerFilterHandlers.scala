@@ -11,19 +11,23 @@ import csw.params.commands.{CommandName, ControlCommand, Setup}
 import csw.params.core.models.Id
 import csw.time.core.models.UTCTime
 import iris.imagerfilter.commands.SelectCommand
+import iris.imagerfilter.events.ImagerPositionEvent
 
-import scala.concurrent.ExecutionContextExecutor
+import scala.concurrent.ExecutionContext
 
 class ImagerFilterHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext) extends ComponentHandlers(ctx, cswCtx) {
 
   import cswCtx._
-  implicit val ec: ExecutionContextExecutor = ctx.executionContext
-  private val log                           = loggerFactory.getLogger
-  private val filterWheelConfiguration      = FilterWheelConfiguration(ctx.system)
-  private val imageActor                    = ctx.spawnAnonymous(FilterWheelActor.behavior(cswCtx, filterWheelConfiguration))
+  implicit val ec: ExecutionContext    = ctx.executionContext
+  private val log                      = loggerFactory.getLogger
+  private val filterWheelConfiguration = FilterWheelConfiguration(ctx.system)
+  private val imageActor               = ctx.spawnAnonymous(FilterWheelActor.behavior(cswCtx, filterWheelConfiguration))
 
   override def initialize(): Unit = {
     log.info("Initializing imager.filter...")
+    cswCtx.eventService.defaultPublisher.publish(
+      ImagerPositionEvent.make(FilterWheelActor.InitialPosition, FilterWheelActor.InitialPosition, dark = false)
+    )
   }
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {}

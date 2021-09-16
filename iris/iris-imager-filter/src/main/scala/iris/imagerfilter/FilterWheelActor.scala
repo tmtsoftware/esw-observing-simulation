@@ -49,8 +49,9 @@ class FilterWheelActor(cswContext: CswContext, configuration: FilterWheelConfigu
         scheduleMoveStep(ctx.self)
         Behaviors.receiveMessage {
           case FilterWheelCommand.MoveStep =>
-            publishPosition(current, target, dark = true)
-            moving(runId, current.nextPosition(target), target)
+            val nextPosition = current.nextPosition(target)
+            if (nextPosition != target) publishPosition(nextPosition, target, dark = true)
+            moving(runId, nextPosition, target)
           case cmd @ FilterWheelCommand.MoveWheel1(_, runId) =>
             val errMsg = s"Cannot accept command: $cmd in [moving] state"
             log.error(errMsg)
@@ -72,7 +73,7 @@ class FilterWheelActor(cswContext: CswContext, configuration: FilterWheelConfigu
 }
 
 object FilterWheelActor {
-  private val InitialPosition = FilterWheelPosition.F1
+  val InitialPosition: FilterWheelPosition = FilterWheelPosition.F1
 
   def behavior(cswContext: CswContext, configuration: FilterWheelConfiguration): Behavior[FilterWheelCommand] =
     new FilterWheelActor(cswContext, configuration).idle(InitialPosition)
