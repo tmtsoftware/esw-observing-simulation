@@ -1,6 +1,9 @@
 package iris.imagerfilter
 
+import akka.actor.typed.Scheduler
 import akka.actor.typed.scaladsl.ActorContext
+import akka.actor.typed.scaladsl.AskPattern.Askable
+import akka.util.Timeout
 import csw.command.client.messages.TopLevelActorMessage
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
@@ -10,14 +13,18 @@ import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandName, ControlCommand, Setup}
 import csw.params.core.models.Id
 import csw.time.core.models.UTCTime
+//import iris.imagerfilter.FilterWheelCommand.IsPossible
 import iris.imagerfilter.commands.SelectCommand
 import iris.imagerfilter.events.ImagerPositionEvent
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.duration.{DurationInt, FiniteDuration}
+import scala.concurrent.{Await, ExecutionContext}
 
 class ImagerFilterHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext) extends ComponentHandlers(ctx, cswCtx) {
 
   import cswCtx._
+  implicit val a: Scheduler = ctx.system.scheduler
+
   implicit val ec: ExecutionContext    = ctx.executionContext
   private val log                      = loggerFactory.getLogger
   private val filterWheelConfiguration = FilterWheelConfiguration(ctx.system)
@@ -32,7 +39,12 @@ class ImagerFilterHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {}
 
-  override def validateCommand(runId: Id, controlCommand: ControlCommand): ValidateCommandResponse = Accepted(runId)
+  override def validateCommand(runId: Id, controlCommand: ControlCommand): ValidateCommandResponse = {
+//    val timeout: FiniteDuration = 1.seconds
+//    implicit val value: Timeout = Timeout(timeout)
+//    Await.result(imageActor ? IsPossible, timeout)
+    Accepted(runId)
+  }
 
   override def onSubmit(runId: Id, controlCommand: ControlCommand): SubmitResponse =
     controlCommand match {

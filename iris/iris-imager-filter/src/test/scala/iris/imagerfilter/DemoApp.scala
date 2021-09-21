@@ -81,7 +81,7 @@ object DemoApp {
 
   private def printImagerPositionEvent(event: Event) = for {
     current <- event.paramType.get(ImagerPositionEvent.CurrentPositionKey).flatMap(_.get(0))
-    target  <- event.paramType.get(ImagerPositionEvent.TargetPositionKey).flatMap(_.get(0))
+    target  <- event.paramType.get(ImagerPositionEvent.DemandPositionKey).flatMap(_.get(0))
     dark    <- event.paramType.get(ImagerPositionEvent.DarkKey).flatMap(_.get(0))
   } yield println(s"$current, $target, $dark")
 

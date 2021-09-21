@@ -7,9 +7,9 @@ import iris.imagerfilter.Constants.ImagerFilterAssemblyPrefix
 import iris.imagerfilter.models.FilterWheelPosition
 
 object ImagerPositionEvent {
-  val CurrentPositionKey: GChoiceKey     = FilterWheelPosition.makeChoiceKey("wheel1CurrentPosition")
-  val TargetPositionKey: GChoiceKey      = FilterWheelPosition.makeChoiceKey("wheel1TargetPosition")
-  val DarkKey: Key[Boolean]              = BooleanKey.make("darkInserted")
+  val CurrentPositionKey: GChoiceKey     = FilterWheelPosition.makeChoiceKey("current")
+  val DemandPositionKey: GChoiceKey      = FilterWheelPosition.makeChoiceKey("demand")
+  val DarkKey: Key[Boolean]              = BooleanKey.make("dark")
   val ImagerPositionEventName: EventName = EventName("Wheel1Position")
   val ImagerPositionEventKey: EventKey   = EventKey(ImagerFilterAssemblyPrefix, ImagerPositionEventName)
 
@@ -19,7 +19,7 @@ object ImagerPositionEvent {
       ImagerPositionEventName,
       Set(
         CurrentPositionKey.set(current.entryName),
-        TargetPositionKey.set(target.entryName),
+        DemandPositionKey.set(target.entryName),
         DarkKey.set(dark)
       )
     )

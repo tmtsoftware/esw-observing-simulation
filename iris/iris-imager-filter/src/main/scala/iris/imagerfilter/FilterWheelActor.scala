@@ -1,5 +1,6 @@
 package iris.imagerfilter
 
+import akka.Done
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.actor.typed.{ActorRef, Behavior}
 import csw.framework.models.CswContext
@@ -16,6 +17,7 @@ sealed trait FilterWheelCommand
 object FilterWheelCommand {
   case class MoveWheel1(target: FilterWheelPosition, runId: Id) extends FilterWheelCommand
   case object MoveStep                                          extends FilterWheelCommand
+//  case class IsPossible(replyTo: ActorRef[Done])                extends FilterWheelCommand
 }
 
 class FilterWheelActor(cswContext: CswContext, configuration: FilterWheelConfiguration) {
