@@ -45,7 +45,7 @@ class ResWheelActor(cswContext: CswContext, configuration: ResWheelConfiguration
 
       if (current == target) {
         log.info(s"Res wheels target position: $current reached")
-        publishPosition(current, target, dark = false)
+        publishPosition(current, target)
         crm.updateCommand(Completed(runId))
         idle(current)
       }
@@ -61,7 +61,7 @@ class ResWheelActor(cswContext: CswContext, configuration: ResWheelConfiguration
             Behaviors.same
           case ResWheelCommand.MoveStep =>
             val nextPosition = current.nextPosition(target)
-            if (nextPosition != target) publishPosition(nextPosition, target, dark = true)
+            if (nextPosition != target) publishPosition(nextPosition, target)
             moving(runId, nextPosition, target)
         }
       }
@@ -72,7 +72,7 @@ class ResWheelActor(cswContext: CswContext, configuration: ResWheelConfiguration
       self ! MoveStep
     }
 
-  private def publishPosition(current: ResWheelPosition, target: ResWheelPosition, dark: Boolean) =
+  private def publishPosition(current: ResWheelPosition, target: ResWheelPosition) =
     eventPublisher.publish(IfsPositionEvent.make(current, target))
 
   private def getLogger(ctx: ActorContext[ResWheelCommand]) = cswContext.loggerFactory.getLogger(ctx)

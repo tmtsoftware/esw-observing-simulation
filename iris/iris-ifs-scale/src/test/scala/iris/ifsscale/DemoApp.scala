@@ -1,4 +1,4 @@
-package iris.ifsres
+package iris.ifsscale
 
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
@@ -14,11 +14,11 @@ import csw.params.core.models.Id
 import csw.params.events.Event
 import csw.prefix.models.Prefix
 import csw.prefix.models.Subsystem.IRIS
-import iris.ifsres.commands.SelectCommand
-import iris.ifsres.models.ResWheelPosition
-import Constants.IfsResAssemblyConnection
-import ResWheelPosition._
-import iris.ifsres.events.IfsPositionEvent
+import iris.ifsscale.Constants.IfsScaleAssemblyConnection
+import iris.ifsscale.commands.SelectCommand
+import iris.ifsscale.events.IfsScaleEvent
+import iris.ifsscale.models.ScaleLevel
+import iris.ifsscale.models.ScaleLevel._
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
@@ -39,28 +39,28 @@ object DemoApp {
 
   def main(args: Array[String]): Unit =
     try {
-      val imagerAssembly = Await.result(locationService.resolve(IfsResAssemblyConnection, 5.seconds), 6.seconds).get
-      val commandService = CommandServiceFactory.make(imagerAssembly)
+      val scaleAssembly  = Await.result(locationService.resolve(IfsScaleAssemblyConnection, 5.seconds), 6.seconds).get
+      val commandService = CommandServiceFactory.make(scaleAssembly)
 
-      subscribeToIfsPositionEvents()
+      subscribeToIfsScaleEvents()
       Thread.sleep(5000)
-      moveCommandScenario(commandService, Mirror)
-//      concurrentMoveCommandsScenario(commandService, R4000_H_K)
+//      moveCommandScenario(commandService, S4)
+      concurrentMoveCommandsScenario(commandService, S50)
     }
     finally shutdown()
 
-  private def moveCommandScenario(commandService: CommandService, target: ResWheelPosition): Unit = {
-    val spectralResolutionSetup =
-      Setup(sequencerPrefix, SelectCommand.Name, None).add(SelectCommand.SpectralResolutionKey.set(target.entryName))
-    val initial = submitCommand(commandService, spectralResolutionSetup)
+  private def moveCommandScenario(commandService: CommandService, target: ScaleLevel): Unit = {
+    val scaleSetup =
+      Setup(sequencerPrefix, SelectCommand.Name, None).add(SelectCommand.ScaleKey.set(target.entryName))
+    val initial = submitCommand(commandService, scaleSetup)
     queryFinal(commandService, initial.runId)
   }
 
-  private def concurrentMoveCommandsScenario(commandService: CommandService, target: ResWheelPosition): Unit = {
-    val spectralResolutionSetup =
-      Setup(sequencerPrefix, SelectCommand.Name, None).add(SelectCommand.SpectralResolutionKey.set(target.entryName))
-    val initial1 = submitCommand(commandService, spectralResolutionSetup)
-    val initial2 = submitCommand(commandService, spectralResolutionSetup)
+  private def concurrentMoveCommandsScenario(commandService: CommandService, target: ScaleLevel): Unit = {
+    val scaleSetup =
+      Setup(sequencerPrefix, SelectCommand.Name, None).add(SelectCommand.ScaleKey.set(target.entryName))
+    val initial1 = submitCommand(commandService, scaleSetup)
+    val initial2 = submitCommand(commandService, scaleSetup)
     queryFinal(commandService, initial1.runId)
     queryFinal(commandService, initial2.runId)
   }
@@ -77,14 +77,14 @@ object DemoApp {
     response
   }
 
-  private def subscribeToIfsPositionEvents() =
+  private def subscribeToIfsScaleEvents() =
     eventSubscriber
-      .subscribe(Set(IfsPositionEvent.IfsResPositionEventKey))
-      .runForeach(e => printIfsPositionEvent(e))
+      .subscribe(Set(IfsScaleEvent.IfsScaleEventKey))
+      .runForeach(e => printScaleEvent(e))
 
-  private def printIfsPositionEvent(event: Event) = for {
-    current <- event.paramType.get(IfsPositionEvent.CurrentPositionKey).flatMap(_.get(0))
-    target  <- event.paramType.get(IfsPositionEvent.TargetPositionKey).flatMap(_.get(0))
+  private def printScaleEvent(event: Event) = for {
+    current <- event.paramType.get(IfsScaleEvent.CurrentScaleKey).flatMap(_.get(0))
+    target  <- event.paramType.get(IfsScaleEvent.TargetScaleKey).flatMap(_.get(0))
   } yield println(s"$current, $target")
 
   private def shutdown(): Unit = {

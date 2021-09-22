@@ -19,11 +19,19 @@ lazy val `iris-ifs-res` = project
     libraryDependencies ++= Dependencies.ImagerFilter
   )
 
+// assembly3 module
+lazy val `iris-ifs-scale` = project
+  .in(file("iris-ifs-scale"))
+  .settings(
+    libraryDependencies ++= Dependencies.ImagerFilter
+  )
+
 // deploy module
 lazy val `iris-irisdeploy` = project
   .dependsOn(
     `iris-imager-filter`,
-    `iris-ifs-res`
+    `iris-ifs-res`,
+    `iris-ifs-scale`
   )
   .enablePlugins(CswBuildInfo)
   .settings(
