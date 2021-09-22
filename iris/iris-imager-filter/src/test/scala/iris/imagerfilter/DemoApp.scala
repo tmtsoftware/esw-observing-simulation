@@ -43,8 +43,9 @@ object DemoApp {
       val commandService = CommandServiceFactory.make(imagerAssembly)
 
       subscribeToImagerPositionEvents()
+      Thread.sleep(5000)
       moveCommandScenario(commandService, F3)
-//      concurrentMoveCommandsScenario(commandService, F3)
+//      concurrentMoveCommandsScenario(commandService, F8)
     }
     finally shutdown()
 

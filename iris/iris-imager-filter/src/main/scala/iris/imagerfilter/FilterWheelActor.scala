@@ -1,11 +1,10 @@
 package iris.imagerfilter
 
-import akka.Done
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.actor.typed.{ActorRef, Behavior}
 import csw.framework.models.CswContext
 import csw.params.commands.CommandIssue.AssemblyBusyIssue
-import csw.params.commands.CommandResponse.{Completed, Invalid}
+import csw.params.commands.CommandResponse.{Accepted, Completed, Invalid, ValidateCommandResponse}
 import csw.params.core.models.Id
 import csw.time.core.models.UTCTime
 import iris.imagerfilter.FilterWheelCommand.MoveStep
@@ -15,9 +14,9 @@ import iris.imagerfilter.models.FilterWheelPosition
 sealed trait FilterWheelCommand
 
 object FilterWheelCommand {
-  case class MoveWheel1(target: FilterWheelPosition, runId: Id) extends FilterWheelCommand
-  case object MoveStep                                          extends FilterWheelCommand
-//  case class IsPossible(replyTo: ActorRef[Done])                extends FilterWheelCommand
+  case class MoveWheel1(target: FilterWheelPosition, runId: Id)                 extends FilterWheelCommand
+  case object MoveStep                                                          extends FilterWheelCommand
+  case class IsValidMove(runId: Id, replyTo: ActorRef[ValidateCommandResponse]) extends FilterWheelCommand
 }
 
 class FilterWheelActor(cswContext: CswContext, configuration: FilterWheelConfiguration) {
@@ -29,6 +28,9 @@ class FilterWheelActor(cswContext: CswContext, configuration: FilterWheelConfigu
     Behaviors.receive { (ctx, msg) =>
       val log = getLogger(ctx)
       msg match {
+        case FilterWheelCommand.IsValidMove(runId, replyTo) =>
+          replyTo ! Accepted(runId)
+          Behaviors.same
         case FilterWheelCommand.MoveWheel1(target, id) => moving(id, current, target)
         case cmd @ FilterWheelCommand.MoveStep =>
           log.error(s"Cannot accept command: $cmd in [idle] state")
@@ -50,6 +52,12 @@ class FilterWheelActor(cswContext: CswContext, configuration: FilterWheelConfigu
       else {
         scheduleMoveStep(ctx.self)
         Behaviors.receiveMessage {
+          case FilterWheelCommand.IsValidMove(runId, replyTo) =>
+            val errMsg = s"Cannot accept command in [moving] state"
+            log.error(errMsg)
+            val issue = AssemblyBusyIssue(errMsg)
+            replyTo ! Invalid(runId, issue)
+            Behaviors.same
           case FilterWheelCommand.MoveStep =>
             val nextPosition = current.nextPosition(target)
             if (nextPosition != target) publishPosition(nextPosition, target, dark = true)
