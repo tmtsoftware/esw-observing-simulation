@@ -1,8 +1,8 @@
 package iris.ifsres
 
-import akka.actor.typed.Scheduler
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.AskPattern.Askable
+import akka.actor.typed.{ActorRef, Scheduler}
 import akka.util.Timeout
 import csw.command.client.messages.TopLevelActorMessage
 import csw.framework.models.CswContext
@@ -13,12 +13,12 @@ import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandName, ControlCommand, Setup}
 import csw.params.core.models.Id
 import csw.time.core.models.UTCTime
+import iris.ifsres.ResWheelCommand.IsValidMove
 import iris.ifsres.commands.SelectCommand
 import iris.ifsres.events.IfsPositionEvent
-//import ResWheelCommand.IsPossible
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
-import scala.concurrent.{Await, ExecutionContext}
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 class IfsResHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext) extends ComponentHandlers(ctx, cswCtx) {
 
@@ -40,10 +40,12 @@ class IfsResHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {}
 
   override def validateCommand(runId: Id, controlCommand: ControlCommand): ValidateCommandResponse = {
-//    val timeout: FiniteDuration = 1.seconds
-//    implicit val value: Timeout = Timeout(timeout)
-//    Await.result(ifsActor ? IsPossible, timeout)
-    Accepted(runId)
+    val timeout: FiniteDuration = 1.seconds
+    implicit val value: Timeout = Timeout(timeout)
+    val eventualValidateResponse: Future[ValidateCommandResponse] = ifsActor ? { x: ActorRef[ValidateCommandResponse] =>
+      IsValidMove(runId, x)
+    }
+    Await.result(eventualValidateResponse, timeout)
   }
 
   override def onSubmit(runId: Id, controlCommand: ControlCommand): SubmitResponse =

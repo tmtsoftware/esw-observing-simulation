@@ -57,16 +57,12 @@ class FilterWheelActor(cswContext: CswContext, configuration: FilterWheelConfigu
             log.error(errMsg)
             val issue = AssemblyBusyIssue(errMsg)
             replyTo ! Invalid(runId, issue)
+            crm.updateCommand(Invalid(runId, AssemblyBusyIssue(errMsg)))
             Behaviors.same
           case FilterWheelCommand.MoveStep =>
             val nextPosition = current.nextPosition(target)
             if (nextPosition != target) publishPosition(nextPosition, target, dark = true)
             moving(runId, nextPosition, target)
-          case cmd @ FilterWheelCommand.MoveWheel1(_, runId) =>
-            val errMsg = s"Cannot accept command: $cmd in [moving] state"
-            log.error(errMsg)
-            crm.updateCommand(Invalid(runId, AssemblyBusyIssue(errMsg)))
-            Behaviors.unhandled
         }
       }
     }

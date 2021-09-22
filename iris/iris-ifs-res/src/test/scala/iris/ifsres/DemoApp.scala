@@ -71,8 +71,8 @@ object DemoApp {
     response
   }
 
-  private def queryFinal(cs: CommandService, runId: Id) = {
-    val response = Await.result(cs.queryFinal(runId), timeout.duration)
+  private def queryFinal(commandService: CommandService, runId: Id) = {
+    val response = Await.result(commandService.queryFinal(runId), timeout.duration)
     println(s"FINAL RESPONSE: $response")
     response
   }
