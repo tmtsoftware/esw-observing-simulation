@@ -17,9 +17,9 @@ abstract class WheelAssembly[B <: Position[B]](cswContext: CswContext, configura
   private val timeServiceScheduler = cswContext.timeServiceScheduler
   private val crm                  = cswContext.commandResponseManager
 
-  protected val name:String
+  protected val name: String
   protected def publishPosition(current: B, target: B, dark: Boolean): Future[Done]
-  private def unhandledMessage(state:String) = s"$name: Cannot accept command: move in [$state] state"
+  private def unhandledMessage(state: String) = s"$name: Cannot accept command: move in [$state] state"
 
   final def idle(current: B): Behavior[WheelCommand[B]] =
     Behaviors.receive { (ctx, msg) =>

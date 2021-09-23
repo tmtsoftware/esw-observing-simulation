@@ -14,7 +14,7 @@ class FilterWheelActor(cswContext: CswContext, configuration: WheelConfiguration
     extends WheelAssembly[FilterWheelPosition](cswContext, configuration) {
   private lazy val eventPublisher = cswContext.eventService.defaultPublisher
 
-  protected val name:String = "Filter Wheel"
+  protected val name: String = "Filter Wheel"
   def publishPosition(current: FilterWheelPosition, target: FilterWheelPosition, dark: Boolean): Future[Done] =
     eventPublisher.publish(ImagerPositionEvent.make(current, target, dark))
 }

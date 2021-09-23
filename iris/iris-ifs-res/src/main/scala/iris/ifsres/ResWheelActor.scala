@@ -10,10 +10,11 @@ import iris.ifsres.models.ResWheelPosition
 
 import scala.concurrent.Future
 
-class ResWheelActor(cswContext: CswContext, configuration: WheelConfiguration) extends WheelAssembly[ResWheelPosition](cswContext, configuration){
-  private lazy val eventPublisher  = cswContext.eventService.defaultPublisher
+class ResWheelActor(cswContext: CswContext, configuration: WheelConfiguration)
+    extends WheelAssembly[ResWheelPosition](cswContext, configuration) {
+  private lazy val eventPublisher = cswContext.eventService.defaultPublisher
 
-  protected val name:String = "Res Wheel"
+  protected val name: String = "Res Wheel"
   override def publishPosition(current: ResWheelPosition, target: ResWheelPosition, dark: Boolean): Future[Done] =
     eventPublisher.publish(IfsPositionEvent.make(current, target))
 }

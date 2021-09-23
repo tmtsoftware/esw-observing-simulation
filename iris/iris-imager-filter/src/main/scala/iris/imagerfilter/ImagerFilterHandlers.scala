@@ -29,7 +29,7 @@ class ImagerFilterHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
   implicit val ec: ExecutionContext    = ctx.executionContext
   private val log                      = loggerFactory.getLogger
   private val filterWheelConfiguration = WheelConfiguration(ctx.system.settings.config.getConfig("iris.imager.filter"))
-  private val imagerActor               = ctx.spawnAnonymous(FilterWheelActor.behavior(cswCtx, filterWheelConfiguration))
+  private val imagerActor              = ctx.spawnAnonymous(FilterWheelActor.behavior(cswCtx, filterWheelConfiguration))
 
   override def initialize(): Unit = {
     log.info("Initializing imager.filter...")

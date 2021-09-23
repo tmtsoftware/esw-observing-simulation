@@ -12,9 +12,9 @@ import scala.concurrent.Future
 
 class ScaleWheelActor(cswContext: CswContext, configuration: WheelConfiguration)
     extends WheelAssembly[ScaleLevel](cswContext, configuration) {
-  private lazy val eventPublisher  = cswContext.eventService.defaultPublisher
+  private lazy val eventPublisher = cswContext.eventService.defaultPublisher
 
-  protected val name:String = "Scale Wheel"
+  protected val name: String = "Scale Wheel"
   override def publishPosition(current: ScaleLevel, target: ScaleLevel, dark: Boolean): Future[Done] =
     eventPublisher.publish(IfsScaleEvent.make(current, target))
 }

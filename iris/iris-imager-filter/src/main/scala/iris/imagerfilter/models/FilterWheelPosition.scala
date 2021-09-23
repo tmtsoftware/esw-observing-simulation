@@ -8,7 +8,6 @@ import iris.commons.models.{Position, LinearPosition}
 
 import scala.collection.immutable.IndexedSeq
 
-
 sealed abstract class FilterWheelPosition(override val entryName: String) extends LinearPosition[FilterWheelPosition] {
 
   override def getIndexOf(currentPos: Position[FilterWheelPosition]): Int = FilterWheelPosition.values.indexOf(currentPos)

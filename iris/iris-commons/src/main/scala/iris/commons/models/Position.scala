@@ -2,11 +2,11 @@ package iris.commons.models
 
 import enumeratum.EnumEntry
 
-trait Position[T <: Position[T]] extends EnumEntry{
+trait Position[T <: Position[T]] extends EnumEntry {
   def nextPosition(target: T): T
 }
 
-trait LinearPosition[T <: LinearPosition[T]]  extends Position[T] {
+trait LinearPosition[T <: LinearPosition[T]] extends Position[T] {
   protected def getIndexOf(currentPos: Position[T]): Int
   protected def nextPosition(step: Int): T
 
