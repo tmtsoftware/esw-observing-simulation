@@ -13,7 +13,7 @@ import iris.commons.models.{Position, WheelCommand, WheelConfiguration}
 
 import scala.concurrent.Future
 
-abstract class GeneralAssembly[B <: Position[B]](cswContext: CswContext, configuration: WheelConfiguration) {
+abstract class WheelAssembly[B <: Position[B]](cswContext: CswContext, configuration: WheelConfiguration) {
   private val timeServiceScheduler = cswContext.timeServiceScheduler
   private val crm                  = cswContext.commandResponseManager
 

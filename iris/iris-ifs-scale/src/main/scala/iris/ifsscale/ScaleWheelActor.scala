@@ -3,7 +3,7 @@ package iris.ifsscale
 import akka.Done
 import akka.actor.typed.Behavior
 import csw.framework.models.CswContext
-import iris.commons.GeneralAssembly
+import iris.commons.WheelAssembly
 import iris.commons.models.{WheelCommand, WheelConfiguration}
 import iris.ifsscale.events.IfsScaleEvent
 import iris.ifsscale.models.ScaleLevel
@@ -11,7 +11,7 @@ import iris.ifsscale.models.ScaleLevel
 import scala.concurrent.Future
 
 class ScaleWheelActor(cswContext: CswContext, configuration: WheelConfiguration)
-    extends GeneralAssembly[ScaleLevel](cswContext, configuration) {
+    extends WheelAssembly[ScaleLevel](cswContext, configuration) {
   private lazy val eventPublisher  = cswContext.eventService.defaultPublisher
 
   protected val name:String = "Scale Wheel"

@@ -3,7 +3,7 @@ package iris.imagerfilter
 import akka.Done
 import akka.actor.typed.Behavior
 import csw.framework.models.CswContext
-import iris.commons.GeneralAssembly
+import iris.commons.WheelAssembly
 import iris.commons.models.{WheelCommand, WheelConfiguration}
 import iris.imagerfilter.events.ImagerPositionEvent
 import iris.imagerfilter.models.FilterWheelPosition
@@ -11,7 +11,7 @@ import iris.imagerfilter.models.FilterWheelPosition
 import scala.concurrent.Future
 
 class FilterWheelActor(cswContext: CswContext, configuration: WheelConfiguration)
-    extends GeneralAssembly[FilterWheelPosition](cswContext, configuration) {
+    extends WheelAssembly[FilterWheelPosition](cswContext, configuration) {
   private lazy val eventPublisher = cswContext.eventService.defaultPublisher
 
   protected val name:String = "Filter Wheel"

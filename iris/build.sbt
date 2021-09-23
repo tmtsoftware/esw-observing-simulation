@@ -1,6 +1,9 @@
 lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `iris-imager-filter`,
-  `iris-irisdeploy`
+  `iris-irisdeploy`,
+  `iris-ifs-res`,
+  `iris-ifs-scale`,
+  `iris-commons`
 )
 
 lazy val `iris-root` = project
