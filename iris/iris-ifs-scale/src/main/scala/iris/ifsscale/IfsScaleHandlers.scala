@@ -13,7 +13,8 @@ import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandName, ControlCommand, Setup}
 import csw.params.core.models.Id
 import csw.time.core.models.UTCTime
-import iris.ifsscale.ScaleWheelCommand.IsValidMove
+import iris.commons.models.WheelCommand.IsValidMove
+import iris.commons.models.{WheelCommand, WheelConfiguration}
 import iris.ifsscale.commands.SelectCommand
 import iris.ifsscale.events.IfsScaleEvent
 
@@ -27,7 +28,7 @@ class IfsScaleHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswConte
 
   implicit val ec: ExecutionContext   = ctx.executionContext
   private val log                     = loggerFactory.getLogger
-  private val scaleWheelConfiguration = ScaleWheelConfiguration(ctx.system)
+  private val scaleWheelConfiguration = WheelConfiguration(ctx.system.settings.config.getConfig("iris.ifs.scale"))
   private val ifsActor                = ctx.spawnAnonymous(ScaleWheelActor.behavior(cswCtx, scaleWheelConfiguration))
 
   override def initialize(): Unit = {
@@ -70,7 +71,7 @@ class IfsScaleHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswConte
     SelectCommand.getTargetScale(setup) match {
       case Right(targetPosition) =>
         log.info(s"Moving scale wheel to target position: $targetPosition")
-        ifsActor ! ScaleWheelCommand.UpdateScale(targetPosition, runId)
+        ifsActor ! WheelCommand.Move(targetPosition, runId)
         Started(runId)
       case Left(commandIssue) =>
         log.error(s"Failed to retrieve target position, reason: ${commandIssue.reason}")

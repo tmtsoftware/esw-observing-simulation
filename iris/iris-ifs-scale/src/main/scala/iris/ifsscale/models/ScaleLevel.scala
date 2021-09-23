@@ -3,11 +3,14 @@ package iris.ifsscale.models
 import csw.params.core.generics.GChoiceKey
 import csw.params.core.generics.KeyType.ChoiceKey
 import csw.params.core.models.{Choices, Units}
-import enumeratum.{Enum, EnumEntry}
+import enumeratum.Enum
+import iris.commons.models.Position
 
 import scala.collection.immutable.IndexedSeq
 
-sealed class ScaleLevel(override val entryName: String) extends EnumEntry
+sealed class ScaleLevel(override val entryName: String) extends Position[ScaleLevel] {
+  override def nextPosition(target: ScaleLevel): ScaleLevel = target
+}
 
 object ScaleLevel extends Enum[ScaleLevel] {
   override def values: IndexedSeq[ScaleLevel] = findValues

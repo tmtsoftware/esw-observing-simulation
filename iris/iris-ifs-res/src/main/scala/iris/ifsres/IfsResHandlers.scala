@@ -13,7 +13,8 @@ import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandName, ControlCommand, Setup}
 import csw.params.core.models.Id
 import csw.time.core.models.UTCTime
-import iris.ifsres.ResWheelCommand.IsValidMove
+import iris.commons.models.WheelCommand.IsValidMove
+import iris.commons.models.{WheelCommand, WheelConfiguration}
 import iris.ifsres.commands.SelectCommand
 import iris.ifsres.events.IfsPositionEvent
 
@@ -27,7 +28,7 @@ class IfsResHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext
 
   implicit val ec: ExecutionContext = ctx.executionContext
   private val log                   = loggerFactory.getLogger
-  private val resWheelConfiguration = ResWheelConfiguration(ctx.system)
+  private val resWheelConfiguration = WheelConfiguration(ctx.system.settings.config.getConfig("iris.ifs.res"))
   private val ifsActor              = ctx.spawnAnonymous(ResWheelActor.behavior(cswCtx, resWheelConfiguration))
 
   override def initialize(): Unit = {
@@ -70,7 +71,7 @@ class IfsResHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext
     SelectCommand.getSpectralResolutionTargetPosition(setup) match {
       case Right(targetPosition) =>
         log.info(s"Moving res wheel to target position: $targetPosition")
-        ifsActor ! ResWheelCommand.MoveSpectralResolution(targetPosition, runId)
+        ifsActor ! WheelCommand.Move(targetPosition, runId)
         Started(runId)
       case Left(commandIssue) =>
         log.error(s"Failed to retrieve target position, reason: ${commandIssue.reason}")

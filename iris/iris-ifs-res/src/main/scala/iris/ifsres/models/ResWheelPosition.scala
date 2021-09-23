@@ -3,28 +3,22 @@ package iris.ifsres.models
 import csw.params.core.generics.GChoiceKey
 import csw.params.core.generics.KeyType.ChoiceKey
 import csw.params.core.models.Choices
-import enumeratum.{Enum, EnumEntry}
+import enumeratum.Enum
+import iris.commons.models.{Position, LinearPosition}
 
 import scala.collection.immutable.IndexedSeq
 
-sealed abstract class ResWheelPosition(override val entryName: String) extends EnumEntry {
-  def nextPosition(target: ResWheelPosition): ResWheelPosition = nextPosition(step(target))
+sealed abstract class ResWheelPosition(override val entryName: String) extends LinearPosition[ResWheelPosition] {
 
-  def nextPosition(step: Int): ResWheelPosition = {
-    val currId = ResWheelPosition.values.indexOf(this)
+  override protected def getIndexOf(currentPos: Position[ResWheelPosition]): Int = ResWheelPosition.values.indexOf(currentPos)
+
+  override def nextPosition(step: Int): ResWheelPosition = {
+    val currId = getIndexOf(this)
     val nextId = currId + step
     if (nextId < 0 || nextId >= ResWheelPosition.values.length) this
     else ResWheelPosition.values(nextId)
   }
 
-  def step(target: ResWheelPosition): Int = {
-    val currId   = ResWheelPosition.indexOf(this)
-    val targetId = ResWheelPosition.indexOf(target)
-
-    if (this == target) 0
-    else if (currId > targetId) -1
-    else +1
-  }
 }
 
 object ResWheelPosition extends Enum[ResWheelPosition] {

@@ -13,7 +13,8 @@ import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandName, ControlCommand, Setup}
 import csw.params.core.models.Id
 import csw.time.core.models.UTCTime
-import iris.imagerfilter.FilterWheelCommand.IsValidMove
+import iris.commons.models.WheelCommand.IsValidMove
+import iris.commons.models.{WheelCommand, WheelConfiguration}
 import iris.imagerfilter.commands.SelectCommand
 import iris.imagerfilter.events.ImagerPositionEvent
 
@@ -27,8 +28,8 @@ class ImagerFilterHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
 
   implicit val ec: ExecutionContext    = ctx.executionContext
   private val log                      = loggerFactory.getLogger
-  private val filterWheelConfiguration = FilterWheelConfiguration(ctx.system)
-  private val imagerActor              = ctx.spawnAnonymous(FilterWheelActor.behavior(cswCtx, filterWheelConfiguration))
+  private val filterWheelConfiguration = WheelConfiguration(ctx.system.settings.config.getConfig("iris.imager.filter"))
+  private val imagerActor               = ctx.spawnAnonymous(FilterWheelActor.behavior(cswCtx, filterWheelConfiguration))
 
   override def initialize(): Unit = {
     log.info("Initializing imager.filter...")
@@ -70,7 +71,7 @@ class ImagerFilterHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
     SelectCommand.getWheel1TargetPosition(setup) match {
       case Right(targetPosition) =>
         log.info(s"Moving filter wheel to target position: $targetPosition")
-        imagerActor ! FilterWheelCommand.MoveWheel1(targetPosition, runId)
+        imagerActor ! WheelCommand.Move(targetPosition, runId)
         Started(runId)
       case Left(commandIssue) =>
         log.error(s"Failed to retrieve target position, reason: ${commandIssue.reason}")

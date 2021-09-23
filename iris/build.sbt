@@ -9,12 +9,14 @@ lazy val `iris-root` = project
 
 // assembly module
 lazy val `iris-imager-filter` = project
+  .dependsOn(`iris-commons`)
   .settings(
     libraryDependencies ++= Dependencies.ImagerFilter
   )
 
 // assembly2 module
 lazy val `iris-ifs-res` = project
+  .dependsOn(`iris-commons`)
   .settings(
     libraryDependencies ++= Dependencies.ImagerFilter
   )
@@ -22,6 +24,7 @@ lazy val `iris-ifs-res` = project
 // assembly3 module
 lazy val `iris-ifs-scale` = project
   .in(file("iris-ifs-scale"))
+  .dependsOn(`iris-commons`)
   .settings(
     libraryDependencies ++= Dependencies.ImagerFilter
   )
@@ -36,4 +39,10 @@ lazy val `iris-irisdeploy` = project
   .enablePlugins(CswBuildInfo)
   .settings(
     libraryDependencies ++= Dependencies.IrisDeploy
+  )
+
+//common module
+lazy val `iris-commons` = project
+  .settings(
+    libraryDependencies ++= Dependencies.IrisCommons
   )

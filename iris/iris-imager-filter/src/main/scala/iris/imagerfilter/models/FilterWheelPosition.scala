@@ -3,28 +3,23 @@ package iris.imagerfilter.models
 import csw.params.core.generics.GChoiceKey
 import csw.params.core.generics.KeyType.ChoiceKey
 import csw.params.core.models.Choices
-import enumeratum.{Enum, EnumEntry}
+import enumeratum.Enum
+import iris.commons.models.{Position, LinearPosition}
 
 import scala.collection.immutable.IndexedSeq
 
-sealed abstract class FilterWheelPosition(override val entryName: String) extends EnumEntry {
-  def nextPosition(target: FilterWheelPosition): FilterWheelPosition = nextPosition(step(target))
 
-  def nextPosition(step: Int): FilterWheelPosition = {
-    val currId = FilterWheelPosition.values.indexOf(this)
+sealed abstract class FilterWheelPosition(override val entryName: String) extends LinearPosition[FilterWheelPosition] {
+
+  override def getIndexOf(currentPos: Position[FilterWheelPosition]): Int = FilterWheelPosition.values.indexOf(currentPos)
+
+  override def nextPosition(step: Int): FilterWheelPosition = {
+    val currId = getIndexOf(this)
     val nextId = currId + step
     if (nextId < 0 || nextId >= FilterWheelPosition.values.length) this
     else FilterWheelPosition.values(nextId)
   }
 
-  def step(target: FilterWheelPosition): Int = {
-    val currId   = FilterWheelPosition.indexOf(this)
-    val targetId = FilterWheelPosition.indexOf(target)
-
-    if (this == target) 0
-    else if (currId > targetId) -1
-    else +1
-  }
 }
 
 object FilterWheelPosition extends Enum[FilterWheelPosition] {
