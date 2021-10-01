@@ -3,6 +3,7 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `iris-irisdeploy`,
   `iris-ifs-res`,
   `iris-ifs-scale`,
+  `iris-imager-adc`,
   `iris-commons`
 )
 
@@ -14,14 +15,14 @@ lazy val `iris-root` = project
 lazy val `iris-imager-filter` = project
   .dependsOn(`iris-commons`)
   .settings(
-    libraryDependencies ++= Dependencies.ImagerFilter
+    libraryDependencies ++= Dependencies.IrisAssemblies
   )
 
 // assembly2 module
 lazy val `iris-ifs-res` = project
   .dependsOn(`iris-commons`)
   .settings(
-    libraryDependencies ++= Dependencies.ImagerFilter
+    libraryDependencies ++= Dependencies.IrisAssemblies
   )
 
 // assembly3 module
@@ -29,7 +30,14 @@ lazy val `iris-ifs-scale` = project
   .in(file("iris-ifs-scale"))
   .dependsOn(`iris-commons`)
   .settings(
-    libraryDependencies ++= Dependencies.ImagerFilter
+    libraryDependencies ++= Dependencies.IrisAssemblies
+  )
+// assembly4 module
+lazy val `iris-imager-adc` = project
+  .in(file("iris-imager-adc"))
+  .dependsOn(`iris-commons`)
+  .settings(
+    libraryDependencies ++= Dependencies.IrisAssemblies
   )
 
 // deploy module
