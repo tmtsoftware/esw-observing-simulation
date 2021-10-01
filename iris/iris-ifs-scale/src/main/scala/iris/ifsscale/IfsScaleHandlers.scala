@@ -14,7 +14,7 @@ import csw.params.commands.{CommandName, ControlCommand, Setup}
 import csw.params.core.models.Id
 import csw.time.core.models.UTCTime
 import iris.commons.models.WheelCommand.IsValidMove
-import iris.commons.models.{WheelCommand, WheelConfiguration}
+import iris.commons.models.{WheelCommand, AssemblyConfiguration}
 import iris.ifsscale.commands.SelectCommand
 import iris.ifsscale.events.IfsScaleEvent
 
@@ -28,7 +28,7 @@ class IfsScaleHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswConte
 
   implicit val ec: ExecutionContext   = ctx.executionContext
   private val log                     = loggerFactory.getLogger
-  private val scaleWheelConfiguration = WheelConfiguration(ctx.system.settings.config.getConfig("iris.ifs.scale"))
+  private val scaleWheelConfiguration = AssemblyConfiguration(ctx.system.settings.config.getConfig("iris.ifs.scale"))
   private val ifsActor                = ctx.spawnAnonymous(ScaleWheelActor.behavior(cswCtx, scaleWheelConfiguration))
 
   override def initialize(): Unit = {

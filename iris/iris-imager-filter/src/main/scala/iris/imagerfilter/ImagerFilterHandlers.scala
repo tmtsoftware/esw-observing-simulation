@@ -14,7 +14,7 @@ import csw.params.commands.{CommandName, ControlCommand, Setup}
 import csw.params.core.models.Id
 import csw.time.core.models.UTCTime
 import iris.commons.models.WheelCommand.IsValidMove
-import iris.commons.models.{WheelCommand, WheelConfiguration}
+import iris.commons.models.{WheelCommand, AssemblyConfiguration}
 import iris.imagerfilter.commands.SelectCommand
 import iris.imagerfilter.events.ImagerPositionEvent
 
@@ -28,7 +28,7 @@ class ImagerFilterHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
 
   implicit val ec: ExecutionContext    = ctx.executionContext
   private val log                      = loggerFactory.getLogger
-  private val filterWheelConfiguration = WheelConfiguration(ctx.system.settings.config.getConfig("iris.imager.filter"))
+  private val filterWheelConfiguration = AssemblyConfiguration(ctx.system.settings.config.getConfig("iris.imager.filter"))
   private val imagerActor              = ctx.spawnAnonymous(FilterWheelActor.behavior(cswCtx, filterWheelConfiguration))
 
   override def initialize(): Unit = {

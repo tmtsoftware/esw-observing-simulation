@@ -2,7 +2,7 @@ import sbt._
 
 object Dependencies {
 
-  val ImagerFilter = Seq(
+  val IrisAssemblies = Seq(
     CSW.`csw-testkit` % Test,
     Libs.`scalatest`  % Test,
     Libs.`junit-4-13` % Test

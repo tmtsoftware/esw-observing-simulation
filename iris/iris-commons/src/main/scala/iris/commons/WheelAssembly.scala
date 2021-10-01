@@ -9,11 +9,11 @@ import csw.params.commands.CommandResponse.{Accepted, Completed, Invalid}
 import csw.params.core.models.Id
 import csw.time.core.models.UTCTime
 import iris.commons.models.WheelCommand.MoveStep
-import iris.commons.models.{Position, WheelCommand, WheelConfiguration}
+import iris.commons.models.{Position, WheelCommand, AssemblyConfiguration}
 
 import scala.concurrent.Future
 
-abstract class WheelAssembly[B <: Position[B]](cswContext: CswContext, configuration: WheelConfiguration) {
+abstract class WheelAssembly[B <: Position[B]](cswContext: CswContext, configuration: AssemblyConfiguration) {
   private val timeServiceScheduler = cswContext.timeServiceScheduler
   private val crm                  = cswContext.commandResponseManager
 
@@ -75,7 +75,7 @@ abstract class WheelAssembly[B <: Position[B]](cswContext: CswContext, configura
     }
 
   private def scheduleMoveStep(self: ActorRef[WheelCommand[B]]) =
-    timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plus(configuration.wheelDelay))) {
+    timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plus(configuration.movementDelay))) {
       self ! MoveStep
     }
 
