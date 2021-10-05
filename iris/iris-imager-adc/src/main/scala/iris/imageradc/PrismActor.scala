@@ -5,17 +5,17 @@ import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.Behaviors
 import csw.framework.models.CswContext
 import iris.commons.models.AssemblyConfiguration
-import iris.imageradc.commands.{ADCCommand, PrismCommands}
+import iris.imageradc.commands.PrismCommands
 import iris.imageradc.events.{PrismCurrentEvent, PrismStateEvent, PrismTargetEvent}
 import iris.imageradc.models.PrismState
 
 import scala.concurrent.Future
 
 class PrismActor(cswContext: CswContext, configuration: AssemblyConfiguration) {
-  private lazy val eventPublisher                     = cswContext.eventService.defaultPublisher
+  private lazy val eventPublisher = cswContext.eventService.defaultPublisher
   def out(currentAngle: Double): Behavior[PrismCommands] = {
     Behaviors.receiveMessage {
-      case PrismCommands.IN => ???
+      case PrismCommands.IN  => ???
       case PrismCommands.OUT => ???
     }
   }

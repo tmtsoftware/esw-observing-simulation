@@ -19,5 +19,5 @@ object PrismPosition extends Enum[PrismPosition] {
   def makeChoiceKey(keyName: String): GChoiceKey = ChoiceKey.make(keyName, choices)
 
   case object IN  extends PrismPosition("IN")
-  case object OUT  extends PrismPosition("OUT")
+  case object OUT extends PrismPosition("OUT")
 }

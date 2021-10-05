@@ -14,5 +14,5 @@ object PrismState extends Enum[PrismState] {
   def makeChoiceKey(keyName: String): GChoiceKey = ChoiceKey.make(keyName, choices)
 
   case object MOVING  extends PrismState("MOVING")
-  case object STOPPED  extends PrismState("STOPPED")
+  case object STOPPED extends PrismState("STOPPED")
 }
