@@ -3,14 +3,10 @@ package iris.imageradc.models
 import csw.params.core.generics.GChoiceKey
 import csw.params.core.generics.KeyType.ChoiceKey
 import csw.params.core.models.Choices
-import enumeratum.Enum
-import iris.commons.models.Position
-
+import enumeratum.{Enum, EnumEntry}
 import scala.collection.immutable.IndexedSeq
 
-sealed class PrismPosition(override val entryName: String) extends Position[PrismPosition] {
-  override def nextPosition(target: PrismPosition): PrismPosition = target
-}
+sealed abstract class PrismPosition(override val entryName: String) extends EnumEntry
 
 object PrismPosition extends Enum[PrismPosition] {
   override def values: IndexedSeq[PrismPosition] = findValues

@@ -10,7 +10,7 @@ import org.scalatest.funsuite.AnyFunSuiteLike
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class IfsResTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with AnyFunSuiteLike {
+class ImagerADCTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with AnyFunSuiteLike {
 
   import frameworkTestKit._
 

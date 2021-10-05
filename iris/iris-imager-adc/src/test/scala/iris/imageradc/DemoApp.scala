@@ -9,15 +9,13 @@ import csw.event.client.EventServiceFactory
 import csw.event.client.models.EventStores.RedisStore
 import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.params.commands.{ControlCommand, Setup}
+import csw.params.commands.ControlCommand
 import csw.params.core.models.Id
 import csw.params.events.Event
 import csw.prefix.models.Prefix
 import csw.prefix.models.Subsystem.IRIS
-import Constants.ImagerADCAssemblyConnection
-import iris.imageradc.commands.SelectCommand
+import iris.imageradc.Constants.ImagerADCAssemblyConnection
 import iris.imageradc.events.PrismStateEvent
-import iris.imageradc.models.Position
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
@@ -43,25 +41,25 @@ object DemoApp {
 
       subscribeToIfsPositionEvents()
       Thread.sleep(5000)
-      moveCommandScenario(commandService, Mirror)
+      moveCommandScenario(commandService)
 //      concurrentMoveCommandsScenario(commandService, R4000_H_K)
     }
     finally shutdown()
 
-  private def moveCommandScenario(commandService: CommandService, target: Position): Unit = {
-    val spectralResolutionSetup =
-      Setup(sequencerPrefix, SelectCommand.Name, None).add(SelectCommand.SpectralResolutionKey.set(target.entryName))
-    val initial = submitCommand(commandService, spectralResolutionSetup)
-    queryFinal(commandService, initial.runId)
+  private def moveCommandScenario(commandService: CommandService): Unit = {
+//    val spectralResolutionSetup =
+//      Setup(sequencerPrefix, SelectCommand.Name, None).add(SelectCommand.SpectralResolutionKey.set(target.entryName))
+//    val initial = submitCommand(commandService, spectralResolutionSetup)
+//    queryFinal(commandService, initial.runId)
   }
 
-  private def concurrentMoveCommandsScenario(commandService: CommandService, target: Position): Unit = {
-    val spectralResolutionSetup =
-      Setup(sequencerPrefix, SelectCommand.Name, None).add(SelectCommand.SpectralResolutionKey.set(target.entryName))
-    val initial1 = submitCommand(commandService, spectralResolutionSetup)
-    val initial2 = submitCommand(commandService, spectralResolutionSetup)
-    queryFinal(commandService, initial1.runId)
-    queryFinal(commandService, initial2.runId)
+  private def concurrentMoveCommandsScenario(commandService: CommandService): Unit = {
+//    val spectralResolutionSetup =
+//      Setup(sequencerPrefix, SelectCommand.Name, None).add(SelectCommand.SpectralResolutionKey.set(target.entryName))
+//    val initial1 = submitCommand(commandService, spectralResolutionSetup)
+//    val initial2 = submitCommand(commandService, spectralResolutionSetup)
+//    queryFinal(commandService, initial1.runId)
+//    queryFinal(commandService, initial2.runId)
   }
 
   private def submitCommand(commandService: CommandService, command: ControlCommand) = {
@@ -82,8 +80,8 @@ object DemoApp {
       .runForeach(e => printIfsPositionEvent(e))
 
   private def printIfsPositionEvent(event: Event) = for {
-    current <- event.paramType.get(PrismStateEvent.moveKey).flatMap(_.get(0))
-    target  <- event.paramType.get(PrismStateEvent.TargetPositionKey).flatMap(_.get(0))
+    current <- ""
+    target  <- ""
   } yield println(s"$current, $target")
 
   private def shutdown(): Unit = {
