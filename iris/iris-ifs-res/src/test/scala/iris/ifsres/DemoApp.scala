@@ -9,16 +9,16 @@ import csw.event.client.EventServiceFactory
 import csw.event.client.models.EventStores.RedisStore
 import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
+import csw.params.commands.CommandResponse.{SubmitResponse, isFinal}
 import csw.params.commands.{ControlCommand, Setup}
-import csw.params.core.models.Id
 import csw.params.events.Event
 import csw.prefix.models.Prefix
 import csw.prefix.models.Subsystem.IRIS
+import iris.ifsres.Constants.IfsResAssemblyConnection
 import iris.ifsres.commands.SelectCommand
-import iris.ifsres.models.ResWheelPosition
-import Constants.IfsResAssemblyConnection
-import ResWheelPosition._
 import iris.ifsres.events.IfsPositionEvent
+import iris.ifsres.models.ResWheelPosition
+import iris.ifsres.models.ResWheelPosition._
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
@@ -53,7 +53,7 @@ object DemoApp {
     val spectralResolutionSetup =
       Setup(sequencerPrefix, SelectCommand.Name, None).add(SelectCommand.SpectralResolutionKey.set(target.entryName))
     val initial = submitCommand(commandService, spectralResolutionSetup)
-    queryFinal(commandService, initial.runId)
+    queryFinal(commandService, initial)
   }
 
   private def concurrentMoveCommandsScenario(commandService: CommandService, target: ResWheelPosition): Unit = {
@@ -61,8 +61,8 @@ object DemoApp {
       Setup(sequencerPrefix, SelectCommand.Name, None).add(SelectCommand.SpectralResolutionKey.set(target.entryName))
     val initial1 = submitCommand(commandService, spectralResolutionSetup)
     val initial2 = submitCommand(commandService, spectralResolutionSetup)
-    queryFinal(commandService, initial1.runId)
-    queryFinal(commandService, initial2.runId)
+    queryFinal(commandService, initial1)
+    queryFinal(commandService, initial2)
   }
 
   private def submitCommand(commandService: CommandService, command: ControlCommand) = {
@@ -71,8 +71,9 @@ object DemoApp {
     response
   }
 
-  private def queryFinal(commandService: CommandService, runId: Id) = {
-    val response = Await.result(commandService.queryFinal(runId), timeout.duration)
+  private def queryFinal(commandService: CommandService, res: SubmitResponse): SubmitResponse = {
+    if (isFinal(res)) return res
+    val response = Await.result(commandService.queryFinal(res.runId), timeout.duration)
     println(s"FINAL RESPONSE: $response")
     response
   }

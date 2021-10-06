@@ -9,8 +9,8 @@ import csw.event.client.EventServiceFactory
 import csw.event.client.models.EventStores.RedisStore
 import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
+import csw.params.commands.CommandResponse.{SubmitResponse, isFinal}
 import csw.params.commands.{ControlCommand, Setup}
-import csw.params.core.models.Id
 import csw.params.events.Event
 import csw.prefix.models.Prefix
 import csw.prefix.models.Subsystem.IRIS
@@ -52,15 +52,15 @@ object DemoApp {
   private def moveCommandScenario(commandService: CommandService, target: FilterWheelPosition): Unit = {
     val wheel1Setup = Setup(sequencerPrefix, SelectCommand.Name, None).add(SelectCommand.Wheel1Key.set(target.entryName))
     val initial     = submitCommand(commandService, wheel1Setup)
-    queryFinal(commandService, initial.runId)
+    queryFinal(commandService, initial)
   }
 
   private def concurrentMoveCommandsScenario(commandService: CommandService, target: FilterWheelPosition): Unit = {
     val wheel1Setup = Setup(sequencerPrefix, SelectCommand.Name, None).add(SelectCommand.Wheel1Key.set(target.entryName))
     val initial1    = submitCommand(commandService, wheel1Setup)
     val initial2    = submitCommand(commandService, wheel1Setup)
-    queryFinal(commandService, initial1.runId)
-    queryFinal(commandService, initial2.runId)
+    queryFinal(commandService, initial1)
+    queryFinal(commandService, initial2)
   }
 
   private def submitCommand(commandService: CommandService, command: ControlCommand) = {
@@ -69,8 +69,9 @@ object DemoApp {
     response
   }
 
-  private def queryFinal(cs: CommandService, runId: Id) = {
-    val response = Await.result(cs.queryFinal(runId), timeout.duration)
+  private def queryFinal(cs: CommandService, res: SubmitResponse): SubmitResponse = {
+    if (isFinal(res)) return res
+    val response = Await.result(cs.queryFinal(res.runId), timeout.duration)
     println(s"FINAL RESPONSE: $response")
     response
   }

@@ -60,7 +60,6 @@ abstract class WheelAssembly[B <: Position[B]](cswContext: CswContext, configura
           log.error(errMsg)
           val issue = AssemblyBusyIssue(errMsg)
           replyTo ! Invalid(runId, issue)
-          crm.updateCommand(Invalid(runId, AssemblyBusyIssue(errMsg)))
           Behaviors.same
         case WheelCommand.MoveStep =>
           val nextPosition = currentPos.nextPosition(targetPos)

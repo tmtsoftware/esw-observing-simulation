@@ -1,8 +1,8 @@
 package iris.imagerfilter
 
+import akka.actor.typed.Scheduler
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.AskPattern.Askable
-import akka.actor.typed.{ActorRef, Scheduler}
 import akka.util.Timeout
 import csw.command.client.messages.TopLevelActorMessage
 import csw.framework.models.CswContext
@@ -14,12 +14,12 @@ import csw.params.commands.{CommandName, ControlCommand, Setup}
 import csw.params.core.models.Id
 import csw.time.core.models.UTCTime
 import iris.commons.models.WheelCommand.IsValidMove
-import iris.commons.models.{WheelCommand, AssemblyConfiguration}
+import iris.commons.models.{AssemblyConfiguration, WheelCommand}
 import iris.imagerfilter.commands.SelectCommand
 import iris.imagerfilter.events.ImagerPositionEvent
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext}
 
 class ImagerFilterHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext) extends ComponentHandlers(ctx, cswCtx) {
 
@@ -43,16 +43,21 @@ class ImagerFilterHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
   override def validateCommand(runId: Id, controlCommand: ControlCommand): ValidateCommandResponse = {
     val timeout: FiniteDuration = 1.seconds
     implicit val value: Timeout = Timeout(timeout)
-    val eventualValidateResponse: Future[ValidateCommandResponse] = imagerActor ? { x: ActorRef[ValidateCommandResponse] =>
-      IsValidMove(runId, x)
+
+    val initialValidateRes = controlCommand match {
+      case cmd: Setup => validateSetupCommand(runId, cmd)
+      case observe    => Invalid(runId, UnsupportedCommandIssue(s"$observe command not supported."))
     }
-    Await.result(eventualValidateResponse, timeout)
+
+    initialValidateRes match {
+      case _: Accepted => Await.result(imagerActor ? (IsValidMove(runId, _)), timeout)
+      case invalidRes  => invalidRes
+    }
   }
 
   override def onSubmit(runId: Id, controlCommand: ControlCommand): SubmitResponse =
     controlCommand match {
-      case setup: Setup => handleSetup(runId, setup)
-      case observe      => Invalid(runId, UnsupportedCommandIssue(s"$observe command not supported."))
+      case setup: Setup => handleSelect(runId, setup)
     }
 
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = {}
@@ -70,21 +75,26 @@ class ImagerFilterHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
   private def handleSelect(runId: Id, setup: Setup) =
     SelectCommand.getWheel1TargetPosition(setup) match {
       case Right(targetPosition) =>
-        log.info(s"Moving filter wheel to target position: $targetPosition")
+        log.info(s"Imager Filter: Moving wheel to target position: $targetPosition")
         imagerActor ! WheelCommand.Move(targetPosition, runId)
         Started(runId)
+      case Left(commandIssue) => Invalid(runId, commandIssue)
+    }
+
+  private def validateSelect(runId: Id, setup: Setup) =
+    SelectCommand.getWheel1TargetPosition(setup) match {
+      case Right(_) => Accepted(runId)
       case Left(commandIssue) =>
-        log.error(s"Failed to retrieve target position, reason: ${commandIssue.reason}")
+        log.error(s"Imager Filter: Failed to retrieve target position, reason: ${commandIssue.reason}")
         Invalid(runId, commandIssue)
     }
 
-  private def handleSetup(runId: Id, setup: Setup) =
-    setup.commandName match {
-      case SelectCommand.Name => handleSelect(runId, setup)
-      case CommandName(name) =>
-        val errMsg = s"Setup command: $name not supported."
-        log.error(errMsg)
-        Invalid(runId, UnsupportedCommandIssue(errMsg))
-    }
+  private def validateSetupCommand(runId: Id, setup: Setup) = setup.commandName match {
+    case SelectCommand.Name => validateSelect(runId, setup)
+    case CommandName(name) =>
+      val errMsg = s"Imager Filter: Setup command: $name not supported."
+      log.error(errMsg)
+      Invalid(runId, UnsupportedCommandIssue(errMsg))
+  }
 
 }
