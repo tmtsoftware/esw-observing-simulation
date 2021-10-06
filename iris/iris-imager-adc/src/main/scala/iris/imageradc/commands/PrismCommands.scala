@@ -11,6 +11,6 @@ sealed trait PrismCommands
 object PrismCommands {
   case class RetractSelect(runId: Id, position: PrismPosition)                              extends PrismCommands
   case class IsValid(runId: Id, command: Setup, replyTo: ActorRef[ValidateCommandResponse]) extends PrismCommands
-  case class PRISM_FOLLOW(runId: Id)                                                        extends PrismCommands
+  case class PRISM_FOLLOW(runId: Id, targetAngle: Double)                                   extends PrismCommands
   case class PRISM_STOP(runId: Id)                                                          extends PrismCommands
 }

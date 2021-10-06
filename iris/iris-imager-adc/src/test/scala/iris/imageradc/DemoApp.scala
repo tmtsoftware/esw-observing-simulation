@@ -9,13 +9,19 @@ import csw.event.client.EventServiceFactory
 import csw.event.client.models.EventStores.RedisStore
 import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.params.commands.ControlCommand
+import csw.params.commands.{ControlCommand, Setup}
 import csw.params.core.models.Id
 import csw.params.events.Event
 import csw.prefix.models.Prefix
 import csw.prefix.models.Subsystem.IRIS
 import iris.imageradc.Constants.ImagerADCAssemblyConnection
-import iris.imageradc.events.PrismStateEvent
+import iris.imageradc.commands.ADCCommand
+import iris.imageradc.events.PrismCurrentEvent.ImagerADCCurrentEventKey
+import iris.imageradc.events.PrismRetractEvent.{ImagerADCRetractEventKey, ImagerADCRetractEventName}
+import iris.imageradc.events.PrismStateEvent.ImagerADCStateEventKey
+import iris.imageradc.events.PrismTargetEvent.ImagerADCTargetEventKey
+import iris.imageradc.events.{PrismCurrentEvent, PrismRetractEvent, PrismStateEvent, PrismTargetEvent}
+import iris.imageradc.models.PrismPosition
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
@@ -39,18 +45,31 @@ object DemoApp {
       val imagerAssembly = Await.result(locationService.resolve(ImagerADCAssemblyConnection, 5.seconds), 6.seconds).get
       val commandService = CommandServiceFactory.make(imagerAssembly)
 
-      subscribeToIfsPositionEvents()
-      Thread.sleep(5000)
+      subscribeToCurrentEvent()
+      subscribeToRetractEvent()
+      subscribeToTargetEvent()
+      subscribeToStateEvent()
+      Thread.sleep(10000)
       moveCommandScenario(commandService)
 //      concurrentMoveCommandsScenario(commandService, R4000_H_K)
     }
     finally shutdown()
 
   private def moveCommandScenario(commandService: CommandService): Unit = {
-//    val spectralResolutionSetup =
-//      Setup(sequencerPrefix, SelectCommand.Name, None).add(SelectCommand.SpectralResolutionKey.set(target.entryName))
-//    val initial = submitCommand(commandService, spectralResolutionSetup)
+    val InCommand =
+      Setup(sequencerPrefix, ADCCommand.RetractSelect, None).add(PrismPosition.RetractKey.set(PrismPosition.IN.entryName))
+//    println(submitCommand(commandService, InCommand))
+    val initial = submitCommand(commandService, InCommand)
 //    queryFinal(commandService, initial.runId)
+    val FollowCommand =
+      Setup(sequencerPrefix, ADCCommand.PrismFollow, None).add(ADCCommand.targetAngleKey.set(20.0))
+    submitCommand(commandService, FollowCommand)
+
+    Thread.sleep(20000)
+
+    val StopCommand =
+      Setup(sequencerPrefix, ADCCommand.PrismStop, None)
+    submitCommand(commandService, StopCommand)
   }
 
   private def concurrentMoveCommandsScenario(commandService: CommandService): Unit = {
@@ -73,16 +92,48 @@ object DemoApp {
     println(s"FINAL RESPONSE: $response")
     response
   }
-
-  private def subscribeToIfsPositionEvents() =
+// ImagerADCRetractEventKey, ImagerADCCurrentEventKey, ImagerADCTargetEventKey
+  private def subscribeToStateEvent() =
     eventSubscriber
-      .subscribe(Set(PrismStateEvent.ImagerADCStateEventKey))
-      .runForeach(e => printIfsPositionEvent(e))
+      .subscribe(Set(ImagerADCStateEventKey))
+      .runForeach(e => printPrismStateEvent(e))
 
-  private def printIfsPositionEvent(event: Event) = for {
-    current <- ""
-    target  <- ""
-  } yield println(s"$current, $target")
+  private def printPrismStateEvent(event: Event) = for {
+    move     <- event.paramType.get(PrismStateEvent.moveKey).flatMap(_.get(0))
+    onTarget <- event.paramType.get(PrismStateEvent.onTargetKey).flatMap(_.get(0))
+  } yield println(s"Prism State: $move, OnTarget: $onTarget")
+
+  private def subscribeToTargetEvent() =
+    eventSubscriber
+      .subscribe(Set(ImagerADCTargetEventKey))
+      .runForeach(e => printPrismTargetEvent(e))
+
+  private def printPrismTargetEvent(event: Event) =
+    for {
+      angle <- event.paramType.get(PrismTargetEvent.angleKey).flatMap(_.get(0))
+    } yield println(s"Target Angle: $angle")
+
+  private def subscribeToRetractEvent() =
+    eventSubscriber
+      .subscribe(Set(ImagerADCRetractEventKey))
+      .runForeach(e => printPrismRetractEvent(e))
+
+  private def printPrismRetractEvent(event: Event) = {
+    println(s"event, $event")
+    for {
+      position <- event.paramType.get(PrismPosition.RetractKey).flatMap(_.get(0))
+    } yield println(s"Retract position: $position")
+  }
+
+  private def subscribeToCurrentEvent() =
+    eventSubscriber
+      .subscribe(Set(ImagerADCCurrentEventKey))
+      .runForeach(e => printPrismCurrentEvent(e))
+
+  private def printPrismCurrentEvent(event: Event) = for {
+    angle      <- event.paramType.get(PrismCurrentEvent.angleKey).flatMap(_.get(0))
+    angleError <- event.paramType.get(PrismCurrentEvent.angleErrorKey).flatMap(_.get(0))
+  } yield println(s"Current angle: $angle, Angle Error: $angleError")
 
   private def shutdown(): Unit = {
     redisStore.redisClient.shutdown()

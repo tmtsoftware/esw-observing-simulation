@@ -45,7 +45,8 @@ lazy val `iris-irisdeploy` = project
   .dependsOn(
     `iris-imager-filter`,
     `iris-ifs-res`,
-    `iris-ifs-scale`
+    `iris-ifs-scale`,
+    `iris-imager-adc`
   )
   .enablePlugins(CswBuildInfo)
   .settings(

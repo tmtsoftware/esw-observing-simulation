@@ -1,6 +1,6 @@
 package iris.imageradc
 
-import akka.actor.typed.{ActorRef, Scheduler}
+import akka.actor.typed.Scheduler
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.AskPattern.Askable
 import akka.util.Timeout
@@ -9,29 +9,27 @@ import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models.TrackingEvent
 import csw.params.commands.CommandIssue.UnsupportedCommandIssue
-import csw.params.commands.CommandResponse.{Invalid, Started, SubmitResponse, ValidateCommandResponse}
-import csw.params.commands.{CommandName, CommandResponse, ControlCommand, Observe, Setup}
+import csw.params.commands.CommandResponse._
+import csw.params.commands.{CommandName, ControlCommand, Setup}
 import csw.params.core.models.Id
 import csw.time.core.models.UTCTime
-import iris.commons.models.{AssemblyConfiguration, WheelCommand}
-import iris.imageradc.commands.ADCCommand.PrismPositionKey
-import iris.imageradc.commands.{ADCCommand, PrismCommands}
 import iris.imageradc.commands.PrismCommands.IsValid
+import iris.imageradc.commands.{ADCCommand, PrismCommands}
 import iris.imageradc.events.PrismStateEvent
-import iris.imageradc.models.{PrismPosition, PrismState}
+import iris.imageradc.models.PrismState
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext}
 
 class ImagerADCHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext) extends ComponentHandlers(ctx, cswCtx) {
 
   import cswCtx._
   implicit val a: Scheduler = ctx.system.scheduler
 
-  implicit val ec: ExecutionContext  = ctx.executionContext
-  private val log                    = loggerFactory.getLogger
-  private val adcImagerConfiguration = AssemblyConfiguration(ctx.system.settings.config.getConfig("iris.imager.adc"))
-  private val adcActor               = ctx.spawnAnonymous(PrismActor.behavior(cswCtx, adcImagerConfiguration))
+  implicit val ec: ExecutionContext = ctx.executionContext
+  private val log                   = loggerFactory.getLogger
+//  private val adcImagerConfiguration = AssemblyConfiguration(ctx.system.settings.config.getConfig("iris.imager.adc"))
+  private val adcActor = ctx.spawnAnonymous(PrismActor.behavior(cswCtx))
 
   override def initialize(): Unit = {
     log.info("Initializing imager.adc...")
@@ -79,11 +77,18 @@ class ImagerADCHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
             Started(runId)
         }
       case ADCCommand.PrismFollow =>
-        adcActor ! PrismCommands.PRISM_FOLLOW(runId)
-        Started(runId)
+        ADCCommand.getTargetAngle(setup) match {
+          case Left(commandIssue) =>
+            log.error(s"Failed to retrieve target angle, reason: ${commandIssue.reason}")
+            Invalid(runId, commandIssue)
+          case Right(value) =>
+            adcActor ! PrismCommands.PRISM_FOLLOW(runId, value)
+            Completed(runId)
+        }
+
       case ADCCommand.PrismStop =>
         adcActor ! PrismCommands.PRISM_STOP(runId)
-        Started(runId)
+        Completed(runId)
       case CommandName(name) =>
         val errMsg = s"Setup command: $name not supported."
         log.error(errMsg)
@@ -94,13 +99,8 @@ class ImagerADCHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
     val timeout: FiniteDuration = 1.seconds
     implicit val value: Timeout = Timeout(timeout)
 
-    def sendIsValid: ValidateCommandResponse = {
-      val eventualValidateResponse =
-        adcActor ? { x: ActorRef[ValidateCommandResponse] =>
-          IsValid(runId, setup, x)
-        }
-      Await.result(eventualValidateResponse, timeout)
-    }
+    def sendIsValid: ValidateCommandResponse =
+      Await.result(adcActor ? (IsValid(runId, setup, _)), timeout)
 
     setup.commandName match {
       case ADCCommand.RetractSelect =>
@@ -110,6 +110,13 @@ class ImagerADCHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
             Invalid(runId, commandIssue)
           case Right(_) =>
             sendIsValid
+        }
+      case ADCCommand.PrismFollow =>
+        ADCCommand.getTargetAngle(setup) match {
+          case Left(commandIssue) =>
+            log.error(s"Failed to retrieve target angle, reason: ${commandIssue.reason}")
+            Invalid(runId, commandIssue)
+          case Right(_) => sendIsValid
         }
       case _ => sendIsValid
     }
