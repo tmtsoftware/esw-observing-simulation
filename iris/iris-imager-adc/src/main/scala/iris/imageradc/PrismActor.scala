@@ -2,7 +2,7 @@ package iris.imageradc
 
 import akka.actor.Cancellable
 import akka.actor.typed.Behavior
-import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import csw.framework.models.CswContext
 import csw.params.commands.CommandIssue.UnsupportedCommandIssue
 import csw.params.commands.CommandResponse.{Accepted, Completed, Invalid}
@@ -14,10 +14,12 @@ import iris.imageradc.models.{PrismPosition, PrismState}
 
 import scala.compat.java8.DurationConverters.FiniteDurationops
 import scala.concurrent.duration.DurationInt
+import scala.math.BigDecimal.RoundingMode
 
 class PrismActor(cswContext: CswContext) {
-  var prismTarget: Double          = 0.0
-  var prismCurrent: Double         = 0.0
+  var prismTarget: BigDecimal      = 0.0
+  var prismCurrent: BigDecimal     = 0.0
+  var fastMoving: Boolean          = false
   private val timeServiceScheduler = cswContext.timeServiceScheduler
   private val crm                  = cswContext.commandResponseManager
   private lazy val eventPublisher  = cswContext.eventService.defaultPublisher
@@ -45,6 +47,7 @@ class PrismActor(cswContext: CswContext) {
             inAndMoving
           case PrismCommands.PRISM_STOP(_) =>
             Behaviors.same
+          case _ => Behaviors.unhandled
         }
       }
     }
@@ -77,11 +80,7 @@ class PrismActor(cswContext: CswContext) {
                 replyTo ! Invalid(runId, UnsupportedCommandIssue(errMsg))
                 Behaviors.unhandled
             }
-          case PrismCommands.PRISM_FOLLOW(_, _) =>
-            val errMsg = s"Setup command: $name is not valid in disabled state."
-            log.error(errMsg)
-            Behaviors.unhandled
-          case PrismCommands.PRISM_STOP(_) =>
+          case _ =>
             val errMsg = s"Setup command: $name is not valid in disabled state."
             log.error(errMsg)
             Behaviors.unhandled
@@ -90,44 +89,62 @@ class PrismActor(cswContext: CswContext) {
     }
   }
   def inAndMoving: Behavior[PrismCommands] = {
-    val targetModifier         = scheduleJobForTarget
-    val targetFollower         = scheduleJobForCurrent
-    val publisherSubscriptions = publishPrismStatesFor(MOVING)
-    Behaviors.receive { (ctx, msg) =>
-      val log = cswContext.loggerFactory.getLogger(ctx)
-      msg match {
-        case PrismCommands.RetractSelect(_, _) =>
-          val errMsg = s"Setup command: $name is not valid in moving state."
-          log.error(errMsg)
-          Behaviors.unhandled
-        case PrismCommands.IsValid(runId, command, replyTo) =>
-          command.commandName match {
-            case ADCCommand.RetractSelect =>
-              val errMsg = s"Setup command: $name is not valid in moving state."
-              log.error(errMsg)
-              replyTo ! Invalid(runId, UnsupportedCommandIssue(errMsg))
-              Behaviors.unhandled
-            case _ =>
-              replyTo ! Accepted(runId)
-              Behaviors.same
-          }
-        case PrismCommands.PRISM_FOLLOW(_, _) =>
-          Behaviors.same
-        case PrismCommands.PRISM_STOP(_) =>
-          targetModifier.cancel()
-          targetFollower.cancel()
-          publisherSubscriptions.foreach(_.cancel())
-          inAndStopped
+    Behaviors.setup { ctx =>
+      val targetFollower         = scheduleJobForCurrent(ctx)
+      val targetModifier         = scheduleJobForTarget(ctx)
+      val publisherSubscriptions = publishPrismStatesFor(MOVING)
+      Behaviors.receiveMessage { msg =>
+        val log = cswContext.loggerFactory.getLogger(ctx)
+        msg match {
+          case PrismCommands.RetractSelect(_, _) =>
+            val errMsg = s"Setup command: $name is not valid in moving state."
+            log.error(errMsg)
+            Behaviors.unhandled
+          case PrismCommands.IsValid(runId, command, replyTo) =>
+            command.commandName match {
+              case ADCCommand.RetractSelect =>
+                val errMsg = s"Setup command: $name is not valid in moving state."
+                log.error(errMsg)
+                replyTo ! Invalid(runId, UnsupportedCommandIssue(errMsg))
+                Behaviors.unhandled
+              case _ =>
+                replyTo ! Accepted(runId)
+                Behaviors.same
+            }
+          case PrismCommands.PRISM_FOLLOW(_, _) =>
+            //schedule ??
+            Behaviors.same
+          case PrismCommands.PRISM_STOP(_) =>
+            targetFollower.cancel()
+            targetModifier.cancel()
+            publisherSubscriptions.foreach(_.cancel())
+            inAndStopped
+          case PrismCommands.MOVE_CURRENT(moveBy: BigDecimal) =>
+//            println(s"==============MOVE CURRENT===================== $fastMoving")
+            if (fastMoving)
+              prismCurrent += moveBy
+            else
+              prismCurrent = if (prismTarget > prismCurrent) prismCurrent + 0.1 else prismCurrent - 0.1
+            Behaviors.same
+          case PrismCommands.MOVE_TARGET =>
+//            println(s"---------------MOVE_TARGET------------------${getCurrentDiff.abs.compare(0.5)}")
+            if (getCurrentDiff.abs.compare(0.5) == -1) {
+              prismTarget += 0.1
+              fastMoving = false
+            }
+            Behaviors.same
+        }
       }
     }
+
   }
 
   private def publishPrismStatesFor(state: PrismState): List[Cancellable] = {
     def generatePrismCurrent: Option[SystemEvent] = Option {
-      PrismCurrentEvent.make(prismCurrent, prismTarget - prismCurrent)
+      PrismCurrentEvent.make(prismCurrent.toDouble, getCurrentDiff.toDouble)
     }
     def generatePrismTarget: Option[SystemEvent] = Option {
-      PrismTargetEvent.make(prismTarget)
+      PrismTargetEvent.make(prismTarget.toDouble)
     }
 
     List(
@@ -140,23 +157,29 @@ class PrismActor(cswContext: CswContext) {
   private def publishPrismState(state: PrismState) = eventPublisher.publish(getPrismStateEvent(state))
 
   private def getPrismStateEvent(state: PrismState) =
-    PrismStateEvent.make(state, Math.abs(prismCurrent - prismTarget) < 0.5)
+    PrismStateEvent.make(state, getCurrentDiff.abs.compare(0.5) == -1)
 
   private def publishRetractPosition(position: PrismPosition): Unit = {
     eventPublisher.publish(PrismRetractEvent.make(position))
   }
 
-  private def scheduleJobForTarget =
+  private def scheduleJobForTarget(ctx: ActorContext[PrismCommands]) =
     timeServiceScheduler.schedulePeriodically(1.seconds.toJava) {
-      if (Math.abs(prismCurrent - prismTarget) < 0.5) {
-        prismTarget += 0.1
-      }
+      ctx.self ! PrismCommands.MOVE_TARGET
     }
 
-  private def scheduleJobForCurrent =
+  private def truncateTo1Decimal(value: BigDecimal) = BigDecimal(value.toDouble).setScale(1, RoundingMode.DOWN)
+
+  private def getCurrentDiff = prismCurrent - prismTarget
+
+  private def scheduleJobForCurrent(ctx: ActorContext[PrismCommands]) = {
+    println("in here going to fast state>>>>>>>>>>>>>>>>>>>>>")
+    fastMoving = true
+    val fastMove: BigDecimal = truncateTo1Decimal((prismTarget - prismCurrent) / 3)
     timeServiceScheduler.schedulePeriodically(1.seconds.toJava) {
-      prismCurrent += (prismTarget - prismCurrent) / 3
+      ctx.self ! PrismCommands.MOVE_CURRENT(fastMove)
     }
+  }
 
   protected val name: String = "Imager ADC"
 }

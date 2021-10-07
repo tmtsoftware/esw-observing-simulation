@@ -65,10 +65,15 @@ object DemoApp {
       Setup(sequencerPrefix, ADCCommand.PrismFollow, None).add(ADCCommand.targetAngleKey.set(20.0))
     submitCommand(commandService, FollowCommand)
 
-    Thread.sleep(20000)
+    Thread.sleep(10000)
+    val StopCommand = Setup(sequencerPrefix, ADCCommand.PrismStop, None)
+    submitCommand(commandService, StopCommand)
+    println("***********************2nd follow command starts here****************")
+    val Follow2Command =
+      Setup(sequencerPrefix, ADCCommand.PrismFollow, None).add(ADCCommand.targetAngleKey.set(10.0))
+    submitCommand(commandService, Follow2Command)
+    Thread.sleep(10000)
 
-    val StopCommand =
-      Setup(sequencerPrefix, ADCCommand.PrismStop, None)
     submitCommand(commandService, StopCommand)
   }
 
@@ -113,6 +118,7 @@ object DemoApp {
       angle <- event.paramType.get(PrismTargetEvent.angleKey).flatMap(_.get(0))
     } yield println(s"Target Angle: $angle")
 
+
   private def subscribeToRetractEvent() =
     eventSubscriber
       .subscribe(Set(ImagerADCRetractEventKey))
@@ -128,7 +134,10 @@ object DemoApp {
   private def subscribeToCurrentEvent() =
     eventSubscriber
       .subscribe(Set(ImagerADCCurrentEventKey))
-      .runForeach(e => printPrismCurrentEvent(e))
+      .runForeach(e => {
+        println(e.paramSet.toString())
+        printPrismCurrentEvent(e)
+      })
 
   private def printPrismCurrentEvent(event: Event) = for {
     angle      <- event.paramType.get(PrismCurrentEvent.angleKey).flatMap(_.get(0))

@@ -13,4 +13,6 @@ object PrismCommands {
   case class IsValid(runId: Id, command: Setup, replyTo: ActorRef[ValidateCommandResponse]) extends PrismCommands
   case class PRISM_FOLLOW(runId: Id, targetAngle: Double)                                   extends PrismCommands
   case class PRISM_STOP(runId: Id)                                                          extends PrismCommands
+  case object MOVE_TARGET                                                                   extends PrismCommands
+  case class MOVE_CURRENT(moveBy: BigDecimal)                                               extends PrismCommands
 }

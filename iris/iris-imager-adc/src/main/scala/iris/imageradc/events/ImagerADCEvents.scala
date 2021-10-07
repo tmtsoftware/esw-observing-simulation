@@ -41,7 +41,7 @@ object PrismTargetEvent {
 object PrismCurrentEvent {
   val angleKey: Key[Double]                = DoubleKey.make("angle")
   val angleErrorKey: Key[Double]           = DoubleKey.make("angle_error")
-  val ImagerADCCurrentEventName: EventName = EventName("prism_target")
+  val ImagerADCCurrentEventName: EventName = EventName("prism_current")
   val ImagerADCCurrentEventKey: EventKey   = EventKey(ImagerADCAssemblyPrefix, ImagerADCCurrentEventName)
 
   def make(angle: Double, angleError: Double): SystemEvent =
