@@ -44,7 +44,7 @@ object DemoApp {
     try {
       val imagerAssembly = Await.result(locationService.resolve(ImagerADCAssemblyConnection, 5.seconds), 6.seconds).get
       val commandService = CommandServiceFactory.make(imagerAssembly)
-      val subscriptions : List[(EventKey, Event => Option[Unit])] = List(
+      val subscriptions: List[(EventKey, Event => Option[Unit])] = List(
         (ImagerADCStateEventKey, printPrismStateEvent),
         (ImagerADCTargetEventKey, printPrismTargetEvent),
         (ImagerADCRetractEventKey, printPrismRetractEvent),
@@ -61,20 +61,27 @@ object DemoApp {
     val InCommand =
       Setup(sequencerPrefix, ADCCommand.RetractSelect, None).add(PrismPosition.RetractKey.set(PrismPosition.IN.entryName))
     val initial = submitCommand(commandService, InCommand)
+    queryFinal(commandService, initial.runId)
     val FollowCommand =
       Setup(sequencerPrefix, ADCCommand.PrismFollow, None).add(ADCCommand.targetAngleKey.set(20.0))
     submitCommand(commandService, FollowCommand)
 
     Thread.sleep(10000)
-    val StopCommand = Setup(sequencerPrefix, ADCCommand.PrismStop, None)
-    submitCommand(commandService, StopCommand)
+    val StopCommand  = Setup(sequencerPrefix, ADCCommand.PrismStop, None)
+    val stopResponse = submitCommand(commandService, StopCommand)
+//    queryFinal(commandService, stopResponse.runId)
     println("***********************2nd follow command starts here****************")
     val Follow2Command =
       Setup(sequencerPrefix, ADCCommand.PrismFollow, None).add(ADCCommand.targetAngleKey.set(10.0))
     submitCommand(commandService, Follow2Command)
     Thread.sleep(10000)
 
-    submitCommand(commandService, StopCommand)
+    val stopResponse2 = submitCommand(commandService, StopCommand)
+//    queryFinal(commandService, stopResponse2.runId)
+    val OutCommand =
+      Setup(sequencerPrefix, ADCCommand.RetractSelect, None).add(PrismPosition.RetractKey.set(PrismPosition.OUT.entryName))
+    val finalState = submitCommand(commandService, OutCommand)
+    queryFinal(commandService, finalState.runId)
   }
 
   private def concurrentMoveCommandsScenario(commandService: CommandService): Unit = {

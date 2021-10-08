@@ -1,12 +1,13 @@
 package iris.imageradc
 
-import akka.actor.Cancellable
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import csw.framework.models.CswContext
 import csw.params.commands.CommandIssue.UnsupportedCommandIssue
 import csw.params.commands.CommandResponse.{Accepted, Completed, Invalid}
 import csw.params.events.SystemEvent
+import csw.time.core.models.UTCTime
+import iris.imageradc.commands.PrismCommands.{GOING_IN, GOING_OUT}
 import iris.imageradc.commands.{ADCCommand, PrismCommands}
 import iris.imageradc.events.{PrismCurrentEvent, PrismRetractEvent, PrismStateEvent, PrismTargetEvent}
 import iris.imageradc.models.PrismState.MOVING
@@ -27,19 +28,23 @@ class PrismActor(cswContext: CswContext) {
   def inAndStopped: Behavior[PrismCommands] = {
     publishPrismState(PrismState.STOPPED)
     publishRetractPosition(PrismPosition.IN)
-    Behaviors.receive { (_, msg) =>
+    Behaviors.receive { (ctx, msg) =>
       {
         msg match {
-          case PrismCommands.RetractSelect(runId, position) =>
+          case PrismCommands.RETRACT_SELECT(runId, position) =>
             position match {
               case PrismPosition.IN =>
                 crm.updateCommand(Completed(runId))
                 Behaviors.same
               case PrismPosition.OUT =>
-                //todo add scheduler to go to out behaviour after some delay
-                outAndStopped
+                println("RECEIVED PrismPosition.OUT")
+                timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plus(4.seconds.toJava))) {
+                  crm.updateCommand(Completed(runId))
+                  ctx.self ! GOING_OUT
+                }
+                Behaviors.same
             }
-          case PrismCommands.IsValid(runId, _, replyTo) =>
+          case PrismCommands.IS_VALID(runId, _, replyTo) =>
             replyTo ! Accepted(runId)
             Behaviors.same
           case PrismCommands.PRISM_FOLLOW(_, targetAngle) =>
@@ -47,6 +52,9 @@ class PrismActor(cswContext: CswContext) {
             inAndMoving
           case PrismCommands.PRISM_STOP(_) =>
             Behaviors.same
+          case GOING_OUT =>
+            println("GOING_OUT")
+            outAndStopped
           case _ => Behaviors.unhandled
         }
       }
@@ -58,32 +66,38 @@ class PrismActor(cswContext: CswContext) {
       {
         val log = cswContext.loggerFactory.getLogger(ctx)
         msg match {
-          case PrismCommands.RetractSelect(runId, position) =>
+          case PrismCommands.RETRACT_SELECT(runId, position) =>
             position match {
               case PrismPosition.IN =>
-                //todo add scheduler to go to out behaviour after some delay
-                println("going from OUT to IN")
-                crm.updateCommand(Completed(runId))
-                inAndStopped
+                println("RECEIVED PrismPosition.IN")
+                timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plus(4.seconds.toJava))) {
+                  crm.updateCommand(Completed(runId))
+                  ctx.self ! GOING_IN
+                }
+                Behaviors.same
               case PrismPosition.OUT =>
                 crm.updateCommand(Completed(runId))
                 Behaviors.same
             }
-          case PrismCommands.IsValid(runId, command, replyTo) =>
+          case PrismCommands.IS_VALID(runId, command, replyTo) =>
             command.commandName match {
               case ADCCommand.RetractSelect =>
                 replyTo ! Accepted(runId)
                 Behaviors.same
-              case _ =>
-                val errMsg = s"Setup command: $name is not valid in disabled state."
+              case cmd =>
+                val errMsg = s"Setup command: ${cmd.name} is not valid in disabled state."
                 log.error(errMsg)
                 replyTo ! Invalid(runId, UnsupportedCommandIssue(errMsg))
                 Behaviors.unhandled
             }
-          case _ =>
-            val errMsg = s"Setup command: $name is not valid in disabled state."
+          case GOING_IN =>
+            println("GOING_IN")
+            inAndStopped
+          case cmd =>
+            val errMsg = s"$cmd is not valid in disabled state."
             log.error(errMsg)
             Behaviors.unhandled
+
         }
       }
     }
@@ -97,14 +111,14 @@ class PrismActor(cswContext: CswContext) {
       Behaviors.receiveMessage { msg =>
         val log = cswContext.loggerFactory.getLogger(ctx)
         msg match {
-          case PrismCommands.RetractSelect(_, _) =>
-            val errMsg = s"Setup command: $name is not valid in moving state."
+          case cmd @ PrismCommands.RETRACT_SELECT(_, _) =>
+            val errMsg = s"$cmd is not valid in moving state."
             log.error(errMsg)
             Behaviors.unhandled
-          case PrismCommands.IsValid(runId, command, replyTo) =>
+          case PrismCommands.IS_VALID(runId, command, replyTo) =>
             command.commandName match {
               case ADCCommand.RetractSelect =>
-                val errMsg = s"Setup command: $name is not valid in moving state."
+                val errMsg = s"Setup command: ${command.commandName.name} is not valid in moving state."
                 log.error(errMsg)
                 replyTo ! Invalid(runId, UnsupportedCommandIssue(errMsg))
                 Behaviors.unhandled
@@ -112,9 +126,11 @@ class PrismActor(cswContext: CswContext) {
                 replyTo ! Accepted(runId)
                 Behaviors.same
             }
-          case PrismCommands.PRISM_FOLLOW(_, _) =>
-            //schedule ??
-            Behaviors.same
+          case cmd @ PrismCommands.PRISM_FOLLOW(_, _) =>
+            //TODD as if required schedule ??
+            val errMsg = s"$cmd is not valid in moving state."
+            log.error(errMsg)
+            Behaviors.unhandled
           case PrismCommands.PRISM_STOP(_) =>
             targetModifier.cancel()
             inAndStopped
@@ -165,8 +181,6 @@ class PrismActor(cswContext: CswContext) {
   private def truncateTo1Decimal(value: BigDecimal) = BigDecimal(value.toDouble).setScale(1, RoundingMode.DOWN)
 
   private def getCurrentDiff = prismCurrent - prismTarget
-
-  protected val name: String = "Imager ADC"
 }
 
 object PrismActor {

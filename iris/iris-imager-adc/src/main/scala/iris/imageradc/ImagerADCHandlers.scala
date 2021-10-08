@@ -13,7 +13,7 @@ import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandName, ControlCommand, Setup}
 import csw.params.core.models.Id
 import csw.time.core.models.UTCTime
-import iris.imageradc.commands.PrismCommands.IsValid
+import iris.imageradc.commands.PrismCommands.IS_VALID
 import iris.imageradc.commands.{ADCCommand, PrismCommands}
 import iris.imageradc.events.PrismStateEvent
 import iris.imageradc.models.PrismState
@@ -73,7 +73,7 @@ class ImagerADCHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
             log.error(s"Failed to retrieve prism position, reason: ${commandIssue.reason}")
             Invalid(runId, commandIssue)
           case Right(value) =>
-            adcActor ! PrismCommands.RetractSelect(runId, value)
+            adcActor ! PrismCommands.RETRACT_SELECT(runId, value)
             Started(runId)
         }
       case ADCCommand.PrismFollow =>
@@ -100,7 +100,7 @@ class ImagerADCHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
     implicit val value: Timeout = Timeout(timeout)
 
     def sendIsValid: ValidateCommandResponse =
-      Await.result(adcActor ? (IsValid(runId, setup, _)), timeout)
+      Await.result(adcActor ? (IS_VALID(runId, setup, _)), timeout)
 
     setup.commandName match {
       case ADCCommand.RetractSelect =>
