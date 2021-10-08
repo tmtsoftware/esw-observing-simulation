@@ -106,7 +106,10 @@ object DemoApp {
   private def printPrismStateEvent(event: Event) = for {
     move     <- event.paramType.get(PrismStateEvent.moveKey).flatMap(_.get(0))
     onTarget <- event.paramType.get(PrismStateEvent.onTargetKey).flatMap(_.get(0))
-  } yield println(s"Prism State: $move, OnTarget: $onTarget")
+  } yield {
+    println("------------------------------------------")
+    println(s"Prism State: $move, OnTarget: $onTarget")
+  }
 
   private def printPrismTargetEvent(event: Event) =
     for {

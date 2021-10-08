@@ -90,9 +90,11 @@ class PrismActor(cswContext: CswContext) {
   }
   def inAndMoving: Behavior[PrismCommands] = {
     Behaviors.setup { ctx =>
-      val targetFollower         = scheduleJobForCurrent(ctx)
-      val targetModifier         = scheduleJobForTarget(ctx)
-      val publisherSubscriptions = publishPrismStatesFor(MOVING)
+      println("in here going to fast state >>>>>>>>>>>>>>>>>>>>>")
+      fastMoving = true
+      val fastMovement: BigDecimal = truncateTo1Decimal((prismTarget - prismCurrent) / 3)
+      val targetModifier           = scheduleJobForPrismMovement(ctx)
+      val publisherSubscriptions   = publishPrismStatesFor(MOVING)
       Behaviors.receiveMessage { msg =>
         val log = cswContext.loggerFactory.getLogger(ctx)
         msg match {
@@ -115,23 +117,23 @@ class PrismActor(cswContext: CswContext) {
             //schedule ??
             Behaviors.same
           case PrismCommands.PRISM_STOP(_) =>
-            targetFollower.cancel()
             targetModifier.cancel()
             publisherSubscriptions.foreach(_.cancel())
             inAndStopped
-          case PrismCommands.MOVE_CURRENT(moveBy: BigDecimal) =>
+          case PrismCommands.MOVE_CURRENT =>
 //            println(s"==============MOVE CURRENT===================== $fastMoving")
             if (fastMoving)
-              prismCurrent += moveBy
+              prismCurrent += fastMovement
             else
-              prismCurrent = if (prismTarget > prismCurrent) prismCurrent + 0.1 else prismCurrent - 0.1
+              prismCurrent += slowMovement
             Behaviors.same
           case PrismCommands.MOVE_TARGET =>
-//            println(s"---------------MOVE_TARGET------------------${getCurrentDiff.abs.compare(0.5)}")
-            if (getCurrentDiff.abs.compare(0.5) == -1) {
+//            println(s"---------------MOVE_TARGET------------------:${getCurrentDiff.abs.compare(0.5)}")
+            if (isWithinToleranceRange) {
               prismTarget += 0.1
               fastMoving = false
             }
+            ctx.self ! PrismCommands.MOVE_CURRENT
             Behaviors.same
         }
       }
@@ -139,11 +141,17 @@ class PrismActor(cswContext: CswContext) {
 
   }
 
+  private def slowMovement = if (prismTarget > prismCurrent) +0.1 else -0.1
+
+  private def isWithinToleranceRange = getCurrentDiff.abs.compare(0.5) == -1
+
   private def publishPrismStatesFor(state: PrismState): List[Cancellable] = {
     def generatePrismCurrent: Option[SystemEvent] = Option {
+      println(s"============= CURRENT EVENT===================== ${prismCurrent.toDouble}, ${getCurrentDiff.toDouble}")
       PrismCurrentEvent.make(prismCurrent.toDouble, getCurrentDiff.toDouble)
     }
     def generatePrismTarget: Option[SystemEvent] = Option {
+      println(s"============= TARGET EVENT===================== ${prismTarget.toDouble}")
       PrismTargetEvent.make(prismTarget.toDouble)
     }
 
@@ -157,29 +165,20 @@ class PrismActor(cswContext: CswContext) {
   private def publishPrismState(state: PrismState) = eventPublisher.publish(getPrismStateEvent(state))
 
   private def getPrismStateEvent(state: PrismState) =
-    PrismStateEvent.make(state, getCurrentDiff.abs.compare(0.5) == -1)
+    PrismStateEvent.make(state, isWithinToleranceRange)
 
   private def publishRetractPosition(position: PrismPosition): Unit = {
     eventPublisher.publish(PrismRetractEvent.make(position))
   }
 
-  private def scheduleJobForTarget(ctx: ActorContext[PrismCommands]) =
+  private def scheduleJobForPrismMovement(ctx: ActorContext[PrismCommands]) = {
     timeServiceScheduler.schedulePeriodically(1.seconds.toJava) {
       ctx.self ! PrismCommands.MOVE_TARGET
     }
-
+  }
   private def truncateTo1Decimal(value: BigDecimal) = BigDecimal(value.toDouble).setScale(1, RoundingMode.DOWN)
 
   private def getCurrentDiff = prismCurrent - prismTarget
-
-  private def scheduleJobForCurrent(ctx: ActorContext[PrismCommands]) = {
-    println("in here going to fast state>>>>>>>>>>>>>>>>>>>>>")
-    fastMoving = true
-    val fastMove: BigDecimal = truncateTo1Decimal((prismTarget - prismCurrent) / 3)
-    timeServiceScheduler.schedulePeriodically(1.seconds.toJava) {
-      ctx.self ! PrismCommands.MOVE_CURRENT(fastMove)
-    }
-  }
 
   protected val name: String = "Imager ADC"
 }
