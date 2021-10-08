@@ -94,7 +94,6 @@ class PrismActor(cswContext: CswContext) {
       fastMoving = true
       val fastMovement: BigDecimal = truncateTo1Decimal((prismTarget - prismCurrent) / 3)
       val targetModifier           = scheduleJobForPrismMovement(ctx)
-      val publisherSubscriptions   = publishPrismStatesFor(MOVING)
       Behaviors.receiveMessage { msg =>
         val log = cswContext.loggerFactory.getLogger(ctx)
         msg match {
@@ -118,22 +117,24 @@ class PrismActor(cswContext: CswContext) {
             Behaviors.same
           case PrismCommands.PRISM_STOP(_) =>
             targetModifier.cancel()
-            publisherSubscriptions.foreach(_.cancel())
             inAndStopped
           case PrismCommands.MOVE_CURRENT =>
-//            println(s"==============MOVE CURRENT===================== $fastMoving")
+            println(s"==============MOVE CURRENT===================== $fastMoving")
             if (fastMoving)
               prismCurrent += fastMovement
             else
               prismCurrent += slowMovement
+            publishEvent(PrismCurrentEvent.make(prismCurrent.toDouble, getCurrentDiff.toDouble))
             Behaviors.same
           case PrismCommands.MOVE_TARGET =>
-//            println(s"---------------MOVE_TARGET------------------:${getCurrentDiff.abs.compare(0.5)}")
+            println(s"---------------MOVE_TARGET------------------:${getCurrentDiff.abs.compare(0.5)}")
             if (isWithinToleranceRange) {
               prismTarget += 0.1
               fastMoving = false
             }
             ctx.self ! PrismCommands.MOVE_CURRENT
+            publishEvent(PrismTargetEvent.make(prismTarget.toDouble))
+            publishPrismState(MOVING)
             Behaviors.same
         }
       }
@@ -145,22 +146,7 @@ class PrismActor(cswContext: CswContext) {
 
   private def isWithinToleranceRange = getCurrentDiff.abs.compare(0.5) == -1
 
-  private def publishPrismStatesFor(state: PrismState): List[Cancellable] = {
-    def generatePrismCurrent: Option[SystemEvent] = Option {
-      println(s"============= CURRENT EVENT===================== ${prismCurrent.toDouble}, ${getCurrentDiff.toDouble}")
-      PrismCurrentEvent.make(prismCurrent.toDouble, getCurrentDiff.toDouble)
-    }
-    def generatePrismTarget: Option[SystemEvent] = Option {
-      println(s"============= TARGET EVENT===================== ${prismTarget.toDouble}")
-      PrismTargetEvent.make(prismTarget.toDouble)
-    }
-
-    List(
-      eventPublisher.publish(generatePrismCurrent, 1.second),
-      eventPublisher.publish(generatePrismTarget, 1.second),
-      eventPublisher.publish(Some(getPrismStateEvent(state)), 1.second)
-    )
-  }
+  private def publishEvent(event: SystemEvent) = eventPublisher.publish(event)
 
   private def publishPrismState(state: PrismState) = eventPublisher.publish(getPrismStateEvent(state))
 
