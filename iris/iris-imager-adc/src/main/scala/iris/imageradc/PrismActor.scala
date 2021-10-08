@@ -48,7 +48,7 @@ class PrismActor(cswContext: CswContext) {
             replyTo ! Accepted(runId)
             Behaviors.same
           case PrismCommands.PRISM_FOLLOW(_, targetAngle) =>
-            prismTarget = targetAngle
+            prismTarget = truncateTo1DecimalAndNormalizeToCompleteAngle(targetAngle)
             inAndMoving
           case PrismCommands.PRISM_STOP(_) =>
             Behaviors.same
@@ -106,7 +106,7 @@ class PrismActor(cswContext: CswContext) {
     Behaviors.setup { ctx =>
       println("in here going to fast state >>>>>>>>>>>>>>>>>>>>>")
       fastMoving = true
-      val fastMovement: BigDecimal = truncateTo1Decimal((prismTarget - prismCurrent) / 3)
+      val fastMovement: BigDecimal = truncateTo1DecimalAndNormalizeToCompleteAngle((prismTarget - prismCurrent) / 3)
       val targetModifier           = scheduleJobForPrismMovement(ctx)
       Behaviors.receiveMessage { msg =>
         val log = cswContext.loggerFactory.getLogger(ctx)
@@ -127,25 +127,23 @@ class PrismActor(cswContext: CswContext) {
                 Behaviors.same
             }
           case cmd @ PrismCommands.PRISM_FOLLOW(_, _) =>
-            //TODD as if required schedule ??
-            val errMsg = s"$cmd is not valid in moving state."
-            log.error(errMsg)
-            Behaviors.unhandled
+            //TODO ask if required, schedule ??
+            Behaviors.same
           case PrismCommands.PRISM_STOP(_) =>
             targetModifier.cancel()
             inAndStopped
           case PrismCommands.MOVE_CURRENT =>
             println(s"==============MOVE CURRENT===================== $fastMoving")
             if (fastMoving)
-              prismCurrent += fastMovement
+              prismCurrent = truncateTo1DecimalAndNormalizeToCompleteAngle(prismCurrent + fastMovement)
             else
-              prismCurrent += slowMovement
+              prismCurrent = truncateTo1DecimalAndNormalizeToCompleteAngle(prismCurrent + slowMovement)
             publishEvent(PrismCurrentEvent.make(prismCurrent.toDouble, getCurrentDiff.toDouble))
             Behaviors.same
           case PrismCommands.MOVE_TARGET =>
             println(s"---------------MOVE_TARGET------------------:${getCurrentDiff.abs.compare(0.5)}")
             if (isWithinToleranceRange) {
-              prismTarget += 0.1
+              prismTarget = truncateTo1DecimalAndNormalizeToCompleteAngle(prismTarget + 0.1)
               fastMoving = false
             }
             ctx.self ! PrismCommands.MOVE_CURRENT
@@ -178,7 +176,8 @@ class PrismActor(cswContext: CswContext) {
       ctx.self ! PrismCommands.MOVE_TARGET
     }
   }
-  private def truncateTo1Decimal(value: BigDecimal) = BigDecimal(value.toDouble).setScale(1, RoundingMode.DOWN)
+  private def truncateTo1DecimalAndNormalizeToCompleteAngle(value: BigDecimal): BigDecimal =
+    BigDecimal(value.toDouble % 360).setScale(1, RoundingMode.DOWN)
 
   private def getCurrentDiff = prismCurrent - prismTarget
 }
