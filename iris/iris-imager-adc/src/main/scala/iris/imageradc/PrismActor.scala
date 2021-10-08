@@ -11,13 +11,11 @@ import iris.imageradc.commands.PrismCommands.{GOING_IN, GOING_OUT}
 import iris.imageradc.commands.{ADCCommand, PrismCommands}
 import iris.imageradc.events.{PrismCurrentEvent, PrismRetractEvent, PrismStateEvent, PrismTargetEvent}
 import iris.imageradc.models.PrismState.MOVING
-import iris.imageradc.models.{PrismPosition, PrismState}
+import iris.imageradc.models.{AssemblyConfiguration, PrismPosition, PrismState}
 
-import scala.compat.java8.DurationConverters.FiniteDurationops
-import scala.concurrent.duration.DurationInt
 import scala.math.BigDecimal.RoundingMode
 
-class PrismActor(cswContext: CswContext) {
+class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfiguration) {
   var prismTarget: BigDecimal      = 0.0
   var prismCurrent: BigDecimal     = 0.0
   var fastMoving: Boolean          = false
@@ -38,7 +36,7 @@ class PrismActor(cswContext: CswContext) {
                 Behaviors.same
               case PrismPosition.OUT =>
                 println("RECEIVED PrismPosition.OUT")
-                timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plus(4.seconds.toJava))) {
+                timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plus(adcImagerConfiguration.retractSelectDelay))) {
                   crm.updateCommand(Completed(runId))
                   ctx.self ! GOING_OUT
                 }
@@ -70,7 +68,7 @@ class PrismActor(cswContext: CswContext) {
             position match {
               case PrismPosition.IN =>
                 println("RECEIVED PrismPosition.IN")
-                timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plus(4.seconds.toJava))) {
+                timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plus(adcImagerConfiguration.retractSelectDelay))) {
                   crm.updateCommand(Completed(runId))
                   ctx.self ! GOING_IN
                 }
@@ -143,7 +141,7 @@ class PrismActor(cswContext: CswContext) {
           case PrismCommands.MOVE_TARGET =>
             println(s"---------------MOVE_TARGET------------------:${getCurrentDiff.abs.compare(0.5)}")
             if (isWithinToleranceRange) {
-              prismTarget = truncateTo1DecimalAndNormalizeToCompleteAngle(prismTarget + 0.1)
+              prismTarget = truncateTo1DecimalAndNormalizeToCompleteAngle(prismTarget + adcImagerConfiguration.targetMovementAngle)
               fastMoving = false
             }
             ctx.self ! PrismCommands.MOVE_CURRENT
@@ -156,7 +154,8 @@ class PrismActor(cswContext: CswContext) {
 
   }
 
-  private def slowMovement = if (prismTarget > prismCurrent) +0.1 else -0.1
+  private def slowMovement =
+    if (prismTarget > prismCurrent) +adcImagerConfiguration.targetMovementAngle else -adcImagerConfiguration.targetMovementAngle
 
   private def isWithinToleranceRange = getCurrentDiff.abs.compare(0.5) == -1
 
@@ -172,7 +171,7 @@ class PrismActor(cswContext: CswContext) {
   }
 
   private def scheduleJobForPrismMovement(ctx: ActorContext[PrismCommands]) = {
-    timeServiceScheduler.schedulePeriodically(1.seconds.toJava) {
+    timeServiceScheduler.schedulePeriodically(adcImagerConfiguration.targetMovementDelay) {
       ctx.self ! PrismCommands.MOVE_TARGET
     }
   }
@@ -184,7 +183,7 @@ class PrismActor(cswContext: CswContext) {
 
 object PrismActor {
 
-  def behavior(cswContext: CswContext): Behavior[PrismCommands] =
-    new PrismActor(cswContext).outAndStopped
+  def behavior(cswContext: CswContext, adcImagerConfiguration: AssemblyConfiguration): Behavior[PrismCommands] =
+    new PrismActor(cswContext, adcImagerConfiguration).outAndStopped
 
 }

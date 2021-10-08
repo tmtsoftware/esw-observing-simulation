@@ -16,7 +16,7 @@ import csw.time.core.models.UTCTime
 import iris.imageradc.commands.PrismCommands.IS_VALID
 import iris.imageradc.commands.{ADCCommand, PrismCommands}
 import iris.imageradc.events.PrismStateEvent
-import iris.imageradc.models.PrismState
+import iris.imageradc.models.{AssemblyConfiguration, PrismState}
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 import scala.concurrent.{Await, ExecutionContext}
@@ -26,10 +26,10 @@ class ImagerADCHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
   import cswCtx._
   implicit val a: Scheduler = ctx.system.scheduler
 
-  implicit val ec: ExecutionContext = ctx.executionContext
-  private val log                   = loggerFactory.getLogger
-//  private val adcImagerConfiguration = AssemblyConfiguration(ctx.system.settings.config.getConfig("iris.imager.adc"))
-  private val adcActor = ctx.spawnAnonymous(PrismActor.behavior(cswCtx))
+  implicit val ec: ExecutionContext  = ctx.executionContext
+  private val log                    = loggerFactory.getLogger
+  private val adcImagerConfiguration = AssemblyConfiguration(ctx.system.settings.config.getConfig("iris.imager.ADC"))
+  private val adcActor               = ctx.spawnAnonymous(PrismActor.behavior(cswCtx, adcImagerConfiguration))
 
   override def initialize(): Unit = {
     log.info("Initializing imager.adc...")
