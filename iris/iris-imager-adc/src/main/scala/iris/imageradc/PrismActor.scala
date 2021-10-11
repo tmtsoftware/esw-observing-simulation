@@ -35,12 +35,11 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
                 crm.updateCommand(Completed(runId))
                 Behaviors.same
               case PrismPosition.OUT =>
-                println("RECEIVED PrismPosition.OUT")
                 timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plus(adcImagerConfiguration.retractSelectDelay))) {
                   crm.updateCommand(Completed(runId))
                   ctx.self ! GOING_OUT
                 }
-                Behaviors.same
+                goingOut
             }
           case PrismCommands.IS_VALID(runId, _, replyTo) =>
             replyTo ! Accepted(runId)
@@ -50,14 +49,36 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
             inAndMoving
           case PrismCommands.PRISM_STOP(_) =>
             Behaviors.same
-          case GOING_OUT =>
-            println("GOING_OUT")
-            outAndStopped
           case _ => Behaviors.unhandled
         }
       }
     }
   }
+  def goingIn: Behavior[PrismCommands] =
+    Behaviors.receive { (ctx, msg) =>
+      val log = cswContext.loggerFactory.getLogger(ctx)
+      msg match {
+        case PrismCommands.GOING_IN =>
+          inAndStopped
+        case cmd =>
+          val errMsg = s"$cmd is not valid in disabled state."
+          log.error(errMsg)
+          Behaviors.unhandled
+      }
+    }
+
+  def goingOut: Behavior[PrismCommands] =
+    Behaviors.receive { (ctx, msg) =>
+      val log = cswContext.loggerFactory.getLogger(ctx)
+      msg match {
+        case PrismCommands.GOING_OUT =>
+          outAndStopped
+        case cmd =>
+          val errMsg = s"$cmd is not valid in disabled state."
+          log.error(errMsg)
+          Behaviors.unhandled
+      }
+    }
   def outAndStopped: Behavior[PrismCommands] = {
     publishRetractPosition(PrismPosition.OUT)
     Behaviors.receive { (ctx, msg) =>
@@ -67,12 +88,11 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
           case PrismCommands.RETRACT_SELECT(runId, position) =>
             position match {
               case PrismPosition.IN =>
-                println("RECEIVED PrismPosition.IN")
                 timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plus(adcImagerConfiguration.retractSelectDelay))) {
                   crm.updateCommand(Completed(runId))
                   ctx.self ! GOING_IN
                 }
-                Behaviors.same
+                goingIn
               case PrismPosition.OUT =>
                 crm.updateCommand(Completed(runId))
                 Behaviors.same
@@ -88,21 +108,16 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
                 replyTo ! Invalid(runId, UnsupportedCommandIssue(errMsg))
                 Behaviors.unhandled
             }
-          case GOING_IN =>
-            println("GOING_IN")
-            inAndStopped
           case cmd =>
             val errMsg = s"$cmd is not valid in disabled state."
             log.error(errMsg)
             Behaviors.unhandled
-
         }
       }
     }
   }
-  def inAndMoving: Behavior[PrismCommands] = {
+  def inAndMoving: Behavior[PrismCommands] =
     Behaviors.setup { ctx =>
-      println("in here going to fast state >>>>>>>>>>>>>>>>>>>>>")
       fastMoving = true
       val fastMovement: BigDecimal = truncateTo1DecimalAndNormalizeToCompleteAngle((prismTarget - prismCurrent) / 3)
       val targetModifier           = scheduleJobForPrismMovement(ctx)
@@ -131,7 +146,6 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
             targetModifier.cancel()
             inAndStopped
           case PrismCommands.MOVE_CURRENT =>
-            println(s"==============MOVE CURRENT===================== $fastMoving")
             if (fastMoving)
               prismCurrent = truncateTo1DecimalAndNormalizeToCompleteAngle(prismCurrent + fastMovement)
             else
@@ -139,7 +153,6 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
             publishEvent(PrismCurrentEvent.make(prismCurrent.toDouble, getCurrentDiff.toDouble))
             Behaviors.same
           case PrismCommands.MOVE_TARGET =>
-            println(s"---------------MOVE_TARGET------------------:${getCurrentDiff.abs.compare(0.5)}")
             if (isWithinToleranceRange) {
               prismTarget = truncateTo1DecimalAndNormalizeToCompleteAngle(prismTarget + adcImagerConfiguration.targetMovementAngle)
               fastMoving = false
@@ -151,8 +164,6 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
         }
       }
     }
-
-  }
 
   private def slowMovement =
     if (prismTarget > prismCurrent) +adcImagerConfiguration.targetMovementAngle else -adcImagerConfiguration.targetMovementAngle

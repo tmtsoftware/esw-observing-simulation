@@ -4,24 +4,20 @@ import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.util.Timeout
 import csw.command.client.CommandServiceFactory
 import csw.location.api.models.Connection.AkkaConnection
-import csw.prefix.models.Prefix
 import csw.location.api.models.{ComponentId, ComponentType}
 import csw.params.commands.CommandResponse.{Completed, Started}
 import csw.params.commands.Setup
-import csw.params.core.models.Choice
 import csw.params.events.{Event, SystemEvent}
+import csw.prefix.models.Prefix
 import csw.prefix.models.Subsystem.IRIS
-import csw.testkit.scaladsl.CSWService.{AlarmServer, EventServer}
+import csw.testkit.scaladsl.CSWService.EventServer
 import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
-import iris.imageradc.DemoApp.{queryFinal, sequencerPrefix, submitCommand}
 import iris.imageradc.commands.ADCCommand
 import iris.imageradc.events.PrismCurrentEvent.{ImagerADCCurrentEventKey, ImagerADCCurrentEventName, angleErrorKey}
 import iris.imageradc.events.PrismRetractEvent.{ImagerADCRetractEventKey, ImagerADCRetractEventName}
-import iris.imageradc.events.PrismStateEvent
 import iris.imageradc.events.PrismStateEvent.{ImagerADCStateEventKey, ImagerADCStateEventName, moveKey, onTargetKey}
-import iris.imageradc.events.PrismTargetEvent.{ImagerADCTargetEventKey, ImagerADCTargetEventName, angleKey}
+import iris.imageradc.events.PrismTargetEvent.{ImagerADCTargetEventKey, angleKey}
 import iris.imageradc.models.{PrismPosition, PrismState}
-import iris.imageradc.models.PrismState.STOPPED
 import org.scalatest.funsuite.AnyFunSuiteLike
 
 import scala.concurrent.Await
@@ -33,7 +29,6 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
 
   override def beforeAll(): Unit = {
     super.beforeAll()
-    // uncomment if you want one Assembly run for all tests
     spawnStandalone(com.typesafe.config.ConfigFactory.load("ImagerADCStandalone.conf"))
   }
 
@@ -63,7 +58,7 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
     isOnTarget shouldBe true
 
     val commandService = CommandServiceFactory.make(akkaLocation)
-    // Retract prism to IN from OUT
+    // Retract prism from OUT to IN
     val InCommand =
       Setup(sequencerPrefix, ADCCommand.RetractSelect, None).add(PrismPosition.RetractKey.set(PrismPosition.IN.entryName))
     val response = commandService.submit(InCommand)
@@ -73,7 +68,6 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
     // Retracting from one position to another takes 4 seconds to complete
     val finalResponse = commandService.queryFinal(initialResponse.runId)(Timeout(5.seconds))
     finalResponse.futureValue shouldBe a[Completed]
-
 
     eventually {
       val goingInEvent = testProbe.expectMessageType[SystemEvent]
@@ -96,10 +90,10 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
 
     // Send STOP command
     val StopCommand  = Setup(sequencerPrefix, ADCCommand.PrismStop, None)
-    val stopResponse =commandService.submit(StopCommand)
+    val stopResponse = commandService.submit(StopCommand)
     stopResponse.futureValue shouldBe a[Completed]
 
-    // expect 
+    // expect STOPPED event
     eventually {
       val stoppedEvent = testProbe.expectMessageType[SystemEvent]
       stoppedEvent.eventName shouldBe ImagerADCStateEventName
@@ -107,6 +101,7 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
       stoppedEvent.paramType.get(onTargetKey).value.values.head shouldBe true
     }
 
+    // Retract prism from IN to OUT
     val OutCommand =
       Setup(sequencerPrefix, ADCCommand.RetractSelect, None).add(PrismPosition.RetractKey.set(PrismPosition.OUT.entryName))
     val finalState = commandService.submit(OutCommand).futureValue
