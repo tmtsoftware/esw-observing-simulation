@@ -2,6 +2,7 @@ package iris.imageradc.events
 
 import csw.params.core.generics.{GChoiceKey, Key}
 import csw.params.core.generics.KeyType.{BooleanKey, DoubleKey}
+import csw.params.core.models.Choice
 import csw.params.events.{EventKey, EventName, SystemEvent}
 import iris.imageradc.Constants.ImagerADCAssemblyPrefix
 import iris.imageradc.models.{PrismPosition, PrismState}
@@ -58,7 +59,6 @@ object PrismCurrentEvent {
 object PrismRetractEvent {
   val ImagerADCRetractEventName: EventName = EventName("prism_position")
   val ImagerADCRetractEventKey: EventKey   = EventKey(ImagerADCAssemblyPrefix, ImagerADCRetractEventName)
-
   def make(state: PrismPosition): SystemEvent =
     SystemEvent(
       ImagerADCAssemblyPrefix,

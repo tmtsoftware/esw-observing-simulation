@@ -3,9 +3,10 @@ import sbt._
 object Dependencies {
 
   val IrisAssemblies = Seq(
-    CSW.`csw-testkit` % Test,
-    Libs.`scalatest`  % Test,
-    Libs.`junit-4-13` % Test
+    CSW.`csw-testkit`               % Test,
+    Libs.`scalatest`                % Test,
+    Libs.`junit-4-13`               % Test,
+    Libs.`akka-actor-testkit-typed` % Test
   )
 
   val IrisDeploy = Seq(
