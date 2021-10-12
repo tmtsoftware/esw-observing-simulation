@@ -1,0 +1,42 @@
+name: iris
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main, 'branch-*']
+    paths:
+      - iris/**
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: laughedelic/coursier-setup@v1
+        with:
+          jvm: 11
+          apps: sbt sbtn
+      - uses: coursier/cache-action@v5
+
+      - name: Install Redis
+        run: sudo apt-get install redis-server
+
+      - name: Install Kotlin
+        run: |
+          curl -s https://get.sdkman.io | bash
+          source "/home/runner/.sdkman/bin/sdkman-init.sh"
+          sdk install kotlin
+          sudo ln -s $(which kotlinc) /usr/local/bin/kotlinc
+
+      - name: Build
+        working-directory: iris
+        run: |
+          sbtn clean
+          sbtn scalafmtCheck
+
+      - name: Tests
+        working-directory: iris
+        run: sbt test:test
