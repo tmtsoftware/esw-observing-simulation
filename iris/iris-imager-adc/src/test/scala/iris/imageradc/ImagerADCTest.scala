@@ -16,7 +16,8 @@ import iris.imageradc.commands.ADCCommand
 import iris.imageradc.events.PrismCurrentEvent.{ImagerADCCurrentEventKey, ImagerADCCurrentEventName, angleErrorKey}
 import iris.imageradc.events.PrismRetractEvent.{ImagerADCRetractEventKey, ImagerADCRetractEventName}
 import iris.imageradc.events.PrismStateEvent.{ImagerADCStateEventKey, ImagerADCStateEventName, moveKey, onTargetKey}
-import iris.imageradc.events.PrismTargetEvent.{ImagerADCTargetEventKey, angleKey}
+import iris.imageradc.events.PrismTargetEvent.{ImagerADCTargetEventKey, ImagerADCTargetEventName, angleKey}
+import iris.imageradc.models.PrismState.MOVING
 import iris.imageradc.models.{PrismPosition, PrismState}
 import org.scalatest.funsuite.AnyFunSuiteLike
 
@@ -32,7 +33,7 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
     spawnStandalone(com.typesafe.config.ConfigFactory.load("ImagerADCStandalone.conf"))
   }
 
-  test("Assembly should be locatable using Location Service") {
+  test("ADC Assembly behaviour | ESW-547") {
     implicit val patienceConfig: PatienceConfig = PatienceConfig(10.seconds)
     val sequencerPrefix                         = Prefix(IRIS, "darknight")
     val connection                              = AkkaConnection(ComponentId(Prefix("IRIS.imager.adc"), ComponentType.Assembly))
@@ -79,13 +80,28 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
     val followResponse = commandService.submit(FollowCommand)
     followResponse.futureValue shouldBe a[Completed]
 
+    //verify targetAngle is set to 20.0
+    eventually {
+      val targetEvent = testProbe.expectMessageType[SystemEvent]
+      targetEvent.eventName shouldBe ImagerADCTargetEventName
+      targetEvent.paramType.get(angleKey).value.values.head shouldBe 20.0
+    }
+
+    //verify whether prism has started moving
+    eventually {
+      val movingEvent = testProbe.expectMessageType[SystemEvent]
+      movingEvent.eventName shouldBe ImagerADCStateEventName
+      movingEvent.paramType.get(moveKey).value.values.head.name shouldBe MOVING.entryName
+      movingEvent.paramType.get(onTargetKey).value.values.head shouldBe false
+    }
+
     Thread.sleep(3000)
     // After some time, current angle reaches near to targetAngle.
     eventually {
       val current = testProbe.expectMessageType[SystemEvent]
       current.eventName shouldBe ImagerADCCurrentEventName
       current.paramType.get(angleKey).value.values.head shouldBe 20.0
-      current.paramType.get(angleErrorKey).value.values.head shouldBe -0.2
+      current.paramType.get(angleErrorKey).value.values.head shouldBe 0.2
     }
 
     // Send STOP command

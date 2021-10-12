@@ -189,7 +189,7 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
   private def truncateTo1DecimalAndNormalizeToCompleteAngle(value: BigDecimal): BigDecimal =
     BigDecimal(value.toDouble % 360).setScale(1, RoundingMode.DOWN)
 
-  private def getCurrentDiff = prismCurrent - prismTarget
+  private def getCurrentDiff = prismTarget - prismCurrent
 }
 
 object PrismActor {

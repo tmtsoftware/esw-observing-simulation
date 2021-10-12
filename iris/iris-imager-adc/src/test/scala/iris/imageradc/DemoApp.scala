@@ -76,8 +76,8 @@ object DemoApp {
     submitCommand(commandService, Follow2Command)
     Thread.sleep(10000)
 
-    val stopResponse2 = submitCommand(commandService, StopCommand)
-//    queryFinal(commandService, stopResponse2.runId)
+    submitCommand(commandService, StopCommand)
+
     val OutCommand =
       Setup(sequencerPrefix, ADCCommand.RetractSelect, None).add(PrismPosition.RetractKey.set(PrismPosition.OUT.entryName))
     val finalState = submitCommand(commandService, OutCommand)
@@ -113,15 +113,16 @@ object DemoApp {
   private def printPrismStateEvent(event: Event) = for {
     move     <- event.paramType.get(PrismStateEvent.moveKey).flatMap(_.get(0))
     onTarget <- event.paramType.get(PrismStateEvent.onTargetKey).flatMap(_.get(0))
-  } yield {
-    println("------------------------------------------")
-    println(s"Prism State: $move, OnTarget: $onTarget")
-  }
+  } yield println(s"Prism State: $move, OnTarget: $onTarget")
+
 
   private def printPrismTargetEvent(event: Event) =
     for {
       angle <- event.paramType.get(PrismTargetEvent.angleKey).flatMap(_.get(0))
-    } yield println(s"Target Angle: $angle")
+    } yield {
+      println("------------------------------------------")
+      println(s"Target Angle: $angle")
+    }
 
   private def printPrismRetractEvent(event: Event) =
     for {
