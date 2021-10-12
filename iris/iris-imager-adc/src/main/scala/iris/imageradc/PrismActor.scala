@@ -60,8 +60,13 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
       msg match {
         case PrismCommands.GOING_IN =>
           inAndStopped
+        case PrismCommands.IS_VALID(runId, command, replyTo) =>
+          val errMsg = s"${command.commandName.name} is not valid in Retracting IN state."
+          log.error(errMsg)
+          replyTo ! Invalid(runId, UnsupportedCommandIssue(errMsg))
+          Behaviors.unhandled
         case cmd =>
-          val errMsg = s"$cmd is not valid in disabled state."
+          val errMsg = s"$cmd is not valid in Retracting state."
           log.error(errMsg)
           Behaviors.unhandled
       }
@@ -73,8 +78,13 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
       msg match {
         case PrismCommands.GOING_OUT =>
           outAndStopped
+        case PrismCommands.IS_VALID(runId, command, replyTo) =>
+          val errMsg = s"${command.commandName.name} is not valid in Retracting OUT state."
+          log.error(errMsg)
+          replyTo ! Invalid(runId, UnsupportedCommandIssue(errMsg))
+          Behaviors.unhandled
         case cmd =>
-          val errMsg = s"$cmd is not valid in disabled state."
+          val errMsg = s"$cmd is not valid in Retracting state."
           log.error(errMsg)
           Behaviors.unhandled
       }

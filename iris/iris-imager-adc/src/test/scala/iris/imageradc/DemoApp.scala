@@ -82,6 +82,8 @@ object DemoApp {
       Setup(sequencerPrefix, ADCCommand.RetractSelect, None).add(PrismPosition.RetractKey.set(PrismPosition.OUT.entryName))
     val finalState = submitCommand(commandService, OutCommand)
     queryFinal(commandService, finalState.runId)
+
+    Thread.sleep(10000)
   }
 
   private def concurrentMoveCommandsScenario(commandService: CommandService): Unit = {
@@ -114,7 +116,6 @@ object DemoApp {
     move     <- event.paramType.get(PrismStateEvent.moveKey).flatMap(_.get(0))
     onTarget <- event.paramType.get(PrismStateEvent.onTargetKey).flatMap(_.get(0))
   } yield println(s"Prism State: $move, OnTarget: $onTarget")
-
 
   private def printPrismTargetEvent(event: Event) =
     for {

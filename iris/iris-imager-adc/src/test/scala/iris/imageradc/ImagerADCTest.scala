@@ -1,11 +1,13 @@
 package iris.imageradc
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
+import akka.actor.typed.ActorRef
 import akka.util.Timeout
 import csw.command.client.CommandServiceFactory
+import csw.command.client.messages.ComponentMessage
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{ComponentId, ComponentType}
-import csw.params.commands.CommandResponse.{Completed, Started}
+import csw.params.commands.CommandResponse.{Completed, Invalid, Started}
 import csw.params.commands.Setup
 import csw.params.events.{Event, SystemEvent}
 import csw.prefix.models.Prefix
@@ -55,7 +57,7 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
     val currentEvent      = testProbe.expectMessageType[SystemEvent]
     val prismCurrentState = currentEvent.paramType.get(moveKey).value.values.head.name
     val isOnTarget        = currentEvent.paramType.get(onTargetKey).value.values.head
-    prismCurrentState shouldBe (PrismState.STOPPED.entryName)
+    prismCurrentState shouldBe PrismState.STOPPED.entryName
     isOnTarget shouldBe true
 
     val commandService = CommandServiceFactory.make(akkaLocation)
@@ -130,5 +132,48 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
       prismRetractOutState.eventName shouldBe ImagerADCRetractEventName
       prismRetractOutState.paramType.get(PrismPosition.RetractKey).value.values.head.name shouldBe PrismPosition.OUT.entryName
     }
+  }
+
+  test("ADC Assembly behaviour should return Invalid when concurrent (RETRACT IN) commands received | ESW-547") {
+    implicit val patienceConfig: PatienceConfig = PatienceConfig(10.seconds)
+    val sequencerPrefix                         = Prefix(IRIS, "darknight")
+    val connection                              = AkkaConnection(ComponentId(Prefix("IRIS.imager.adc"), ComponentType.Assembly))
+    val akkaLocation                            = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
+    akkaLocation.connection shouldBe connection
+
+    val testProbe = TestProbe[Event]()
+    //Subscribe to event's which will be published by prism in it's lifecycle
+    eventService.defaultSubscriber.subscribeActorRef(
+      Set(
+        ImagerADCStateEventKey,
+        ImagerADCTargetEventKey,
+        ImagerADCRetractEventKey,
+        ImagerADCCurrentEventKey
+      ),
+      testProbe.ref
+    )
+    // initially prism is stopped & on target
+    val currentEvent      = testProbe.expectMessageType[SystemEvent]
+    val prismCurrentState = currentEvent.paramType.get(moveKey).value.values.head.name
+    val isOnTarget        = currentEvent.paramType.get(onTargetKey).value.values.head
+    prismCurrentState shouldBe PrismState.STOPPED.entryName
+    isOnTarget shouldBe true
+
+    val commandService = CommandServiceFactory.make(akkaLocation)
+    // Retract prism from OUT to IN
+    val InCommand =
+      Setup(sequencerPrefix, ADCCommand.RetractSelect, None).add(PrismPosition.RetractKey.set(PrismPosition.IN.entryName))
+    val response1 = commandService.submit(InCommand)
+
+    // concurrent Retract prism from OUT to IN
+    val response2 = commandService.submit(InCommand)
+
+    val initialResponse = response1.futureValue
+    initialResponse shouldBe a[Started]
+    response2.futureValue shouldBe a[Invalid]
+
+    // Retracting from one position to another takes 4 seconds to complete
+    val finalResponse = commandService.queryFinal(initialResponse.runId)(Timeout(5.seconds))
+    finalResponse.futureValue shouldBe a[Completed]
   }
 }
