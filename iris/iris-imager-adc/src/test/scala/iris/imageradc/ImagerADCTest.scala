@@ -1,10 +1,8 @@
 package iris.imageradc
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.ActorRef
 import akka.util.Timeout
 import csw.command.client.CommandServiceFactory
-import csw.command.client.messages.ComponentMessage
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{ComponentId, ComponentType}
 import csw.params.commands.CommandResponse.{Completed, Invalid, Started}

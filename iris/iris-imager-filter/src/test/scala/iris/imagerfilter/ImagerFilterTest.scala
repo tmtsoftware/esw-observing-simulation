@@ -1,10 +1,23 @@
 package iris.imagerfilter
 
+import akka.actor.testkit.typed.scaladsl.TestProbe
+import akka.util.Timeout
+import csw.command.client.CommandServiceFactory
 import csw.location.api.models.Connection.AkkaConnection
 import csw.prefix.models.Prefix
 import csw.location.api.models.{ComponentId, ComponentType}
+import csw.params.commands.CommandResponse.{Completed, Invalid, Started}
+import csw.params.commands.Setup
+import csw.params.events.{Event, SystemEvent}
+import csw.prefix.models.Subsystem.IRIS
 import csw.testkit.scaladsl.CSWService.{AlarmServer, EventServer}
 import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
+import iris.imagerfilter.commands.SelectCommand
+import iris.imagerfilter.commands.SelectCommand.Wheel1Key
+import iris.imagerfilter.events.ImagerPositionEvent
+import iris.imagerfilter.events.ImagerPositionEvent.{CurrentPositionKey, DarkKey, DemandPositionKey}
+import iris.imagerfilter.models.FilterWheelPosition
+import iris.imagerfilter.models.FilterWheelPosition._
 import org.scalatest.funsuite.AnyFunSuiteLike
 
 import scala.concurrent.Await
@@ -20,10 +33,134 @@ class ImagerFilterTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServe
     spawnStandalone(com.typesafe.config.ConfigFactory.load("ImagerFilterStandalone.conf"))
   }
 
-  test("Assembly should be locatable using Location Service") {
-    val connection   = AkkaConnection(ComponentId(Prefix("IRIS.imager.filter"), ComponentType.Assembly))
-    val akkaLocation = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
-
+  test("Imager Filter Assembly behaviour | ESW-544") {
+    implicit val patienceConfig: PatienceConfig = PatienceConfig(10.seconds)
+    val sequencerPrefix                         = Prefix(IRIS, "darknight")
+    val connection                              = AkkaConnection(ComponentId(Prefix("IRIS.imager.filter"), ComponentType.Assembly))
+    val akkaLocation                            = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
     akkaLocation.connection shouldBe connection
+
+    val testProbe = TestProbe[Event]()
+    //Subscribe to event's which will be published by imager in it's lifecycle
+    eventService.defaultSubscriber.subscribeActorRef(
+      Set(
+        ImagerPositionEvent.ImagerPositionEventKey
+      ),
+      testProbe.ref
+    )
+    // initially imager is idle & at FilterWheelPosition.Z
+    val currentEvent    = testProbe.expectMessageType[SystemEvent]
+    val demandPosition  = currentEvent.paramType.get(ImagerPositionEvent.DemandPositionKey).value.values.head.name
+    val currentPosition = currentEvent.paramType.get(ImagerPositionEvent.CurrentPositionKey).value.values.head.name
+    val dark            = currentEvent.paramType.get(ImagerPositionEvent.DarkKey).value.values.head
+
+    demandPosition shouldBe FilterWheelPosition.Z.entryName
+    currentPosition shouldBe FilterWheelPosition.Z.entryName
+    dark shouldBe false
+
+    val commandService = CommandServiceFactory.make(akkaLocation)
+
+    // move position forwards
+    val selectCommand =
+      Setup(sequencerPrefix, SelectCommand.Name, None).add(Wheel1Key.set(H.entryName))
+    val initialResponse = commandService.submit(selectCommand).futureValue
+
+    initialResponse shouldBe a[Started]
+
+    eventually {
+      val event1 = testProbe.expectMessageType[SystemEvent]
+      event1.paramType.get(DemandPositionKey).value.values.head.name shouldBe H.entryName
+      event1.paramType.get(CurrentPositionKey).value.values.head.name shouldBe Y.entryName
+      event1.paramType.get(DarkKey).value.values.head shouldBe true
+    }
+
+    eventually {
+      val event2 = testProbe.expectMessageType[SystemEvent]
+      event2.paramType.get(DemandPositionKey).value.values.head.name shouldBe H.entryName
+      event2.paramType.get(CurrentPositionKey).value.values.head.name shouldBe J.entryName
+      event2.paramType.get(DarkKey).value.values.head shouldBe true
+    }
+
+    eventually {
+      val event3 = testProbe.expectMessageType[SystemEvent]
+      event3.paramType.get(DemandPositionKey).value.values.head.name shouldBe H.entryName
+      event3.paramType.get(CurrentPositionKey).value.values.head.name shouldBe H.entryName
+      event3.paramType.get(DarkKey).value.values.head shouldBe false
+    }
+
+    val finalResponse = commandService.queryFinal(initialResponse.runId)(Timeout(2.seconds))
+    finalResponse.futureValue shouldBe a[Completed]
+
+    //Move position backwards
+
+    val selectCommand2 =
+      Setup(sequencerPrefix, SelectCommand.Name, None).add(Wheel1Key.set(Z.entryName))
+    val initialResponse2 = commandService.submit(selectCommand2).futureValue
+
+    initialResponse2 shouldBe a[Started]
+
+    eventually {
+      val event1 = testProbe.expectMessageType[SystemEvent]
+      event1.paramType.get(DemandPositionKey).value.values.head.name shouldBe Z.entryName
+      event1.paramType.get(CurrentPositionKey).value.values.head.name shouldBe J.entryName
+      event1.paramType.get(DarkKey).value.values.head shouldBe true
+    }
+
+    eventually {
+      val event2 = testProbe.expectMessageType[SystemEvent]
+      event2.paramType.get(DemandPositionKey).value.values.head.name shouldBe Z.entryName
+      event2.paramType.get(CurrentPositionKey).value.values.head.name shouldBe Y.entryName
+      event2.paramType.get(DarkKey).value.values.head shouldBe true
+    }
+
+    eventually {
+      val event3 = testProbe.expectMessageType[SystemEvent]
+      event3.paramType.get(DemandPositionKey).value.values.head.name shouldBe Z.entryName
+      event3.paramType.get(CurrentPositionKey).value.values.head.name shouldBe Z.entryName
+      event3.paramType.get(DarkKey).value.values.head shouldBe false
+    }
+
+    val finalResponse2 = commandService.queryFinal(initialResponse2.runId)(Timeout(2.seconds))
+    finalResponse2.futureValue shouldBe a[Completed]
+
+  }
+
+  test("Imager Filter Assembly behaviour should return Invalid when concurrent commands received | ESW-544") {
+    implicit val patienceConfig: PatienceConfig = PatienceConfig(10.seconds)
+    val sequencerPrefix                         = Prefix(IRIS, "darknight")
+    val connection                              = AkkaConnection(ComponentId(Prefix("IRIS.imager.filter"), ComponentType.Assembly))
+    val akkaLocation                            = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
+    akkaLocation.connection shouldBe connection
+
+    val testProbe = TestProbe[Event]()
+    //Subscribe to event's which will be published by imager in it's lifecycle
+    eventService.defaultSubscriber.subscribeActorRef(
+      Set(
+        ImagerPositionEvent.ImagerPositionEventKey
+      ),
+      testProbe.ref
+    )
+    // initially imager is idle & at FilterWheelPosition.Z
+    val currentEvent    = testProbe.expectMessageType[SystemEvent]
+    val demandPosition  = currentEvent.paramType.get(ImagerPositionEvent.DemandPositionKey).value.values.head.name
+    val currentPosition = currentEvent.paramType.get(ImagerPositionEvent.CurrentPositionKey).value.values.head.name
+    val dark            = currentEvent.paramType.get(ImagerPositionEvent.DarkKey).value.values.head
+
+    demandPosition shouldBe FilterWheelPosition.Z.entryName
+    currentPosition shouldBe FilterWheelPosition.Z.entryName
+    dark shouldBe false
+
+    val commandService = CommandServiceFactory.make(akkaLocation)
+
+    // move position forwards
+    val selectCommand =
+      Setup(sequencerPrefix, SelectCommand.Name, None).add(Wheel1Key.set(H.entryName))
+    val initialResponse = commandService.submit(selectCommand).futureValue
+
+    //concurrent move
+    val command2Response = commandService.submit(selectCommand).futureValue
+
+    initialResponse shouldBe a[Started]
+    command2Response shouldBe a[Invalid]
   }
 }
