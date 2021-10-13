@@ -4,7 +4,7 @@ import csw.params.core.generics.GChoiceKey
 import csw.params.core.generics.KeyType.ChoiceKey
 import csw.params.core.models.Choices
 import enumeratum.Enum
-import iris.commons.models.{Position, LinearPosition}
+import iris.commons.models.{LinearPosition, Position}
 
 import scala.collection.immutable.IndexedSeq
 
@@ -27,20 +27,21 @@ object FilterWheelPosition extends Enum[FilterWheelPosition] {
   private lazy val choices: Choices              = Choices.from(FilterWheelPosition.values.map(_.entryName): _*)
   def makeChoiceKey(keyName: String): GChoiceKey = ChoiceKey.make(keyName, choices)
 
-  case object F1  extends FilterWheelPosition("f1")
-  case object F2  extends FilterWheelPosition("f2")
-  case object F3  extends FilterWheelPosition("f3")
-  case object F4  extends FilterWheelPosition("f4")
-  case object F5  extends FilterWheelPosition("f5")
-  case object F6  extends FilterWheelPosition("f6")
-  case object F7  extends FilterWheelPosition("f7")
-  case object F8  extends FilterWheelPosition("f8")
-  case object F9  extends FilterWheelPosition("f9")
-  case object F10 extends FilterWheelPosition("f10")
-  case object F11 extends FilterWheelPosition("f11")
-  case object F12 extends FilterWheelPosition("f12")
-  case object F13 extends FilterWheelPosition("f13")
-  case object F14 extends FilterWheelPosition("f14")
-  case object F15 extends FilterWheelPosition("f15")
-  case object F16 extends FilterWheelPosition("f16")
+  case object Z        extends FilterWheelPosition("Z")
+  case object Y        extends FilterWheelPosition("Y")
+  case object J        extends FilterWheelPosition("J")
+  case object H        extends FilterWheelPosition("H")
+  case object K        extends FilterWheelPosition("K")
+  case object Ks       extends FilterWheelPosition("Ks")
+  case object HKNotch  extends FilterWheelPosition("H+K notch")
+  case object CO       extends FilterWheelPosition("CO")
+  case object BrGamma  extends FilterWheelPosition("BrGamma")
+  case object PaBeta   extends FilterWheelPosition("PaBeta")
+  case object H2       extends FilterWheelPosition("H2")
+  case object FeII     extends FilterWheelPosition("FeII")
+  case object HeI      extends FilterWheelPosition("HeI")
+  case object CaIITrip extends FilterWheelPosition("CaII Trip")
+  case object JCont    extends FilterWheelPosition("J Cont")
+  case object HCont    extends FilterWheelPosition("H Cont")
+  case object KCont    extends FilterWheelPosition("K Cont")
 }

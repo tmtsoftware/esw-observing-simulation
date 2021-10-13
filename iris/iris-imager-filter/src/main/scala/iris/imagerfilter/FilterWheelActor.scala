@@ -20,7 +20,7 @@ class FilterWheelActor(cswContext: CswContext, configuration: AssemblyConfigurat
 }
 
 object FilterWheelActor {
-  val InitialPosition: FilterWheelPosition = FilterWheelPosition.F1
+  val InitialPosition: FilterWheelPosition = FilterWheelPosition.Z
 
   def behavior(cswContext: CswContext, configuration: AssemblyConfiguration): Behavior[WheelCommand[FilterWheelPosition]] =
     new FilterWheelActor(cswContext, configuration).idle(InitialPosition)

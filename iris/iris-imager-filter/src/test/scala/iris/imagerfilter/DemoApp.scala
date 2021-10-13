@@ -44,8 +44,8 @@ object DemoApp {
 
       subscribeToImagerPositionEvents()
       Thread.sleep(5000)
-      moveCommandScenario(commandService, F3)
-//      concurrentMoveCommandsScenario(commandService, F8)
+      moveCommandScenario(commandService, PaBeta)
+//      concurrentMoveCommandsScenario(commandService, JCont)
     }
     finally shutdown()
 
