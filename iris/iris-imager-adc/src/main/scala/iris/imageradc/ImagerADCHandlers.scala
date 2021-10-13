@@ -13,7 +13,7 @@ import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandName, ControlCommand, Setup}
 import csw.params.core.models.Id
 import csw.time.core.models.UTCTime
-import iris.imageradc.commands.PrismCommands.IS_VALID
+import iris.imageradc.commands.PrismCommands.IsValid
 import iris.imageradc.commands.{ADCCommand, PrismCommands}
 import iris.imageradc.events.PrismStateEvent
 import iris.imageradc.models.{AssemblyConfiguration, PrismState}
@@ -69,30 +69,23 @@ class ImagerADCHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
     setup.commandName match {
       case ADCCommand.RetractSelect =>
         ADCCommand.getPrismPosition(setup) match {
-          case Left(commandIssue) =>
-            log.error(s"Failed to retrieve prism position, reason: ${commandIssue.reason}")
-            Invalid(runId, commandIssue)
+          case Left(commandIssue) => Invalid(runId, commandIssue)
           case Right(value) =>
-            adcActor ! PrismCommands.RETRACT_SELECT(runId, value)
+            adcActor ! PrismCommands.RetractSelect(runId, value)
             Started(runId)
         }
       case ADCCommand.PrismFollow =>
         ADCCommand.getTargetAngle(setup) match {
-          case Left(commandIssue) =>
-            log.error(s"Failed to retrieve target angle, reason: ${commandIssue.reason}")
-            Invalid(runId, commandIssue)
+          case Left(commandIssue) => Invalid(runId, commandIssue)
           case Right(value) =>
-            adcActor ! PrismCommands.PRISM_FOLLOW(runId, value)
+            adcActor ! PrismCommands.PrismFollow(runId, value)
             Completed(runId)
         }
 
       case ADCCommand.PrismStop =>
-        adcActor ! PrismCommands.PRISM_STOP(runId)
+        adcActor ! PrismCommands.PrismStop(runId)
         Completed(runId)
-      case CommandName(name) =>
-        val errMsg = s"Setup command: $name not supported."
-        log.error(errMsg)
-        Invalid(runId, UnsupportedCommandIssue(errMsg))
+      case CommandName(name) => Invalid(runId, UnsupportedCommandIssue(s"Setup command: $name not supported."))
     }
 
   private def handleValidation(runId: Id, setup: Setup): ValidateCommandResponse = {
@@ -100,7 +93,7 @@ class ImagerADCHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
     implicit val value: Timeout = Timeout(timeout)
 
     def sendIsValid: ValidateCommandResponse =
-      Await.result(adcActor ? (IS_VALID(runId, setup, _)), timeout)
+      Await.result(adcActor ? (IsValid(runId, setup, _)), timeout)
 
     setup.commandName match {
       case ADCCommand.RetractSelect =>

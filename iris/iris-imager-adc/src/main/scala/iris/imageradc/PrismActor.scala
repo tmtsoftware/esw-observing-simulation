@@ -7,7 +7,7 @@ import csw.params.commands.CommandIssue.UnsupportedCommandIssue
 import csw.params.commands.CommandResponse.{Accepted, Completed, Invalid}
 import csw.params.events.SystemEvent
 import csw.time.core.models.UTCTime
-import iris.imageradc.commands.PrismCommands.{GOING_IN, GOING_OUT}
+import iris.imageradc.commands.PrismCommands.{GoingIn, GoingOut}
 import iris.imageradc.commands.{ADCCommand, PrismCommands}
 import iris.imageradc.events.{PrismCurrentEvent, PrismRetractEvent, PrismStateEvent, PrismTargetEvent}
 import iris.imageradc.models.PrismState.MOVING
@@ -29,7 +29,7 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
     Behaviors.receive { (ctx, msg) =>
       {
         msg match {
-          case PrismCommands.RETRACT_SELECT(runId, position) =>
+          case PrismCommands.RetractSelect(runId, position) =>
             position match {
               case PrismPosition.IN =>
                 crm.updateCommand(Completed(runId))
@@ -37,17 +37,17 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
               case PrismPosition.OUT =>
                 timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plus(adcImagerConfiguration.retractSelectDelay))) {
                   crm.updateCommand(Completed(runId))
-                  ctx.self ! GOING_OUT
+                  ctx.self ! GoingOut
                 }
                 goingOut
             }
-          case PrismCommands.IS_VALID(runId, _, replyTo) =>
+          case PrismCommands.IsValid(runId, _, replyTo) =>
             replyTo ! Accepted(runId)
             Behaviors.same
-          case PrismCommands.PRISM_FOLLOW(_, targetAngle) =>
+          case PrismCommands.PrismFollow(_, targetAngle) =>
             prismTarget = truncateTo1DecimalAndNormalizeToCompleteAngle(targetAngle)
             inAndMoving
-          case PrismCommands.PRISM_STOP(_) =>
+          case PrismCommands.PrismStop(_) =>
             Behaviors.same
           case _ => Behaviors.unhandled
         }
@@ -58,9 +58,9 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
     Behaviors.receive { (ctx, msg) =>
       val log = cswContext.loggerFactory.getLogger(ctx)
       msg match {
-        case PrismCommands.GOING_IN =>
+        case PrismCommands.GoingIn =>
           inAndStopped
-        case PrismCommands.IS_VALID(runId, command, replyTo) =>
+        case PrismCommands.IsValid(runId, command, replyTo) =>
           val errMsg = s"${command.commandName.name} is not valid in Retracting IN state."
           log.error(errMsg)
           replyTo ! Invalid(runId, UnsupportedCommandIssue(errMsg))
@@ -76,9 +76,9 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
     Behaviors.receive { (ctx, msg) =>
       val log = cswContext.loggerFactory.getLogger(ctx)
       msg match {
-        case PrismCommands.GOING_OUT =>
+        case PrismCommands.GoingOut =>
           outAndStopped
-        case PrismCommands.IS_VALID(runId, command, replyTo) =>
+        case PrismCommands.IsValid(runId, command, replyTo) =>
           val errMsg = s"${command.commandName.name} is not valid in Retracting OUT state."
           log.error(errMsg)
           replyTo ! Invalid(runId, UnsupportedCommandIssue(errMsg))
@@ -95,19 +95,19 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
       {
         val log = cswContext.loggerFactory.getLogger(ctx)
         msg match {
-          case PrismCommands.RETRACT_SELECT(runId, position) =>
+          case PrismCommands.RetractSelect(runId, position) =>
             position match {
               case PrismPosition.IN =>
                 timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plus(adcImagerConfiguration.retractSelectDelay))) {
                   crm.updateCommand(Completed(runId))
-                  ctx.self ! GOING_IN
+                  ctx.self ! GoingIn
                 }
                 goingIn
               case PrismPosition.OUT =>
                 crm.updateCommand(Completed(runId))
                 Behaviors.same
             }
-          case PrismCommands.IS_VALID(runId, command, replyTo) =>
+          case PrismCommands.IsValid(runId, command, replyTo) =>
             command.commandName match {
               case ADCCommand.RetractSelect =>
                 replyTo ! Accepted(runId)
@@ -134,11 +134,11 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
       Behaviors.receiveMessage { msg =>
         val log = cswContext.loggerFactory.getLogger(ctx)
         msg match {
-          case cmd @ PrismCommands.RETRACT_SELECT(_, _) =>
+          case cmd @ PrismCommands.RetractSelect(_, _) =>
             val errMsg = s"$cmd is not valid in moving state."
             log.error(errMsg)
             Behaviors.unhandled
-          case PrismCommands.IS_VALID(runId, command, replyTo) =>
+          case PrismCommands.IsValid(runId, command, replyTo) =>
             command.commandName match {
               case ADCCommand.RetractSelect =>
                 val errMsg = s"Setup command: ${command.commandName.name} is not valid in moving state."
@@ -149,25 +149,25 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
                 replyTo ! Accepted(runId)
                 Behaviors.same
             }
-          case cmd @ PrismCommands.PRISM_FOLLOW(_, _) =>
+          case cmd @ PrismCommands.PrismFollow(_, _) =>
             //TODO ask if required, schedule ??
             Behaviors.same
-          case PrismCommands.PRISM_STOP(_) =>
+          case PrismCommands.PrismStop(_) =>
             targetModifier.cancel()
             inAndStopped
-          case PrismCommands.MOVE_CURRENT =>
+          case PrismCommands.MoveCurrent =>
             if (fastMoving)
               prismCurrent = truncateTo1DecimalAndNormalizeToCompleteAngle(prismCurrent + fastMovement)
             else
               prismCurrent = truncateTo1DecimalAndNormalizeToCompleteAngle(prismCurrent + slowMovement)
             publishEvent(PrismCurrentEvent.make(prismCurrent.toDouble, getCurrentDiff.toDouble))
             Behaviors.same
-          case PrismCommands.MOVE_TARGET =>
+          case PrismCommands.MoveTarget =>
             if (isWithinToleranceRange) {
               prismTarget = truncateTo1DecimalAndNormalizeToCompleteAngle(prismTarget + adcImagerConfiguration.targetMovementAngle)
               fastMoving = false
             }
-            ctx.self ! PrismCommands.MOVE_CURRENT
+            ctx.self ! PrismCommands.MoveCurrent
             publishEvent(PrismTargetEvent.make(prismTarget.toDouble))
             publishPrismState(MOVING)
             Behaviors.same
@@ -193,7 +193,7 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
 
   private def scheduleJobForPrismMovement(ctx: ActorContext[PrismCommands]) = {
     timeServiceScheduler.schedulePeriodically(adcImagerConfiguration.targetMovementDelay) {
-      ctx.self ! PrismCommands.MOVE_TARGET
+      ctx.self ! PrismCommands.MoveTarget
     }
   }
   private def truncateTo1DecimalAndNormalizeToCompleteAngle(value: BigDecimal): BigDecimal =
