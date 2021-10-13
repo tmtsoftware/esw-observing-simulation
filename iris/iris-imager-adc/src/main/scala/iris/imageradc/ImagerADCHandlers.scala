@@ -29,7 +29,7 @@ class ImagerADCHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
   implicit val ec: ExecutionContext  = ctx.executionContext
   private val log                    = loggerFactory.getLogger
   private val adcImagerConfiguration = AssemblyConfiguration(ctx.system.settings.config.getConfig("iris.imager.ADC"))
-  private val adcActor               = ctx.spawnAnonymous(PrismActor.behavior(cswCtx, adcImagerConfiguration))
+  private val adcActor               = ctx.spawnAnonymous(PrismActor.behavior(cswCtx, adcImagerConfiguration, log))
 
   override def initialize(): Unit = {
     log.info("Initializing imager.adc...")
