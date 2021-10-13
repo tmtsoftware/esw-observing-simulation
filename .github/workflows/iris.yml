@@ -40,3 +40,12 @@ jobs:
       - name: Tests
         working-directory: iris
         run: sbt test:test
+
+      - name: Notify slack
+        if: always()
+        continue-on-error: true
+        uses: kpritam/slack-job-status-action@v1
+        with:
+          job-status: ${{ job.status }}
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
+          channel: ci-dev
