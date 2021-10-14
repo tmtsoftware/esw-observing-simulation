@@ -104,6 +104,20 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
       current.paramType.get(angleErrorKey).value.values.head shouldBe 0.0
     }
 
+    //assertion to check if prism takes another follow command in moving state
+    val FollowCommand1 =
+      Setup(sequencerPrefix, ADCCommand.PrismFollow, None).add(ADCCommand.targetAngleKey.set(60.0))
+    val followResponse1 = commandService.submit(FollowCommand1)
+    followResponse1.futureValue shouldBe a[Completed]
+
+    //assertion to check if prism follows the new target
+    eventually {
+      val current = testProbe.expectMessageType[SystemEvent]
+      current.eventName shouldBe ImagerADCCurrentEventName
+      current.paramType.get(angleKey).value.values.head shouldBe 60.0
+      current.paramType.get(angleErrorKey).value.values.head shouldBe 0.0
+    }
+
     // Send STOP command
     val StopCommand  = Setup(sequencerPrefix, ADCCommand.PrismStop, None)
     val stopResponse = commandService.submit(StopCommand)
