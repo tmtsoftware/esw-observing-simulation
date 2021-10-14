@@ -9,8 +9,8 @@ class PrismAngle(initialAngle: BigDecimal, defaultVelocity: BigDecimal, targetVe
   private var _targetAngle: BigDecimal          = 0
   private var velocity: BigDecimal              = calculateDiff(_targetAngle)
 
-  def target: BigDecimal = _targetAngle
-  def currentAngle: BigDecimal  = _currentAngle
+  def target: BigDecimal       = _targetAngle
+  def currentAngle: BigDecimal = _currentAngle
 
   def setTarget(target: BigDecimal): Unit = {
     _targetAngle = round(target)
@@ -21,7 +21,6 @@ class PrismAngle(initialAngle: BigDecimal, defaultVelocity: BigDecimal, targetVe
     if (_currentAngle < _targetAngle) _currentAngle += velocity
     if ((_targetAngle - _currentAngle) <= tolerance) velocity = calculateDiff(_targetAngle)
   }
-
 
   def nextTarget(): Unit = {
     if (_currentAngle == _targetAngle) _targetAngle += targetVelocity
