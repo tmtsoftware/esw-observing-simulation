@@ -1,4 +1,4 @@
-package iris.imageradc
+package iris.imageradc.models
 
 import scala.math.BigDecimal.RoundingMode
 

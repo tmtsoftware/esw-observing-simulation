@@ -15,7 +15,7 @@ import iris.imageradc.commands.PrismCommands.{GoingIn, GoingOut}
 import iris.imageradc.commands.{ADCCommand, PrismCommands}
 import iris.imageradc.events.{PrismCurrentEvent, PrismRetractEvent, PrismStateEvent, PrismTargetEvent}
 import iris.imageradc.models.PrismState.MOVING
-import iris.imageradc.models.{AssemblyConfiguration, PrismPosition, PrismState}
+import iris.imageradc.models.{AssemblyConfiguration, PrismAngle, PrismPosition, PrismState}
 
 class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfiguration, logger: Logger) {
   private val targetVelocity: Double = adcImagerConfiguration.targetMovementAngle
