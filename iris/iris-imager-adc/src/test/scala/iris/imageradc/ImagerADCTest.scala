@@ -75,16 +75,16 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
       goingInEvent.paramType.get(PrismPosition.RetractKey).value.values.head.name shouldBe PrismPosition.IN.entryName
     }
     //Send Follow command to prism with target angle. This command is immediately completed.
-    val FollowCommand =
-      Setup(sequencerPrefix, ADCCommand.PrismFollow, None).add(ADCCommand.targetAngleKey.set(20.0))
-    val followResponse = commandService.submit(FollowCommand)
+    val followCommand =
+      Setup(sequencerPrefix, ADCCommand.PrismFollow, None).add(ADCCommand.targetAngleKey.set(50.0))
+    val followResponse = commandService.submit(followCommand)
     followResponse.futureValue shouldBe a[Completed]
 
     //verify targetAngle is set to 20.0
     eventually {
       val targetEvent = testProbe.expectMessageType[SystemEvent]
       targetEvent.eventName shouldBe ImagerADCTargetEventName
-      targetEvent.paramType.get(angleKey).value.values.head shouldBe 20.0
+      targetEvent.paramType.get(angleKey).value.values.head shouldBe 50.0
     }
 
     //verify whether prism has started moving
@@ -100,21 +100,21 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
     eventually {
       val current = testProbe.expectMessageType[SystemEvent]
       current.eventName shouldBe ImagerADCCurrentEventName
-      current.paramType.get(angleKey).value.values.head shouldBe 20.0
+      current.paramType.get(angleKey).value.values.head shouldBe 50.0
       current.paramType.get(angleErrorKey).value.values.head shouldBe 0.0
     }
 
     //assertion to check if prism takes another follow command in moving state
-    val FollowCommand1 =
-      Setup(sequencerPrefix, ADCCommand.PrismFollow, None).add(ADCCommand.targetAngleKey.set(60.0))
-    val followResponse1 = commandService.submit(FollowCommand1)
+    val followCommand1 =
+      Setup(sequencerPrefix, ADCCommand.PrismFollow, None).add(ADCCommand.targetAngleKey.set(10.0))
+    val followResponse1 = commandService.submit(followCommand1)
     followResponse1.futureValue shouldBe a[Completed]
 
     //assertion to check if prism follows the new target
     eventually {
       val current = testProbe.expectMessageType[SystemEvent]
       current.eventName shouldBe ImagerADCCurrentEventName
-      current.paramType.get(angleKey).value.values.head shouldBe 60.0
+      current.paramType.get(angleKey).value.values.head shouldBe 10.0
       current.paramType.get(angleErrorKey).value.values.head shouldBe 0.0
     }
 
