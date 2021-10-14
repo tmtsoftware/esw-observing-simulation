@@ -78,7 +78,7 @@ class ImagerADCHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
         ADCCommand.getTargetAngle(setup) match {
           case Left(commandIssue) => Invalid(runId, commandIssue)
           case Right(value) =>
-            adcActor ! PrismCommands.PrismFollow(runId, value)
+            adcActor ! PrismCommands.PrismFollow(value)
             Completed(runId)
         }
 

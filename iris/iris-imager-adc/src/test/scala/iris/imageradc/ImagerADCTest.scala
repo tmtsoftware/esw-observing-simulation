@@ -101,7 +101,7 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
       val current = testProbe.expectMessageType[SystemEvent]
       current.eventName shouldBe ImagerADCCurrentEventName
       current.paramType.get(angleKey).value.values.head shouldBe 20.0
-      current.paramType.get(angleErrorKey).value.values.head shouldBe 0.2
+      current.paramType.get(angleErrorKey).value.values.head shouldBe 0.0
     }
 
     // Send STOP command

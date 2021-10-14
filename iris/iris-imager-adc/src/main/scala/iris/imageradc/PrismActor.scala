@@ -10,21 +10,20 @@ import csw.params.commands.Setup
 import csw.params.core.models.Id
 import csw.params.events.SystemEvent
 import csw.time.core.models.UTCTime
+import csw.time.scheduler.api.Cancellable
 import iris.imageradc.commands.PrismCommands.{GoingIn, GoingOut}
 import iris.imageradc.commands.{ADCCommand, PrismCommands}
 import iris.imageradc.events.{PrismCurrentEvent, PrismRetractEvent, PrismStateEvent, PrismTargetEvent}
 import iris.imageradc.models.PrismState.MOVING
 import iris.imageradc.models.{AssemblyConfiguration, PrismPosition, PrismState}
 
-import scala.math.BigDecimal.RoundingMode
-
 class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfiguration, logger: Logger) {
-  private var prismTarget: BigDecimal  = 0.0
-  private var prismCurrent: BigDecimal = 0.0
-  private var fastMoving: Boolean      = false
-  private val timeServiceScheduler     = cswContext.timeServiceScheduler
-  private val crm                      = cswContext.commandResponseManager
-  private lazy val eventPublisher      = cswContext.eventService.defaultPublisher
+  private val targetVelocity: Double = adcImagerConfiguration.targetMovementAngle
+  private val tolerance: BigDecimal  = 0.5
+  private val prismAngle             = new PrismAngle(0.0, BigDecimal(targetVelocity), BigDecimal(targetVelocity), tolerance)
+  private val timeServiceScheduler   = cswContext.timeServiceScheduler
+  private val crm                    = cswContext.commandResponseManager
+  private lazy val eventPublisher    = cswContext.eventService.defaultPublisher
 
   def inAndStopped: Behavior[PrismCommands] = {
     publishPrismState(PrismState.STOPPED)
@@ -41,9 +40,9 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
               goingOut
           }
         case PrismCommands.IsValid(runId, command, replyTo) =>
-          isValid(predicate = true)("Retracting IN", runId, command, replyTo)
-        case PrismCommands.PrismFollow(_, targetAngle) =>
-          prismTarget = truncateTo1DecimalAndNormalizeToCompleteAngle(targetAngle)
+          isValid(predicate = true)("IN", runId, command, replyTo)
+        case PrismCommands.PrismFollow(targetAngle) =>
+          prismAngle.setTarget(targetAngle)
           inAndMoving
         case PrismCommands.PrismStop(_) =>
           Behaviors.same
@@ -90,9 +89,9 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
               Behaviors.same
           }
         case PrismCommands.IsValid(runId, command, replyTo) =>
-          isValid(command.commandName == ADCCommand.RetractSelect)("disabled", runId, command, replyTo)
+          isValid(command.commandName == ADCCommand.RetractSelect)("OUT", runId, command, replyTo)
         case cmd =>
-          val errMsg = s"$cmd is not valid in disabled state."
+          val errMsg = s"$cmd is not valid in OUT state."
           logger.error(errMsg)
           Behaviors.unhandled
       }
@@ -101,37 +100,25 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
 
   def inAndMoving: Behavior[PrismCommands] =
     Behaviors.setup { ctx =>
-      fastMoving = true
-      val fastMovement: BigDecimal = truncateTo1DecimalAndNormalizeToCompleteAngle((prismTarget - prismCurrent) / 3)
-      val targetModifier           = scheduleJobForPrismMovement(ctx)
+      val targetModifier = scheduleJobForPrismMovement(ctx)
       Behaviors.receiveMessage {
         case cmd @ PrismCommands.RetractSelect(_, _) =>
-          val errMsg = s"$cmd is not valid in moving state."
-          logger.error(errMsg)
+          logger.error(s"$cmd is not valid in moving state.")
           Behaviors.unhandled
         case PrismCommands.IsValid(runId, command, replyTo) =>
           isValid(command.commandName != ADCCommand.RetractSelect)("moving", runId, command, replyTo)
-        case cmd @ PrismCommands.PrismFollow(_, _) =>
-          //TODO ask if required, schedule ??
+        case PrismCommands.PrismFollow(targetAngle) =>
+          prismAngle.setTarget(targetAngle)
           Behaviors.same
         case PrismCommands.PrismStop(_) =>
           targetModifier.cancel()
           inAndStopped
-        case PrismCommands.MoveCurrent =>
-          if (fastMoving)
-            prismCurrent = truncateTo1DecimalAndNormalizeToCompleteAngle(prismCurrent + fastMovement)
-          else
-            prismCurrent = truncateTo1DecimalAndNormalizeToCompleteAngle(prismCurrent + slowMovement)
-          publishEvent(PrismCurrentEvent.make(prismCurrent.toDouble, getCurrentDiff.toDouble))
-          Behaviors.same
-        case PrismCommands.MoveTarget =>
-          if (isWithinToleranceRange) {
-            prismTarget = truncateTo1DecimalAndNormalizeToCompleteAngle(prismTarget + adcImagerConfiguration.targetMovementAngle)
-            fastMoving = false
-          }
-          ctx.self ! PrismCommands.MoveCurrent
-          publishEvent(PrismTargetEvent.make(prismTarget.toDouble))
+        case PrismCommands.FollowTarget =>
+          publishEvent(PrismTargetEvent.make(prismAngle.target.toDouble))
           publishPrismState(MOVING)
+          prismAngle.nextCurrent()
+          publishEvent(PrismCurrentEvent.make(prismAngle.currentAngle.toDouble, getCurrentDiff.toDouble))
+          prismAngle.nextTarget()
           Behaviors.same
       }
     }
@@ -154,31 +141,18 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
       whenDone
     }
 
-  private def slowMovement =
-    if (prismTarget > prismCurrent) +adcImagerConfiguration.targetMovementAngle else -adcImagerConfiguration.targetMovementAngle
+  private def publishEvent(event: SystemEvent)                = eventPublisher.publish(event)
+  private def publishRetractPosition(position: PrismPosition) = publishEvent(PrismRetractEvent.make(position))
+  private def publishPrismState(state: PrismState) =
+    publishEvent(PrismStateEvent.make(state, getCurrentDiff <= tolerance))
 
-  private def isWithinToleranceRange = getCurrentDiff.abs.compare(0.5) == -1
-
-  private def publishEvent(event: SystemEvent) = eventPublisher.publish(event)
-
-  private def publishPrismState(state: PrismState) = eventPublisher.publish(getPrismStateEvent(state))
-
-  private def getPrismStateEvent(state: PrismState) =
-    PrismStateEvent.make(state, isWithinToleranceRange)
-
-  private def publishRetractPosition(position: PrismPosition): Unit = {
-    eventPublisher.publish(PrismRetractEvent.make(position))
-  }
-
-  private def scheduleJobForPrismMovement(ctx: ActorContext[PrismCommands]) = {
+  private def scheduleJobForPrismMovement(ctx: ActorContext[PrismCommands]): Cancellable = {
     timeServiceScheduler.schedulePeriodically(adcImagerConfiguration.targetMovementDelay) {
-      ctx.self ! PrismCommands.MoveTarget
+      ctx.self ! PrismCommands.FollowTarget
     }
   }
-  private def truncateTo1DecimalAndNormalizeToCompleteAngle(value: BigDecimal): BigDecimal =
-    BigDecimal(value.toDouble % 360).setScale(1, RoundingMode.DOWN)
 
-  private def getCurrentDiff = prismTarget - prismCurrent
+  private def getCurrentDiff = prismAngle.target - prismAngle.currentAngle
 }
 
 object PrismActor {

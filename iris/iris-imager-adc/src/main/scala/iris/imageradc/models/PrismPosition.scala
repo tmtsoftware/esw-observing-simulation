@@ -1,7 +1,5 @@
 package iris.imageradc.models
 
-import csw.params.commands.{CommandIssue, Setup}
-import csw.params.commands.CommandIssue.{MissingKeyIssue, ParameterValueOutOfRangeIssue}
 import csw.params.core.generics.GChoiceKey
 import csw.params.core.generics.KeyType.ChoiceKey
 import csw.params.core.models.Choices
