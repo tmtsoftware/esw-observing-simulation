@@ -29,7 +29,7 @@ class ImagerFilterHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
   implicit val ec: ExecutionContext    = ctx.executionContext
   private val log                      = loggerFactory.getLogger
   private val filterWheelConfiguration = AssemblyConfiguration(ctx.system.settings.config.getConfig("iris.imager.filter"))
-  private val imagerActor              = ctx.spawnAnonymous(FilterWheelActor.behavior(cswCtx, filterWheelConfiguration))
+  private val imagerActor              = FilterWheelActor.behavior(cswCtx, filterWheelConfiguration)(ctx.system)
 
   override def initialize(): Unit = {
     log.info("Initializing imager.filter...")
@@ -50,7 +50,7 @@ class ImagerFilterHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
     }
 
     initialValidateRes match {
-      case _: Accepted => Await.result(imagerActor ? (IsValidMove(runId, _)), timeout)
+      case _: Accepted => Await.result(imagerActor.isValidMove(runId), timeout)
       case invalidRes  => invalidRes
     }
   }
@@ -76,7 +76,7 @@ class ImagerFilterHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
     SelectCommand.getWheel1TargetPosition(setup) match {
       case Right(targetPosition) =>
         log.info(s"Imager Filter: Moving wheel to target position: $targetPosition")
-        imagerActor ! WheelCommand.Move(targetPosition, runId)
+        imagerActor.move(targetPosition, runId)
         Started(runId)
       case Left(commandIssue) => Invalid(runId, commandIssue)
     }

@@ -1,3 +1,7 @@
+ThisBuild / scalacOptions ++= Seq(
+  "-Xasync"
+)
+
 lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `iris-imager-filter`,
   `iris-irisdeploy`,
