@@ -12,6 +12,7 @@ import csw.location.api.models.TrackingEvent
 import csw.params.commands.CommandResponse.{Accepted, Invalid, Started, SubmitResponse}
 import csw.params.commands._
 import csw.params.core.models.{ExposureId, Id}
+import csw.params.events.ObserveEventKeys
 import csw.time.core.models.UTCTime
 import iris.imager.detector.commands.ControllerMessage._
 import iris.imager.detector.commands.{ControllerMessage, FitsMessage}
@@ -23,9 +24,8 @@ class ImagerDetectorHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
   import cswCtx._
   implicit val ec: ExecutionContext         = ctx.executionContext
   private val log                           = loggerFactory.getLogger
-  private val config: Config                = ConfigFactory.load("iris.imager.detector")
+  private val config: Config                = ConfigFactory.load().getConfig("iris.imager.detector")
   implicit private val scheduler: Scheduler = ctx.system.scheduler
-
   val fitsActor: ActorRef[FitsMessage] = ctx.spawnAnonymous(new FitsActor(cswCtx, config).setup)
   val controller: ActorRef[ControllerMessage] =
     ctx.spawnAnonymous(new ControllerActor(cswCtx, config).uninitialized)
@@ -35,7 +35,11 @@ class ImagerDetectorHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = ???
 
   override def validateCommand(runId: Id, controlCommand: ControlCommand): CommandResponse.ValidateCommandResponse = {
-    if (controlCommand.maybeObsId.isEmpty) {
+    if (
+      controlCommand.maybeObsId.isEmpty &&
+      controlCommand.commandName != Constants.Initialize &&
+      controlCommand.commandName != Constants.Shutdown
+    ) {
       return Invalid(runId, CommandIssue.WrongParameterTypeIssue("obsId not found"))
     }
     controlCommand match {
@@ -58,7 +62,7 @@ class ImagerDetectorHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
       case Constants.LoadConfiguration =>
         (for {
           _ <- validateExposureIdKey(runId, setup)
-          _ <- setup.get(Constants.filenameKey).toRight(Invalid(runId, CommandIssue.WrongParameterTypeIssue("filename not found")))
+          _ <- setup.get(ObserveEventKeys.filename).toRight(Invalid(runId, CommandIssue.WrongParameterTypeIssue("filename not found")))
           _ <- setup.get(Constants.rampsKey).toRight(Invalid(runId, CommandIssue.WrongParameterTypeIssue("ramps not found")))
           _ <- setup
             .get(Constants.rampIntegrationTimeKey)
@@ -80,7 +84,7 @@ class ImagerDetectorHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
   private def validateExposureIdKey(runId: Id, setup: Setup) = {
     val invalid = Invalid(runId, CommandIssue.WrongParameterTypeIssue("Invalid Exposure id"))
     try {
-      setup.get(Constants.exposureIdKey).map(x => ExposureId(x.head)).toRight(invalid)
+      setup.get(ObserveEventKeys.exposureId).map(x => ExposureId(x.head)).toRight(invalid)
     }
     catch {
       case _: Exception => Left(invalid)
@@ -100,8 +104,8 @@ class ImagerDetectorHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
       controller ! Shutdown(runId)
       Started(runId)
     case Constants.LoadConfiguration =>
-      val exposureId      = ExposureId(setup(Constants.exposureIdKey).head)
-      val filename        = setup(Constants.filenameKey).head
+      val exposureId      = ExposureId(setup(ObserveEventKeys.exposureId).head)
+      val filename        = setup(ObserveEventKeys.filename).head
       val ramps           = setup(Constants.rampsKey).head
       val integrationTime = setup(Constants.rampIntegrationTimeKey).head
       controller ! ConfigureExposure(runId, exposureId, filename, ramps, integrationTime)

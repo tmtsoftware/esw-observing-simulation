@@ -15,13 +15,13 @@ import nom.tam.util.BufferedFile
 
 class FitsActor(cswContext: CswContext, config: Config) {
   val crm: CommandResponseManager = cswContext.commandResponseManager
-
+  val eventPublisher              = cswContext.eventService.defaultPublisher
   def setup: Behavior[FitsMessage] = Behaviors.receiveMessage { case WriteData(runId, data, exposureId, filename) =>
     val prefix = cswContext.componentInfo.prefix
-    publish(IRDetectorEvent.dataWriteStart(prefix, exposureId, filename))
+    eventPublisher.publish(IRDetectorEvent.dataWriteStart(prefix, exposureId, filename))
     writeData(data, filename)
     crm.updateCommand(Completed(runId))
-    publish(IRDetectorEvent.dataWriteEnd(prefix, exposureId, filename))
+    eventPublisher.publish(IRDetectorEvent.dataWriteEnd(prefix, exposureId, filename))
     Behaviors.same
   }
 

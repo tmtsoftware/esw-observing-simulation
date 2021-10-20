@@ -11,9 +11,6 @@ object Constants {
   val Shutdown: CommandName          = CommandName("SHUTDOWN")
 
   // keys
-  val obsIdKey: Key[String]            = KeyType.StringKey.make("obsId")
-  val exposureIdKey: Key[String]       = KeyType.StringKey.make("exposureId")
-  val filenameKey: Key[String]         = KeyType.StringKey.make("filename")
   val rampsKey: Key[Int]               = KeyType.IntKey.make("ramps")
   val rampIntegrationTimeKey: Key[Int] = KeyType.IntKey.make("rampIntegrationTime")
 
