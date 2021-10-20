@@ -3,12 +3,16 @@ package iris.imager.detector
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior}
 import com.typesafe.config.Config
+import csw.command.client.CommandResponseManager
+import csw.event.api.scaladsl.EventPublisher
 import csw.framework.models.CswContext
 import csw.params.commands.CommandIssue
 import csw.params.commands.CommandResponse.{Accepted, Completed, Invalid}
 import csw.params.core.models.Id
 import csw.params.events.{IRDetectorEvent, ObserveEvent}
+import csw.prefix.models.Prefix
 import csw.time.core.models.UTCTime
+import csw.time.scheduler.api.TimeServiceScheduler
 import iris.imager.detector.commands.ControllerMessage._
 import iris.imager.detector.commands.FitsMessage.WriteData
 import iris.imager.detector.commands.{ControllerMessage, FitsData, FitsMessage}
@@ -16,10 +20,10 @@ import iris.imager.detector.commands.{ControllerMessage, FitsData, FitsMessage}
 import java.time.Instant
 
 class ControllerActor(cswContext: CswContext, config: Config) {
-  val crm                  = cswContext.commandResponseManager
-  val timeServiceScheduler = cswContext.timeServiceScheduler
-  val eventPublisher       = cswContext.eventService.defaultPublisher
-  val detectorPrefix       = cswContext.componentInfo.prefix
+  val crm: CommandResponseManager = cswContext.commandResponseManager
+  val timeServiceScheduler: TimeServiceScheduler = cswContext.timeServiceScheduler
+  val eventPublisher: EventPublisher = cswContext.eventService.defaultPublisher
+  val detectorPrefix: Prefix = cswContext.componentInfo.prefix
 
   private lazy val detectorDimensions: (Int, Int) = {
     (config.getInt("xs"), config.getInt("ys"))

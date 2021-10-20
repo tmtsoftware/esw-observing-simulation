@@ -5,6 +5,7 @@ import akka.actor.typed.pubsub.Topic.publish
 import akka.actor.typed.scaladsl.Behaviors
 import com.typesafe.config.Config
 import csw.command.client.CommandResponseManager
+import csw.event.api.scaladsl.EventPublisher
 import csw.framework.models.CswContext
 import csw.params.commands.CommandResponse.Completed
 import csw.params.events.IRDetectorEvent
@@ -14,8 +15,9 @@ import nom.tam.fits.{Fits, FitsFactory}
 import nom.tam.util.BufferedFile
 
 class FitsActor(cswContext: CswContext, config: Config) {
-  val crm: CommandResponseManager = cswContext.commandResponseManager
-  val eventPublisher              = cswContext.eventService.defaultPublisher
+  val crm: CommandResponseManager    = cswContext.commandResponseManager
+  val eventPublisher: EventPublisher = cswContext.eventService.defaultPublisher
+
   def setup: Behavior[FitsMessage] = Behaviors.receiveMessage { case WriteData(runId, data, exposureId, filename) =>
     val prefix = cswContext.componentInfo.prefix
     eventPublisher.publish(IRDetectorEvent.dataWriteStart(prefix, exposureId, filename))
