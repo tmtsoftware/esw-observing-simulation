@@ -4,6 +4,7 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `iris-ifs-res`,
   `iris-ifs-scale`,
   `iris-imager-adc`,
+  `iris-imager-detector`,
   `iris-commons`
 )
 
@@ -39,7 +40,13 @@ lazy val `iris-imager-adc` = project
   .settings(
     libraryDependencies ++= Dependencies.IrisAssemblies
   )
-
+//assembly 5 module
+lazy val `iris-imager-detector` = project
+  .in(file("iris-imager-detector"))
+  .dependsOn(`iris-commons`)
+  .settings(
+    libraryDependencies ++= Dependencies.IrisAssemblies
+  )
 // deploy module
 lazy val `iris-irisdeploy` = project
   .dependsOn(
