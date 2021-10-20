@@ -1,9 +1,9 @@
-package wfos.redfilter.commands
+package wfos.filter.commands
 
 import csw.params.commands.CommandIssue.{MissingKeyIssue, ParameterValueOutOfRangeIssue}
 import csw.params.commands.{CommandIssue, CommandName, Setup}
 import csw.params.core.generics.GChoiceKey
-import wfos.redfilter.models.FilterWheelPosition
+import wfos.filter.models.FilterWheelPosition
 
 object SelectCommand {
   val Name: CommandName     = CommandName("SELECT")

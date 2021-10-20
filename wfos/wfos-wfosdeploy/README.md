@@ -11,7 +11,7 @@ built.sbt file:
 ```
 lazy val `wfos-wfos-deploy` = project
   .dependsOn(
-    `wfos-red-filter`,
+    `wfos-filter`,
     `wfos-wfoshcd``
   )
   .settings(

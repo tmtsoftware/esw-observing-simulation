@@ -5,7 +5,7 @@ TMT Common Software ([CSW](https://github.com/tmtsoftware/csw)) APIs.
 
 ## Subprojects
 
-* wfos-red-filter - an assembly that talks to the WFOS HCD
+* wfos-filter - an assembly that talks to the WFOS HCD
 * wfos-wfoshcd - an HCD that talks to the WFOS hardware
 * wfos-wfosdeploy - for starting/deploying HCDs and assemblies
 

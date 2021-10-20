@@ -1,9 +1,10 @@
-package wfos.redfilter
+package wfos.filter
 
 import akka.actor.typed.Scheduler
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.AskPattern.Askable
 import akka.util.Timeout
+import com.typesafe.config.ConfigFactory
 import csw.command.client.messages.TopLevelActorMessage
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
@@ -12,29 +13,32 @@ import csw.params.commands.CommandIssue.UnsupportedCommandIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandName, ControlCommand, Setup}
 import csw.params.core.models.Id
+import csw.prefix.models.Prefix
 import csw.time.core.models.UTCTime
 import wfos.commons.models.WheelCommand.IsValidMove
 import wfos.commons.models.{AssemblyConfiguration, WheelCommand}
-import wfos.redfilter.commands.SelectCommand
-import wfos.redfilter.events.RedFilterPositionEvent
+import wfos.filter.commands.SelectCommand
+import wfos.filter.events.FilterPositionEvent
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 import scala.concurrent.{Await, ExecutionContext}
 
-class RedFilterHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext) extends ComponentHandlers(ctx, cswCtx) {
+class FilterHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext) extends ComponentHandlers(ctx, cswCtx) {
 
   import cswCtx._
   implicit val a: Scheduler = ctx.system.scheduler
 
   implicit val ec: ExecutionContext    = ctx.executionContext
   private val log                      = loggerFactory.getLogger
-  private val filterWheelConfiguration = AssemblyConfiguration(ctx.system.settings.config.getConfig("wfos.red.filter"))
+  private val filterPrefix: Prefix     = cswCtx.componentInfo.prefix
+  private val filterWheelConfiguration = AssemblyConfiguration(ConfigFactory.load().getConfig(filterPrefix.toString()))
+  private val filterPositionEvent      = new FilterPositionEvent(filterPrefix)
   private val redFilterActor           = ctx.spawnAnonymous(FilterWheelActor.behavior(cswCtx, filterWheelConfiguration))
 
   override def initialize(): Unit = {
-    log.info("Initializing red.filter...")
+    log.info(s"Initializing ${filterPrefix.componentName}...")
     cswCtx.eventService.defaultPublisher.publish(
-      RedFilterPositionEvent.make(FilterWheelActor.InitialPosition, FilterWheelActor.InitialPosition, dark = false)
+      filterPositionEvent.make(FilterWheelActor.InitialPosition, FilterWheelActor.InitialPosition, dark = false)
     )
   }
 
@@ -75,7 +79,7 @@ class RedFilterHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
   private def handleSelect(runId: Id, setup: Setup) =
     SelectCommand.getWheel1TargetPosition(setup) match {
       case Right(targetPosition) =>
-        log.info(s"Imager Filter: Moving wheel to target position: $targetPosition")
+        log.info(s"Filter Assembly: Moving wheel to target position: $targetPosition")
         redFilterActor ! WheelCommand.Move(targetPosition, runId)
         Started(runId)
       case Left(commandIssue) => Invalid(runId, commandIssue)
@@ -85,14 +89,14 @@ class RedFilterHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
     SelectCommand.getWheel1TargetPosition(setup) match {
       case Right(_) => Accepted(runId)
       case Left(commandIssue) =>
-        log.error(s"Imager Filter: Failed to retrieve target position, reason: ${commandIssue.reason}")
+        log.error(s"Filter Assembly: Failed to retrieve target position, reason: ${commandIssue.reason}")
         Invalid(runId, commandIssue)
     }
 
   private def validateSetupCommand(runId: Id, setup: Setup) = setup.commandName match {
     case SelectCommand.Name => validateSelect(runId, setup)
     case CommandName(name) =>
-      val errMsg = s"Imager Filter: Setup command: $name not supported."
+      val errMsg = s"Filter Assembly: Setup command: $name not supported."
       log.error(errMsg)
       Invalid(runId, UnsupportedCommandIssue(errMsg))
   }

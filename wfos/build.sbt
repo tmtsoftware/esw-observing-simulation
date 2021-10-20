@@ -1,5 +1,5 @@
 lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
-  `wfos-red-filter`,
+  `wfos-filter`,
   `wfos-wfosdeploy`,
   `wfos-commons`
 )
@@ -9,7 +9,7 @@ lazy val `wfos-root` = project
   .aggregate(aggregatedProjects: _*)
 
 // assembly module
-lazy val `wfos-red-filter` = project
+lazy val `wfos-filter` = project
   .dependsOn(`wfos-commons`)
   .settings(
     libraryDependencies ++= Dependencies.WfosAssemblies
@@ -18,7 +18,7 @@ lazy val `wfos-red-filter` = project
 // deploy module
 lazy val `wfos-wfosdeploy` = project
   .dependsOn(
-    `wfos-red-filter`
+    `wfos-filter`
   )
   .enablePlugins(CswBuildInfo)
   .settings(

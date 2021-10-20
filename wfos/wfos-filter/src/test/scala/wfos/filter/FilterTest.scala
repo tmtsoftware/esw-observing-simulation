@@ -1,4 +1,4 @@
-package wfos.redfilter
+package wfos.filter
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.util.Timeout
@@ -12,20 +12,21 @@ import csw.params.events.{Event, SystemEvent}
 import csw.prefix.models.Subsystem.WFOS
 import csw.testkit.scaladsl.CSWService.{AlarmServer, EventServer}
 import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
-import wfos.redfilter.commands.SelectCommand.Wheel1Key
-import wfos.redfilter.events.RedFilterPositionEvent.{CurrentPositionKey, DarkKey, DemandPositionKey}
-import wfos.redfilter.models.FilterWheelPosition._
+import wfos.filter.commands.SelectCommand.Wheel1Key
+import wfos.filter.models.FilterWheelPosition._
 import org.scalatest.funsuite.AnyFunSuiteLike
-import wfos.redfilter.commands.SelectCommand
-import wfos.redfilter.events.RedFilterPositionEvent
-import wfos.redfilter.models.FilterWheelPosition
+import wfos.filter.commands.SelectCommand
+import wfos.filter.events.FilterPositionEvent
+import wfos.filter.models.FilterWheelPosition
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class RedFilterTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with AnyFunSuiteLike {
+class FilterTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with AnyFunSuiteLike {
 
   import frameworkTestKit._
+  val filterPrefix: Prefix = Prefix(WFOS, "red.filter")
+  val filterPositionEvent  = new FilterPositionEvent(filterPrefix)
 
   override def beforeAll(): Unit = {
     super.beforeAll()
@@ -33,10 +34,10 @@ class RedFilterTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
     spawnStandalone(com.typesafe.config.ConfigFactory.load("RedFilterStandalone.conf"))
   }
 
-  test("Red Filter Assembly behaviour | ESW-556") {
+  test("Filter Assembly behaviour | ESW-556, ESW-557") {
     implicit val patienceConfig: PatienceConfig = PatienceConfig(10.seconds)
     val sequencerPrefix                         = Prefix(WFOS, "darknight")
-    val connection                              = AkkaConnection(ComponentId(Prefix("WFOS.red.filter"), ComponentType.Assembly))
+    val connection                              = AkkaConnection(ComponentId(filterPrefix, ComponentType.Assembly))
     val akkaLocation                            = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
     akkaLocation.connection shouldBe connection
 
@@ -44,15 +45,15 @@ class RedFilterTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
     //Subscribe to event's which will be published by red filter in it's lifecycle
     eventService.defaultSubscriber.subscribeActorRef(
       Set(
-        RedFilterPositionEvent.RedFilterPositionEventKey
+        filterPositionEvent.FilterPositionEventKey
       ),
       testProbe.ref
     )
     // initially red filter is idle & at FilterWheelPosition.Z
     val currentEvent    = testProbe.expectMessageType[SystemEvent]
-    val demandPosition  = currentEvent.paramType.get(RedFilterPositionEvent.DemandPositionKey).value.values.head.name
-    val currentPosition = currentEvent.paramType.get(RedFilterPositionEvent.CurrentPositionKey).value.values.head.name
-    val dark            = currentEvent.paramType.get(RedFilterPositionEvent.DarkKey).value.values.head
+    val demandPosition  = currentEvent.paramType.get(filterPositionEvent.DemandPositionKey).value.values.head.name
+    val currentPosition = currentEvent.paramType.get(filterPositionEvent.CurrentPositionKey).value.values.head.name
+    val dark            = currentEvent.paramType.get(filterPositionEvent.DarkKey).value.values.head
 
     demandPosition shouldBe FilterWheelPosition.Z.entryName
     currentPosition shouldBe FilterWheelPosition.Z.entryName
@@ -69,23 +70,23 @@ class RedFilterTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
 
     eventually {
       val event1 = testProbe.expectMessageType[SystemEvent]
-      event1.paramType.get(DemandPositionKey).value.values.head.name shouldBe H.entryName
-      event1.paramType.get(CurrentPositionKey).value.values.head.name shouldBe Y.entryName
-      event1.paramType.get(DarkKey).value.values.head shouldBe true
+      event1.paramType.get(filterPositionEvent.DemandPositionKey).value.values.head.name shouldBe H.entryName
+      event1.paramType.get(filterPositionEvent.CurrentPositionKey).value.values.head.name shouldBe Y.entryName
+      event1.paramType.get(filterPositionEvent.DarkKey).value.values.head shouldBe true
     }
 
     eventually {
       val event2 = testProbe.expectMessageType[SystemEvent]
-      event2.paramType.get(DemandPositionKey).value.values.head.name shouldBe H.entryName
-      event2.paramType.get(CurrentPositionKey).value.values.head.name shouldBe J.entryName
-      event2.paramType.get(DarkKey).value.values.head shouldBe true
+      event2.paramType.get(filterPositionEvent.DemandPositionKey).value.values.head.name shouldBe H.entryName
+      event2.paramType.get(filterPositionEvent.CurrentPositionKey).value.values.head.name shouldBe J.entryName
+      event2.paramType.get(filterPositionEvent.DarkKey).value.values.head shouldBe true
     }
 
     eventually {
       val event3 = testProbe.expectMessageType[SystemEvent]
-      event3.paramType.get(DemandPositionKey).value.values.head.name shouldBe H.entryName
-      event3.paramType.get(CurrentPositionKey).value.values.head.name shouldBe H.entryName
-      event3.paramType.get(DarkKey).value.values.head shouldBe false
+      event3.paramType.get(filterPositionEvent.DemandPositionKey).value.values.head.name shouldBe H.entryName
+      event3.paramType.get(filterPositionEvent.CurrentPositionKey).value.values.head.name shouldBe H.entryName
+      event3.paramType.get(filterPositionEvent.DarkKey).value.values.head shouldBe false
     }
 
     val finalResponse = commandService.queryFinal(initialResponse.runId)(Timeout(2.seconds))
@@ -101,23 +102,23 @@ class RedFilterTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
 
     eventually {
       val event1 = testProbe.expectMessageType[SystemEvent]
-      event1.paramType.get(DemandPositionKey).value.values.head.name shouldBe Z.entryName
-      event1.paramType.get(CurrentPositionKey).value.values.head.name shouldBe J.entryName
-      event1.paramType.get(DarkKey).value.values.head shouldBe true
+      event1.paramType.get(filterPositionEvent.DemandPositionKey).value.values.head.name shouldBe Z.entryName
+      event1.paramType.get(filterPositionEvent.CurrentPositionKey).value.values.head.name shouldBe J.entryName
+      event1.paramType.get(filterPositionEvent.DarkKey).value.values.head shouldBe true
     }
 
     eventually {
       val event2 = testProbe.expectMessageType[SystemEvent]
-      event2.paramType.get(DemandPositionKey).value.values.head.name shouldBe Z.entryName
-      event2.paramType.get(CurrentPositionKey).value.values.head.name shouldBe Y.entryName
-      event2.paramType.get(DarkKey).value.values.head shouldBe true
+      event2.paramType.get(filterPositionEvent.DemandPositionKey).value.values.head.name shouldBe Z.entryName
+      event2.paramType.get(filterPositionEvent.CurrentPositionKey).value.values.head.name shouldBe Y.entryName
+      event2.paramType.get(filterPositionEvent.DarkKey).value.values.head shouldBe true
     }
 
     eventually {
       val event3 = testProbe.expectMessageType[SystemEvent]
-      event3.paramType.get(DemandPositionKey).value.values.head.name shouldBe Z.entryName
-      event3.paramType.get(CurrentPositionKey).value.values.head.name shouldBe Z.entryName
-      event3.paramType.get(DarkKey).value.values.head shouldBe false
+      event3.paramType.get(filterPositionEvent.DemandPositionKey).value.values.head.name shouldBe Z.entryName
+      event3.paramType.get(filterPositionEvent.CurrentPositionKey).value.values.head.name shouldBe Z.entryName
+      event3.paramType.get(filterPositionEvent.DarkKey).value.values.head shouldBe false
     }
 
     val finalResponse2 = commandService.queryFinal(initialResponse2.runId)(Timeout(2.seconds))
@@ -125,7 +126,7 @@ class RedFilterTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
 
   }
 
-  test("Red Filter Assembly behaviour should return Invalid when concurrent commands received | ESW-556") {
+  test("Filter Assembly behaviour should return Invalid when concurrent commands received | ESW-556, ESW-557") {
     implicit val patienceConfig: PatienceConfig = PatienceConfig(10.seconds)
     val sequencerPrefix                         = Prefix(WFOS, "darknight")
     val connection                              = AkkaConnection(ComponentId(Prefix("WFOS.red.filter"), ComponentType.Assembly))
@@ -136,15 +137,15 @@ class RedFilterTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
     //Subscribe to event's which will be published by red filter in it's lifecycle
     eventService.defaultSubscriber.subscribeActorRef(
       Set(
-        RedFilterPositionEvent.RedFilterPositionEventKey
+        filterPositionEvent.FilterPositionEventKey
       ),
       testProbe.ref
     )
     // initially red filter is idle & at FilterWheelPosition.Z
     val currentEvent    = testProbe.expectMessageType[SystemEvent]
-    val demandPosition  = currentEvent.paramType.get(RedFilterPositionEvent.DemandPositionKey).value.values.head.name
-    val currentPosition = currentEvent.paramType.get(RedFilterPositionEvent.CurrentPositionKey).value.values.head.name
-    val dark            = currentEvent.paramType.get(RedFilterPositionEvent.DarkKey).value.values.head
+    val demandPosition  = currentEvent.paramType.get(filterPositionEvent.DemandPositionKey).value.values.head.name
+    val currentPosition = currentEvent.paramType.get(filterPositionEvent.CurrentPositionKey).value.values.head.name
+    val dark            = currentEvent.paramType.get(filterPositionEvent.DarkKey).value.values.head
 
     demandPosition shouldBe FilterWheelPosition.Z.entryName
     currentPosition shouldBe FilterWheelPosition.Z.entryName

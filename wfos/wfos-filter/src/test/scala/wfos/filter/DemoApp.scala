@@ -1,4 +1,4 @@
-package wfos.redfilter
+package wfos.filter
 
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
@@ -14,11 +14,10 @@ import csw.params.commands.{ControlCommand, Setup}
 import csw.params.events.Event
 import csw.prefix.models.Prefix
 import csw.prefix.models.Subsystem.WFOS
-import Constants.RedFilterAssemblyConnection
-import wfos.redfilter.models.FilterWheelPosition._
-import wfos.redfilter.commands.SelectCommand
-import wfos.redfilter.events.RedFilterPositionEvent
-import wfos.redfilter.models.FilterWheelPosition
+import wfos.filter.commands.SelectCommand
+import wfos.filter.events.FilterPositionEvent
+import wfos.filter.models.FilterWheelPosition
+import wfos.filter.models.FilterWheelPosition._
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
@@ -33,14 +32,17 @@ object DemoApp {
   private lazy val eventService        = eventServiceFactory.make(locationService)
   private lazy val eventSubscriber     = eventService.defaultSubscriber
 
-  private val sequencerPrefix = Prefix(WFOS, "darknight")
+  private val sequencerPrefix     = Prefix(WFOS, "darknight")
+  private val filterPrefix        = Prefix(WFOS, "blue.filter")
+  private val filterPositionEvent = new FilterPositionEvent(filterPrefix)
 
   System.setProperty("INTERFACE_NAME", "en0")
 
   def main(args: Array[String]): Unit =
     try {
-      val redFilterAssembly = Await.result(locationService.resolve(RedFilterAssemblyConnection, 5.seconds), 6.seconds).get
-      val commandService    = CommandServiceFactory.make(redFilterAssembly)
+      val redFilterAssembly =
+        Await.result(locationService.resolve(Filter.getConnection(filterPrefix), 5.seconds), 6.seconds).get
+      val commandService = CommandServiceFactory.make(redFilterAssembly)
 
       subscribeToRedFilterPositionEvents()
       Thread.sleep(5000)
@@ -78,13 +80,13 @@ object DemoApp {
 
   private def subscribeToRedFilterPositionEvents() =
     eventSubscriber
-      .subscribe(Set(RedFilterPositionEvent.RedFilterPositionEventKey))
+      .subscribe(Set(filterPositionEvent.FilterPositionEventKey))
       .runForeach(e => printRedFilterPositionEvent(e))
 
   private def printRedFilterPositionEvent(event: Event) = for {
-    current <- event.paramType.get(RedFilterPositionEvent.CurrentPositionKey).flatMap(_.get(0))
-    target  <- event.paramType.get(RedFilterPositionEvent.DemandPositionKey).flatMap(_.get(0))
-    dark    <- event.paramType.get(RedFilterPositionEvent.DarkKey).flatMap(_.get(0))
+    current <- event.paramType.get(filterPositionEvent.CurrentPositionKey).flatMap(_.get(0))
+    target  <- event.paramType.get(filterPositionEvent.DemandPositionKey).flatMap(_.get(0))
+    dark    <- event.paramType.get(filterPositionEvent.DarkKey).flatMap(_.get(0))
   } yield println(s"$current, $target, $dark")
 
   private def shutdown(): Unit = {

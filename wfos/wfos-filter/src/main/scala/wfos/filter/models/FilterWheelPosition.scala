@@ -1,4 +1,4 @@
-package wfos.redfilter.models
+package wfos.filter.models
 
 import csw.params.core.generics.GChoiceKey
 import csw.params.core.generics.KeyType.ChoiceKey
