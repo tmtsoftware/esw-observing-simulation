@@ -4,13 +4,13 @@ import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.util.Timeout
 import csw.command.client.CommandServiceFactory
 import csw.location.api.models.Connection.AkkaConnection
-import csw.prefix.models.Prefix
 import csw.location.api.models.{ComponentId, ComponentType}
 import csw.params.commands.CommandResponse.{Completed, Invalid, Started}
 import csw.params.commands.Setup
 import csw.params.events.{Event, SystemEvent}
+import csw.prefix.models.Prefix
 import csw.prefix.models.Subsystem.IRIS
-import csw.testkit.scaladsl.CSWService.{AlarmServer, EventServer}
+import csw.testkit.scaladsl.CSWService.EventServer
 import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
 import iris.ifsscale.commands.SelectCommand
 import iris.ifsscale.commands.SelectCommand.ScaleKey
@@ -21,7 +21,7 @@ import org.scalatest.funsuite.AnyFunSuiteLike
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class IfsScaleTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) with AnyFunSuiteLike {
+class IfsScaleTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSuiteLike {
 
   import frameworkTestKit._
 

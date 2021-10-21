@@ -31,9 +31,9 @@ class FilterHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext
   implicit val ec: ExecutionContext    = ctx.executionContext
   private val log                      = loggerFactory.getLogger
   private val filterPrefix: Prefix     = cswCtx.componentInfo.prefix
-  private val filterWheelConfiguration = AssemblyConfiguration(ConfigFactory.load().getConfig(filterPrefix.toString()))
+  private val filterWheelConfiguration = AssemblyConfiguration(ConfigFactory.load().getConfig(filterPrefix.toString().toLowerCase()))
   private val filterPositionEvent      = new FilterPositionEvent(filterPrefix)
-  private val redFilterActor           = ctx.spawnAnonymous(FilterWheelActor.behavior(cswCtx, filterWheelConfiguration))
+  private val filterActor              = ctx.spawnAnonymous(FilterWheelActor.behavior(cswCtx, filterWheelConfiguration))
 
   override def initialize(): Unit = {
     log.info(s"Initializing ${filterPrefix.componentName}...")
@@ -54,7 +54,7 @@ class FilterHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext
     }
 
     initialValidateRes match {
-      case _: Accepted => Await.result(redFilterActor ? (IsValidMove(runId, _)), timeout)
+      case _: Accepted => Await.result(filterActor ? (IsValidMove(runId, _)), timeout)
       case invalidRes  => invalidRes
     }
   }
@@ -80,7 +80,7 @@ class FilterHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext
     SelectCommand.getWheel1TargetPosition(setup) match {
       case Right(targetPosition) =>
         log.info(s"Filter Assembly: Moving wheel to target position: $targetPosition")
-        redFilterActor ! WheelCommand.Move(targetPosition, runId)
+        filterActor ! WheelCommand.Move(targetPosition, runId)
         Started(runId)
       case Left(commandIssue) => Invalid(runId, commandIssue)
     }
