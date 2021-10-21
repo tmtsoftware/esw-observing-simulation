@@ -29,7 +29,7 @@ class DetectorHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswConte
   private val fitsActor: ActorRef[FitsMessage]        = ctx.spawnAnonymous(new FitsActor(cswCtx, config).setup)
   private val controller: ActorRef[ControllerMessage] = ctx.spawnAnonymous(new ControllerActor(cswCtx, config).uninitialized)
 
-  override def initialize(): Unit = log.info("Initializing imager.adc...")
+  override def initialize(): Unit = log.info(s"Initializing ${cswCtx.componentInfo.prefix}...")
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {}
 
