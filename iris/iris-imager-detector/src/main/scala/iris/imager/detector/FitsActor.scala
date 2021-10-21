@@ -1,7 +1,6 @@
 package iris.imager.detector
 
 import akka.actor.typed.Behavior
-import akka.actor.typed.pubsub.Topic.publish
 import akka.actor.typed.scaladsl.Behaviors
 import com.typesafe.config.Config
 import csw.command.client.CommandResponseManager

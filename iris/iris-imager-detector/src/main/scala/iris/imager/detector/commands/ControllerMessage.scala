@@ -3,7 +3,7 @@ package iris.imager.detector.commands
 import akka.actor.typed.ActorRef
 import csw.params.commands.CommandName
 import csw.params.commands.CommandResponse.ValidateCommandResponse
-import csw.params.core.models.{ExposureId, Id, ObsId}
+import csw.params.core.models.{ExposureId, Id}
 
 sealed trait ControllerMessage
 

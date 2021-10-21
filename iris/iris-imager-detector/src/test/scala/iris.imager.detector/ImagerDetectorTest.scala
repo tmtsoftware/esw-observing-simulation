@@ -20,9 +20,10 @@ import scala.concurrent.duration.DurationInt
 class ImagerDetectorTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSuiteLike {
   import frameworkTestKit._
 
-  private val seconds                                  = 10.seconds
+  private val seconds                   = 10.seconds
+  private implicit val timeout: Timeout = Timeout(seconds)
+
   override implicit val patienceConfig: PatienceConfig = PatienceConfig(seconds)
-  private implicit val timeout: Timeout                = Timeout(seconds)
 
   override def beforeAll(): Unit = {
     super.beforeAll()
@@ -41,7 +42,8 @@ class ImagerDetectorTest extends ScalaTestFrameworkTestKit(EventServer) with Any
     akkaLocation.connection shouldBe connection
 
     val testProbe = TestProbe[Event]()
-    //Subscribe to event's which will be published by prism in it's lifecycle
+
+    //Subscribe to event's which will be published by detector in it's lifecycle
     eventService.defaultSubscriber.subscribeActorRef(
       Set(
         EventKey(detectorPrefix, ObserveEventNames.ExposureStart),
