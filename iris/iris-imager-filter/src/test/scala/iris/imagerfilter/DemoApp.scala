@@ -81,11 +81,12 @@ object DemoApp {
       .subscribe(Set(ImagerPositionEvent.ImagerPositionEventKey))
       .runForeach(e => printImagerPositionEvent(e))
 
-  private def printImagerPositionEvent(event: Event) = for {
-    current <- event.paramType.get(ImagerPositionEvent.CurrentPositionKey).flatMap(_.get(0))
-    target  <- event.paramType.get(ImagerPositionEvent.DemandPositionKey).flatMap(_.get(0))
-    dark    <- event.paramType.get(ImagerPositionEvent.DarkKey).flatMap(_.get(0))
-  } yield println(s"$current, $target, $dark")
+  private def printImagerPositionEvent(event: Event): Unit = {
+    val current = event.paramType(ImagerPositionEvent.CurrentPositionKey).head
+    val target  = event.paramType(ImagerPositionEvent.DemandPositionKey).head
+    val dark    = event.paramType(ImagerPositionEvent.DarkKey).head
+    println(s"$current, $target, $dark")
+  }
 
   private def shutdown(): Unit = {
     redisStore.redisClient.shutdown()

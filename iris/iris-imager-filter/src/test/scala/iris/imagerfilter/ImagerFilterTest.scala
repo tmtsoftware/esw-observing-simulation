@@ -50,9 +50,9 @@ class ImagerFilterTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServe
     )
     // initially imager is idle & at FilterWheelPosition.Z
     val currentEvent    = testProbe.expectMessageType[SystemEvent]
-    val demandPosition  = currentEvent.paramType.get(ImagerPositionEvent.DemandPositionKey).value.values.head.name
-    val currentPosition = currentEvent.paramType.get(ImagerPositionEvent.CurrentPositionKey).value.values.head.name
-    val dark            = currentEvent.paramType.get(ImagerPositionEvent.DarkKey).value.values.head
+    val demandPosition  = currentEvent(ImagerPositionEvent.DemandPositionKey).head.name
+    val currentPosition = currentEvent(ImagerPositionEvent.CurrentPositionKey).head.name
+    val dark            = currentEvent(ImagerPositionEvent.DarkKey).head
 
     demandPosition shouldBe FilterWheelPosition.Z.entryName
     currentPosition shouldBe FilterWheelPosition.Z.entryName
@@ -69,23 +69,23 @@ class ImagerFilterTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServe
 
     eventually {
       val event1 = testProbe.expectMessageType[SystemEvent]
-      event1.paramType.get(DemandPositionKey).value.values.head.name shouldBe H.entryName
-      event1.paramType.get(CurrentPositionKey).value.values.head.name shouldBe Y.entryName
-      event1.paramType.get(DarkKey).value.values.head shouldBe true
+      event1(DemandPositionKey).head.name shouldBe H.entryName
+      event1(CurrentPositionKey).head.name shouldBe Y.entryName
+      event1(DarkKey).head shouldBe true
     }
 
     eventually {
       val event2 = testProbe.expectMessageType[SystemEvent]
-      event2.paramType.get(DemandPositionKey).value.values.head.name shouldBe H.entryName
-      event2.paramType.get(CurrentPositionKey).value.values.head.name shouldBe J.entryName
-      event2.paramType.get(DarkKey).value.values.head shouldBe true
+      event2(DemandPositionKey).head.name shouldBe H.entryName
+      event2(CurrentPositionKey).head.name shouldBe J.entryName
+      event2(DarkKey).head shouldBe true
     }
 
     eventually {
       val event3 = testProbe.expectMessageType[SystemEvent]
-      event3.paramType.get(DemandPositionKey).value.values.head.name shouldBe H.entryName
-      event3.paramType.get(CurrentPositionKey).value.values.head.name shouldBe H.entryName
-      event3.paramType.get(DarkKey).value.values.head shouldBe false
+      event3(DemandPositionKey).head.name shouldBe H.entryName
+      event3(CurrentPositionKey).head.name shouldBe H.entryName
+      event3(DarkKey).head shouldBe false
     }
 
     val finalResponse = commandService.queryFinal(initialResponse.runId)(Timeout(2.seconds))
@@ -101,23 +101,23 @@ class ImagerFilterTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServe
 
     eventually {
       val event1 = testProbe.expectMessageType[SystemEvent]
-      event1.paramType.get(DemandPositionKey).value.values.head.name shouldBe Z.entryName
-      event1.paramType.get(CurrentPositionKey).value.values.head.name shouldBe J.entryName
-      event1.paramType.get(DarkKey).value.values.head shouldBe true
+      event1(DemandPositionKey).head.name shouldBe Z.entryName
+      event1(CurrentPositionKey).head.name shouldBe J.entryName
+      event1(DarkKey).head shouldBe true
     }
 
     eventually {
       val event2 = testProbe.expectMessageType[SystemEvent]
-      event2.paramType.get(DemandPositionKey).value.values.head.name shouldBe Z.entryName
-      event2.paramType.get(CurrentPositionKey).value.values.head.name shouldBe Y.entryName
-      event2.paramType.get(DarkKey).value.values.head shouldBe true
+      event2(DemandPositionKey).head.name shouldBe Z.entryName
+      event2(CurrentPositionKey).head.name shouldBe Y.entryName
+      event2(DarkKey).head shouldBe true
     }
 
     eventually {
       val event3 = testProbe.expectMessageType[SystemEvent]
-      event3.paramType.get(DemandPositionKey).value.values.head.name shouldBe Z.entryName
-      event3.paramType.get(CurrentPositionKey).value.values.head.name shouldBe Z.entryName
-      event3.paramType.get(DarkKey).value.values.head shouldBe false
+      event3(DemandPositionKey).head.name shouldBe Z.entryName
+      event3(CurrentPositionKey).head.name shouldBe Z.entryName
+      event3(DarkKey).head shouldBe false
     }
 
     val finalResponse2 = commandService.queryFinal(initialResponse2.runId)(Timeout(2.seconds))
@@ -142,9 +142,9 @@ class ImagerFilterTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServe
     )
     // initially imager is idle & at FilterWheelPosition.Z
     val currentEvent    = testProbe.expectMessageType[SystemEvent]
-    val demandPosition  = currentEvent.paramType.get(ImagerPositionEvent.DemandPositionKey).value.values.head.name
-    val currentPosition = currentEvent.paramType.get(ImagerPositionEvent.CurrentPositionKey).value.values.head.name
-    val dark            = currentEvent.paramType.get(ImagerPositionEvent.DarkKey).value.values.head
+    val demandPosition  = currentEvent(ImagerPositionEvent.DemandPositionKey).head.name
+    val currentPosition = currentEvent(ImagerPositionEvent.CurrentPositionKey).head.name
+    val dark            = currentEvent(ImagerPositionEvent.DarkKey).head
 
     demandPosition shouldBe FilterWheelPosition.Z.entryName
     currentPosition shouldBe FilterWheelPosition.Z.entryName

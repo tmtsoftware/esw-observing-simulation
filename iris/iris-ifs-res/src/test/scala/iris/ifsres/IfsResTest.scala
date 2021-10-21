@@ -48,8 +48,8 @@ class IfsResTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) wit
     )
     // initially res is idle & at R4000_Z
     val currentEvent    = testProbe.expectMessageType[SystemEvent]
-    val demandPosition  = currentEvent.paramType.get(TargetPositionKey).value.values.head.name
-    val currentPosition = currentEvent.paramType.get(CurrentPositionKey).value.values.head.name
+    val demandPosition  = currentEvent(TargetPositionKey).head.name
+    val currentPosition = currentEvent(CurrentPositionKey).head.name
 
     demandPosition shouldBe R4000_Z.entryName
     currentPosition shouldBe R4000_Z.entryName
@@ -65,20 +65,20 @@ class IfsResTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) wit
 
     eventually {
       val event1 = testProbe.expectMessageType[SystemEvent]
-      event1.paramType.get(TargetPositionKey).value.values.head.name shouldBe R4000_H.entryName
-      event1.paramType.get(CurrentPositionKey).value.values.head.name shouldBe R4000_Y.entryName
+      event1(TargetPositionKey).head.name shouldBe R4000_H.entryName
+      event1(CurrentPositionKey).head.name shouldBe R4000_Y.entryName
     }
 
     eventually {
       val event2 = testProbe.expectMessageType[SystemEvent]
-      event2.paramType.get(TargetPositionKey).value.values.head.name shouldBe R4000_H.entryName
-      event2.paramType.get(CurrentPositionKey).value.values.head.name shouldBe R4000_J.entryName
+      event2(TargetPositionKey).head.name shouldBe R4000_H.entryName
+      event2(CurrentPositionKey).head.name shouldBe R4000_J.entryName
     }
 
     eventually {
       val event3 = testProbe.expectMessageType[SystemEvent]
-      event3.paramType.get(TargetPositionKey).value.values.head.name shouldBe R4000_H.entryName
-      event3.paramType.get(CurrentPositionKey).value.values.head.name shouldBe R4000_H.entryName
+      event3(TargetPositionKey).head.name shouldBe R4000_H.entryName
+      event3(CurrentPositionKey).head.name shouldBe R4000_H.entryName
     }
 
     val finalResponse = commandService.queryFinal(initialResponse.runId)(Timeout(2.seconds))
@@ -94,20 +94,20 @@ class IfsResTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) wit
 
     eventually {
       val event1 = testProbe.expectMessageType[SystemEvent]
-      event1.paramType.get(TargetPositionKey).value.values.head.name shouldBe R4000_Z.entryName
-      event1.paramType.get(CurrentPositionKey).value.values.head.name shouldBe R4000_J.entryName
+      event1(TargetPositionKey).head.name shouldBe R4000_Z.entryName
+      event1(CurrentPositionKey).head.name shouldBe R4000_J.entryName
     }
 
     eventually {
       val event2 = testProbe.expectMessageType[SystemEvent]
-      event2.paramType.get(TargetPositionKey).value.values.head.name shouldBe R4000_Z.entryName
-      event2.paramType.get(CurrentPositionKey).value.values.head.name shouldBe R4000_Y.entryName
+      event2(TargetPositionKey).head.name shouldBe R4000_Z.entryName
+      event2(CurrentPositionKey).head.name shouldBe R4000_Y.entryName
     }
 
     eventually {
       val event3 = testProbe.expectMessageType[SystemEvent]
-      event3.paramType.get(TargetPositionKey).value.values.head.name shouldBe R4000_Z.entryName
-      event3.paramType.get(CurrentPositionKey).value.values.head.name shouldBe R4000_Z.entryName
+      event3(TargetPositionKey).head.name shouldBe R4000_Z.entryName
+      event3(CurrentPositionKey).head.name shouldBe R4000_Z.entryName
     }
 
     val finalResponse2 = commandService.queryFinal(initialResponse2.runId)(Timeout(2.seconds))
@@ -132,8 +132,8 @@ class IfsResTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) wit
     )
     // initially imager is idle & at FilterWheelPosition.Z
     val currentEvent    = testProbe.expectMessageType[SystemEvent]
-    val demandPosition  = currentEvent.paramType.get(TargetPositionKey).value.values.head.name
-    val currentPosition = currentEvent.paramType.get(CurrentPositionKey).value.values.head.name
+    val demandPosition  = currentEvent(TargetPositionKey).head.name
+    val currentPosition = currentEvent(CurrentPositionKey).head.name
 
     demandPosition shouldBe R4000_Z.entryName
     currentPosition shouldBe R4000_Z.entryName

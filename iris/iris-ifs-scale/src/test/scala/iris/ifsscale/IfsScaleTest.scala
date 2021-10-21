@@ -48,8 +48,8 @@ class IfsScaleTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) w
     )
     // initially res is idle & at S25
     val currentEvent    = testProbe.expectMessageType[SystemEvent]
-    val demandPosition  = currentEvent.paramType.get(TargetScaleKey).value.values.head.name
-    val currentPosition = currentEvent.paramType.get(CurrentScaleKey).value.values.head.name
+    val demandPosition  = currentEvent(TargetScaleKey).head.name
+    val currentPosition = currentEvent(CurrentScaleKey).head.name
 
     demandPosition shouldBe S25.entryName
     currentPosition shouldBe S25.entryName
@@ -65,8 +65,8 @@ class IfsScaleTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) w
 
     eventually {
       val event1 = testProbe.expectMessageType[SystemEvent]
-      event1.paramType.get(TargetScaleKey).value.values.head.name shouldBe S4.entryName
-      event1.paramType.get(CurrentScaleKey).value.values.head.name shouldBe S4.entryName
+      event1(TargetScaleKey).head.name shouldBe S4.entryName
+      event1(CurrentScaleKey).head.name shouldBe S4.entryName
     }
 
     val finalResponse = commandService.queryFinal(initialResponse.runId)(Timeout(2.seconds))

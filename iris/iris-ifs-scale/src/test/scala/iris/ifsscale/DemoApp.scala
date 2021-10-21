@@ -83,10 +83,11 @@ object DemoApp {
       .subscribe(Set(IfsScaleEvent.IfsScaleEventKey))
       .runForeach(e => printScaleEvent(e))
 
-  private def printScaleEvent(event: Event) = for {
-    current <- event.paramType.get(IfsScaleEvent.CurrentScaleKey).flatMap(_.get(0))
-    target  <- event.paramType.get(IfsScaleEvent.TargetScaleKey).flatMap(_.get(0))
-  } yield println(s"$current, $target")
+  private def printScaleEvent(event: Event): Unit = {
+    val current = event.paramType(IfsScaleEvent.CurrentScaleKey).head
+    val target  = event.paramType(IfsScaleEvent.TargetScaleKey).head
+    println(s"$current, $target")
+  }
 
   private def shutdown(): Unit = {
     redisStore.redisClient.shutdown()

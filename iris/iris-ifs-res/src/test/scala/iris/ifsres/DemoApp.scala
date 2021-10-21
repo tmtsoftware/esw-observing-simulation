@@ -83,10 +83,11 @@ object DemoApp {
       .subscribe(Set(IfsPositionEvent.IfsResPositionEventKey))
       .runForeach(e => printIfsPositionEvent(e))
 
-  private def printIfsPositionEvent(event: Event) = for {
-    current <- event.paramType.get(IfsPositionEvent.CurrentPositionKey).flatMap(_.get(0))
-    target  <- event.paramType.get(IfsPositionEvent.TargetPositionKey).flatMap(_.get(0))
-  } yield println(s"$current, $target")
+  private def printIfsPositionEvent(event: Event): Unit = {
+    val current = event.paramType(IfsPositionEvent.CurrentPositionKey).head
+    val target  = event.paramType(IfsPositionEvent.TargetPositionKey).head
+    println(s"$current, $target")
+  }
 
   private def shutdown(): Unit = {
     redisStore.redisClient.shutdown()

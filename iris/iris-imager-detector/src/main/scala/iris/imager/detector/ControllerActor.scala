@@ -29,7 +29,7 @@ class ControllerActor(cswContext: CswContext, config: Config) {
   private def generateFakeImageData(xs: Int, ys: Int) = Array.tabulate(xs, ys)((x, y) => x * xs + y)
 
   lazy val uninitialized: Behavior[ControllerMessage] =
-    receive("UnInitialised") {
+    receiveWithDefaultBehavior("UnInitialised") {
       case Initialize(runId) =>
         crm.updateCommand(Completed(runId))
         idle
@@ -50,10 +50,10 @@ class ControllerActor(cswContext: CswContext, config: Config) {
       Behaviors.same
   }
 
-  private lazy val idle: Behavior[ControllerMessage] = receive("Non-Configured")(idleHandler)
+  private lazy val idle: Behavior[ControllerMessage] = receiveWithDefaultBehavior("Non-Configured")(idleHandler)
 
   private def loaded(data: ControllerData): Behavior[ControllerMessage] = Behaviors.setup { ctx =>
-    receive("configured") {
+    receiveWithDefaultBehavior("configured") {
       idleHandler.orElse {
         case StartExposure(runId, replyTo) =>
           ctx.self ! ExposureInProgress(runId, 0)
@@ -78,11 +78,11 @@ class ControllerActor(cswContext: CswContext, config: Config) {
         loaded(data)
       }
 
-      receive("exposing") {
+      receiveWithDefaultBehavior("exposing") {
         case ExposureInProgress(runId, currentRamp) if isExposureRunning =>
           if (currentRamp == data.ramps) ctx.self ! ExposureFinished(runId)
           else {
-            timeServiceScheduler.scheduleOnce(UTCTime(Instant.ofEpochMilli(System.currentTimeMillis() + (data.rampIntegrationTime)))) {
+            timeServiceScheduler.scheduleOnce(UTCTime(Instant.ofEpochMilli(System.currentTimeMillis() + data.rampIntegrationTime))) {
               ctx.self ! ExposureInProgress(runId, currentRamp + 1)
             }
           }
@@ -98,7 +98,9 @@ class ControllerActor(cswContext: CswContext, config: Config) {
       }
     }
 
-  private def receive(state: String)(handle: PartialFunction[ControllerMessage, Behavior[ControllerMessage]]): Behavior[ControllerMessage] =
+  private def receiveWithDefaultBehavior(
+      state: String
+  )(handle: PartialFunction[ControllerMessage, Behavior[ControllerMessage]]): Behavior[ControllerMessage] =
     Behaviors.receiveMessage(handle.orElse {
       case IsValid(runId, command, replyTo) =>
         val errMsg = s"Command: ${command.name} is not valid in $state state."

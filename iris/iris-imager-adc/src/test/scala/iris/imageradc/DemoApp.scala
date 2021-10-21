@@ -17,10 +17,10 @@ import csw.prefix.models.Subsystem.IRIS
 import iris.imageradc.Constants.ImagerADCAssemblyConnection
 import iris.imageradc.commands.ADCCommand
 import iris.imageradc.events.PrismCurrentEvent.ImagerADCCurrentEventKey
-import iris.imageradc.events.PrismRetractEvent.{ImagerADCRetractEventKey, ImagerADCRetractEventName}
+import iris.imageradc.events.PrismRetractEvent.ImagerADCRetractEventKey
 import iris.imageradc.events.PrismStateEvent.ImagerADCStateEventKey
 import iris.imageradc.events.PrismTargetEvent.ImagerADCTargetEventKey
-import iris.imageradc.events.{PrismCurrentEvent, PrismRetractEvent, PrismStateEvent, PrismTargetEvent}
+import iris.imageradc.events.{PrismCurrentEvent, PrismStateEvent, PrismTargetEvent}
 import iris.imageradc.models.PrismPosition
 
 import scala.concurrent.Await
@@ -44,13 +44,13 @@ object DemoApp {
     try {
       val imagerAssembly = Await.result(locationService.resolve(ImagerADCAssemblyConnection, 5.seconds), 6.seconds).get
       val commandService = CommandServiceFactory.make(imagerAssembly)
-      val subscriptions: List[(EventKey, Event => Option[Unit])] = List(
+      val subscriptions: List[(EventKey, Event => Unit)] = List(
         (ImagerADCStateEventKey, printPrismStateEvent),
         (ImagerADCTargetEventKey, printPrismTargetEvent),
         (ImagerADCRetractEventKey, printPrismRetractEvent),
         (ImagerADCCurrentEventKey, printPrismCurrentEvent)
       )
-      subscriptions.foreach((k) => subscribeToEvent(k._1, k._2))
+      subscriptions.foreach(k => subscribeToEvent(k._1, k._2))
       Thread.sleep(10000)
       moveCommandScenario(commandService)
 //      concurrentMoveCommandsScenario(commandService, R4000_H_K)
@@ -107,33 +107,33 @@ object DemoApp {
     response
   }
 
-  private def subscribeToEvent(key: EventKey, f: (Event) => Option[Unit]) =
+  private def subscribeToEvent(key: EventKey, f: Event => Unit) =
     eventSubscriber
       .subscribe(Set(key))
       .runForeach(e => f(e))
 
-  private def printPrismStateEvent(event: Event) = for {
-    move     <- event.paramType.get(PrismStateEvent.moveKey).flatMap(_.get(0))
-    onTarget <- event.paramType.get(PrismStateEvent.onTargetKey).flatMap(_.get(0))
-  } yield println(s"Prism State: $move, OnTarget: $onTarget")
+  private def printPrismStateEvent(event: Event): Unit = {
+    val move     = event.paramType(PrismStateEvent.moveKey).head
+    val onTarget = event.paramType(PrismStateEvent.onTargetKey).head
+    println(s"Prism State: $move, OnTarget: $onTarget")
+  }
 
-  private def printPrismTargetEvent(event: Event) =
-    for {
-      angle <- event.paramType.get(PrismTargetEvent.angleKey).flatMap(_.get(0))
-    } yield {
-      println("------------------------------------------")
-      println(s"Target Angle: $angle")
-    }
+  private def printPrismTargetEvent(event: Event): Unit = {
+    val angle = event.paramType(PrismTargetEvent.angleKey).head
+    println("------------------------------------------")
+    println(s"Target Angle: $angle")
+  }
 
-  private def printPrismRetractEvent(event: Event) =
-    for {
-      position <- event.paramType.get(PrismPosition.RetractKey).flatMap(_.get(0))
-    } yield println(s"Retract position: $position")
+  private def printPrismRetractEvent(event: Event): Unit = {
+    val position = event.paramType(PrismPosition.RetractKey).head
+    println(s"Retract position: $position")
+  }
 
-  private def printPrismCurrentEvent(event: Event) = for {
-    angle      <- event.paramType.get(PrismCurrentEvent.angleKey).flatMap(_.get(0))
-    angleError <- event.paramType.get(PrismCurrentEvent.angleErrorKey).flatMap(_.get(0))
-  } yield println(s"Current angle: $angle, Angle Error: $angleError")
+  private def printPrismCurrentEvent(event: Event): Unit = {
+    val angle      = event.paramType(PrismCurrentEvent.angleKey).head
+    val angleError = event.paramType(PrismCurrentEvent.angleErrorKey).head
+    println(s"Current angle: $angle, Angle Error: $angleError")
+  }
 
   private def shutdown(): Unit = {
     redisStore.redisClient.shutdown()

@@ -29,7 +29,7 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
   private def inAndStopped(self: ActorRef[PrismCommands]): Behavior[PrismCommands] = {
     publishPrismState(PrismState.STOPPED)
     publishRetractPosition(PrismPosition.IN)
-    receive("IN") {
+    receiveWithDefaultBehavior("IN") {
       case PrismCommands.RetractSelect(runId, position) =>
         position match {
           case PrismPosition.IN =>
@@ -49,18 +49,18 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
   }
 
   private def goingIn(self: ActorRef[PrismCommands]): Behavior[PrismCommands] =
-    receive("Retracting IN") { case PrismCommands.GoingIn =>
+    receiveWithDefaultBehavior("Retracting IN") { case PrismCommands.GoingIn =>
       inAndStopped(self)
     }
 
   private def goingOut(self: ActorRef[PrismCommands]): Behavior[PrismCommands] =
-    receive("Retracting OUT") { case PrismCommands.GoingOut =>
+    receiveWithDefaultBehavior("Retracting OUT") { case PrismCommands.GoingOut =>
       outAndStopped(self)
     }
 
   private def outAndStopped(self: ActorRef[PrismCommands]): Behavior[PrismCommands] = {
     publishRetractPosition(PrismPosition.OUT)
-    receive("OUT") {
+    receiveWithDefaultBehavior("OUT") {
       case PrismCommands.RetractSelect(runId, position) =>
         position match {
           case PrismPosition.IN =>
@@ -78,7 +78,7 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
 
   private def inAndMoving(self: ActorRef[PrismCommands]): Behavior[PrismCommands] = {
     val targetModifier = scheduleJobForPrismMovement(self)
-    receive("moving") {
+    receiveWithDefaultBehavior("moving") {
       case PrismCommands.IsValid(runId, command, replyTo) if command.commandName != ADCCommand.RetractSelect =>
         replyTo ! Accepted(runId)
         Behaviors.same
@@ -98,7 +98,9 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
     }
   }
 
-  private def receive(state: String)(handle: PartialFunction[PrismCommands, Behavior[PrismCommands]]): Behavior[PrismCommands] = {
+  private def receiveWithDefaultBehavior(
+      state: String
+  )(handle: PartialFunction[PrismCommands, Behavior[PrismCommands]]): Behavior[PrismCommands] = {
     Behaviors.receiveMessage(handle.orElse {
       case PrismCommands.IsValid(runId, command, replyTo) =>
         val errMsg = s"Setup command: ${command.commandName.name} is not valid in $state state."
@@ -111,11 +113,12 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
     })
   }
 
-  private def startRetracting(runId: Id)(whenDone: => Unit) =
+  private def startRetracting(runId: Id)(whenDone: => Unit) = {
     timeServiceScheduler.scheduleOnce(UTCTime(UTCTime.now().value.plus(adcImagerConfiguration.retractSelectDelay))) {
       crm.updateCommand(Completed(runId))
       whenDone
     }
+  }
 
   private def publishEvent(event: SystemEvent)                = eventPublisher.publish(event)
   private def publishRetractPosition(position: PrismPosition) = publishEvent(PrismRetractEvent.make(position))

@@ -68,7 +68,7 @@ class ImagerDetectorTest extends ScalaTestFrameworkTestKit(EventServer) with Any
       Constants.LoadConfiguration,
       Some(obsId),
       Set(
-        ObserveEventKeys.exposureId.set("2020A-001-123-IRIS-IMG-DRK1-0023"),
+        ObserveEventKeys.exposureId.set(exposureId.toString),
         ObserveEventKeys.filename.set(filename),
         Constants.rampsKey.set(5),
         Constants.rampIntegrationTimeKey.set(5)
@@ -84,25 +84,25 @@ class ImagerDetectorTest extends ScalaTestFrameworkTestKit(EventServer) with Any
     eventually {
       val event = testProbe.expectMessageType[ObserveEvent]
       event.eventName.name === ObserveEventNames.ExposureStart.name
-      ExposureId(event.get(ObserveEventKeys.exposureId).get.head) shouldBe exposureId
+      ExposureId(event(ObserveEventKeys.exposureId).head) shouldBe exposureId
     }
     eventually {
       val event = testProbe.expectMessageType[ObserveEvent]
       event.eventName.name === ObserveEventNames.ExposureEnd.name
-      ExposureId(event.get(ObserveEventKeys.exposureId).get.head) shouldBe exposureId
+      ExposureId(event(ObserveEventKeys.exposureId).head) shouldBe exposureId
     }
     eventually {
       val event = testProbe.expectMessageType[ObserveEvent]
       event.eventName.name === ObserveEventNames.DataWriteStart.name
-      event.get(ObserveEventKeys.filename).get.head shouldBe filename
-      ExposureId(event.get(ObserveEventKeys.exposureId).get.head) shouldBe exposureId
+      event(ObserveEventKeys.filename).head shouldBe filename
+      ExposureId(event(ObserveEventKeys.exposureId).head) shouldBe exposureId
     }
 
     eventually {
       val event = testProbe.expectMessageType[ObserveEvent]
       event.eventName.name === ObserveEventNames.DataWriteEnd.name
-      event.get(ObserveEventKeys.filename).get.head shouldBe filename
-      ExposureId(event.get(ObserveEventKeys.exposureId).get.head) shouldBe exposureId
+      event(ObserveEventKeys.filename).head shouldBe filename
+      ExposureId(event(ObserveEventKeys.exposureId).head) shouldBe exposureId
     }
 
   }
