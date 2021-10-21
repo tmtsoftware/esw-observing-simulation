@@ -1,4 +1,4 @@
-package iris.imager.detector
+package iris.detector
 
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.AskPattern.Askable
@@ -14,13 +14,13 @@ import csw.params.commands._
 import csw.params.core.models.{ExposureId, Id}
 import csw.params.events.ObserveEventKeys
 import csw.time.core.models.UTCTime
-import iris.imager.detector.commands.ControllerMessage._
-import iris.imager.detector.commands.{ControllerMessage, FitsMessage}
+import iris.detector.commands.{ControllerMessage, FitsMessage}
+import ControllerMessage._
 
 import scala.concurrent.Await
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
-class ImagerDetectorHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext) extends ComponentHandlers(ctx, cswCtx) {
+class DetectorHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext) extends ComponentHandlers(ctx, cswCtx) {
   import cswCtx._
   private implicit val scheduler: Scheduler = ctx.system.scheduler
   private val log                           = loggerFactory.getLogger

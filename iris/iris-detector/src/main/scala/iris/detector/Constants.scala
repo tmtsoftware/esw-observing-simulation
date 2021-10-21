@@ -1,4 +1,4 @@
-package iris.imager.detector
+package iris.detector
 
 import csw.params.commands.CommandName
 import csw.params.core.generics.{Key, KeyType}

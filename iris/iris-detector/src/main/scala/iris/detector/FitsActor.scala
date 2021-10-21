@@ -1,4 +1,4 @@
-package iris.imager.detector
+package iris.detector
 
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.Behaviors
@@ -8,8 +8,8 @@ import csw.event.api.scaladsl.EventPublisher
 import csw.framework.models.CswContext
 import csw.params.commands.CommandResponse.Completed
 import csw.params.events.IRDetectorEvent
-import iris.imager.detector.commands.FitsMessage._
-import iris.imager.detector.commands.{FitsData, FitsMessage}
+import iris.detector.commands.{FitsData, FitsMessage}
+import iris.detector.commands.FitsMessage._
 import nom.tam.fits.{Fits, FitsFactory}
 import nom.tam.util.BufferedFile
 

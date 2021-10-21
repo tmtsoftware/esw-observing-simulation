@@ -1,4 +1,4 @@
-package iris.imager.detector
+package iris.detector
 
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior}
@@ -13,9 +13,9 @@ import csw.params.events.{IRDetectorEvent, ObserveEvent}
 import csw.prefix.models.Prefix
 import csw.time.core.models.UTCTime
 import csw.time.scheduler.api.TimeServiceScheduler
-import iris.imager.detector.commands.ControllerMessage._
-import iris.imager.detector.commands.FitsMessage.WriteData
-import iris.imager.detector.commands.{ControllerMessage, FitsData, FitsMessage}
+import iris.detector.commands.{ControllerMessage, FitsData, FitsMessage}
+import iris.detector.commands.ControllerMessage._
+import iris.detector.commands.FitsMessage.WriteData
 
 import java.time.Instant
 

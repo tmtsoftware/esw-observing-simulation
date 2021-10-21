@@ -1,4 +1,4 @@
-package iris.imager.detector.commands
+package iris.detector.commands
 
 import akka.actor.typed.ActorRef
 import csw.params.commands.CommandName

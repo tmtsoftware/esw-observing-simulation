@@ -1,4 +1,4 @@
-package iris.imager.detector
+package iris.detector
 
 import csw.params.core.models.ExposureId
 
