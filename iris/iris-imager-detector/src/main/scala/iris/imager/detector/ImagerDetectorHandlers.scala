@@ -24,7 +24,7 @@ class ImagerDetectorHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
   import cswCtx._
   implicit val ec: ExecutionContext         = ctx.executionContext
   private val log                           = loggerFactory.getLogger
-  private val config: Config                = ConfigFactory.load().getConfig(cswCtx.componentInfo.prefix.toString())
+  private val config: Config                = ConfigFactory.load().getConfig(cswCtx.componentInfo.prefix.toString().toLowerCase())
   implicit private val scheduler: Scheduler = ctx.system.scheduler
   val fitsActor: ActorRef[FitsMessage] = ctx.spawnAnonymous(new FitsActor(cswCtx, config).setup)
   val controller: ActorRef[ControllerMessage] =
