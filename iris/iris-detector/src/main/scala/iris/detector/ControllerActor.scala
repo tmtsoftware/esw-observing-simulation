@@ -25,10 +25,12 @@ class ControllerActor(cswContext: CswContext, config: Config) {
   private val eventPublisher: EventPublisher             = cswContext.eventService.defaultPublisher
   private val detectorPrefix: Prefix                     = cswContext.componentInfo.prefix
   private val detectorDimensions: (Int, Int)             = (config.getInt("xs"), config.getInt("ys"))
+  private val log                                        = cswContext.loggerFactory.getLogger
 
   private def generateFakeImageData(xs: Int, ys: Int) = Array.tabulate(xs, ys)((x, y) => x * xs + y)
 
-  lazy val uninitialized: Behavior[ControllerMessage] =
+  lazy val uninitialized: Behavior[ControllerMessage] = {
+    log.info("Detector is now in 'UnInitialised' state")
     receiveWithDefaultBehavior("UnInitialised") {
       case Initialize(runId) =>
         crm.updateCommand(Completed(runId))
@@ -37,6 +39,7 @@ class ControllerActor(cswContext: CswContext, config: Config) {
         replyTo ! Accepted(runId)
         Behaviors.same
     }
+  }
 
   private lazy val idleHandler: PartialFunction[ControllerMessage, Behavior[ControllerMessage]] = {
     case ConfigureExposure(runId, exposureId, filename, ramps, rampIntegrationTime) =>
@@ -50,9 +53,13 @@ class ControllerActor(cswContext: CswContext, config: Config) {
       Behaviors.same
   }
 
-  private lazy val idle: Behavior[ControllerMessage] = receiveWithDefaultBehavior("Non-Configured")(idleHandler)
+  private lazy val idle: Behavior[ControllerMessage] = {
+    log.info("Detector is now in 'Non-Configured' state")
+    receiveWithDefaultBehavior("Non-Configured")(idleHandler)
+  }
 
   private def loaded(data: ControllerData): Behavior[ControllerMessage] = Behaviors.setup { ctx =>
+    log.info(s"Detector is now in 'Configured' state with config $data")
     receiveWithDefaultBehavior("configured") {
       idleHandler.orElse {
         case StartExposure(runId, replyTo) =>
@@ -68,6 +75,7 @@ class ControllerActor(cswContext: CswContext, config: Config) {
 
   private def exposureInProgress(data: ControllerData, replyTo: ActorRef[FitsMessage]): Behavior[ControllerMessage] =
     Behaviors.setup { ctx =>
+      log.info("Exposure Started and Detector is now in 'Exposing' state")
       var isExposureRunning = true
 
       def finishExposure(runId: Id, event: ObserveEvent): Behavior[ControllerMessage] = {
@@ -90,8 +98,12 @@ class ControllerActor(cswContext: CswContext, config: Config) {
         case ExposureInProgress(runId, _) if !isExposureRunning =>
           crm.updateCommand(Completed(runId))
           loaded(data)
-        case AbortExposure(runId)    => finishExposure(runId, IRDetectorEvent.exposureAborted(detectorPrefix, data.exposureId))
-        case ExposureFinished(runId) => finishExposure(runId, IRDetectorEvent.exposureEnd(detectorPrefix, data.exposureId))
+        case AbortExposure(runId) =>
+          log.info(s"Exposure Aborted for runId $runId")
+          finishExposure(runId, IRDetectorEvent.exposureAborted(detectorPrefix, data.exposureId))
+        case ExposureFinished(runId) =>
+          log.info(s"Exposure Finished for runId $runId")
+          finishExposure(runId, IRDetectorEvent.exposureEnd(detectorPrefix, data.exposureId))
         case IsValid(runId, commandName, replyTo) if commandName == Constants.Shutdown || commandName == Constants.AbortExposure =>
           replyTo ! Accepted(runId)
           Behaviors.same

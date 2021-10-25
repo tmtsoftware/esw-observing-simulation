@@ -6,6 +6,7 @@ import com.typesafe.config.Config
 import csw.command.client.CommandResponseManager
 import csw.event.api.scaladsl.EventPublisher
 import csw.framework.models.CswContext
+import csw.logging.api.scaladsl.Logger
 import csw.params.commands.CommandResponse.Completed
 import csw.params.events.IRDetectorEvent
 import iris.detector.commands.{FitsData, FitsMessage}
@@ -16,6 +17,7 @@ import nom.tam.util.BufferedFile
 class FitsActor(cswContext: CswContext, config: Config) {
   val crm: CommandResponseManager    = cswContext.commandResponseManager
   val eventPublisher: EventPublisher = cswContext.eventService.defaultPublisher
+  val log: Logger                    = cswContext.loggerFactory.getLogger
 
   def setup: Behavior[FitsMessage] = Behaviors.receiveMessage { case WriteData(runId, data, exposureId, filename) =>
     val prefix = cswContext.componentInfo.prefix
@@ -33,6 +35,7 @@ class FitsActor(cswContext: CswContext, config: Config) {
       val bf = new BufferedFile(filename, "rw")
       fits.write(bf)
       bf.close()
+      log.info(s"Data has been written to $filename")
     }
   }
 }
