@@ -10,11 +10,10 @@ object Common extends AutoPlugin {
   override def requires: Plugins = JvmPlugin
 
   override lazy val projectSettings: Seq[Setting[_]] = Seq(
-    organization := "com.github.tmtsoftware.esw-observation-simulation",
+    organization := "com.github.tmtsoftware.esw-observing-simulation",
     organizationName := "TMT",
     scalaVersion := Libs.ScalaVersion,
     organizationHomepage := Some(url("http://www.tmt.org")),
-
     scalacOptions ++= Seq(
       "-encoding",
       "UTF-8",
@@ -33,7 +32,7 @@ object Common extends AutoPlugin {
       Tests.Argument(TestFrameworks.JUnit, "-v", "-a")
     ),
     resolvers += "jitpack" at "https://jitpack.io",
-    version := "0.0.1",
+    version := "0.1.0-SNAPSHOT",
     fork := true,
     Test / parallelExecution := false,
     autoCompilerPlugins := true,
