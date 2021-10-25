@@ -12,6 +12,8 @@ object Constants {
 
   // keys
   val rampsKey: Key[Int]               = KeyType.IntKey.make("ramps")
+  val minRampsValue                    = 1
   val rampIntegrationTimeKey: Key[Int] = KeyType.IntKey.make("rampIntegrationTime")
+  val minRampIntegrationTime           = 1750
 
 }

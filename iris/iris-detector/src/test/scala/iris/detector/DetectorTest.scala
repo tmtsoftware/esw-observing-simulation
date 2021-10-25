@@ -41,7 +41,7 @@ class DetectorTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSui
 
   detectors.foreach { detectorPrefix =>
     {
-      test(s" ${detectorPrefix} - test the whole cycle of an observation | ESW-552, ESW-553") {
+      test(s" $detectorPrefix - test the whole cycle of an observation | ESW-552, ESW-553") {
         val connection   = AkkaConnection(ComponentId(detectorPrefix, ComponentType.Assembly))
         val akkaLocation = locationService.resolve(connection, seconds).futureValue.get
         akkaLocation.connection shouldBe connection
@@ -100,7 +100,68 @@ class DetectorTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSui
         commandService.queryFinal(shutdown.runId).futureValue shouldBe a[Completed]
       }
 
-      test(s"${detectorPrefix} - behaviour should return Invalid when concurrent (Start Exposure) commands received | ESW-552, ESW-553") {
+      test(s" $detectorPrefix - test abort exposure within an observation | ESW-552, ESW-553") {
+        val connection   = AkkaConnection(ComponentId(detectorPrefix, ComponentType.Assembly))
+        val akkaLocation = locationService.resolve(connection, seconds).futureValue.get
+        akkaLocation.connection shouldBe connection
+
+        val testProbe = TestProbe[Event]()
+
+        //Subscribe to event's which will be published by detector in it's lifecycle
+        val subscription = eventService.defaultSubscriber.subscribeActorRef(
+          Set(
+            EventKey(detectorPrefix, ObserveEventNames.ExposureStart),
+            EventKey(detectorPrefix, ObserveEventNames.ExposureEnd),
+            EventKey(detectorPrefix, ObserveEventNames.ExposureAborted),
+            EventKey(detectorPrefix, ObserveEventNames.DataWriteEnd),
+            EventKey(detectorPrefix, ObserveEventNames.DataWriteStart)
+          ),
+          testProbe.ref
+        )
+
+        subscription.ready().futureValue shouldBe Done
+
+        val commandService: CommandService = assertAssemblyIsConfigured(testPrefix, akkaLocation)
+
+        val exposureStarted = commandService.submit(Observe(testPrefix, Constants.StartExposure, Some(obsId))).futureValue
+        exposureStarted shouldBe a[Started]
+
+        eventually {
+          val event = testProbe.expectMessageType[ObserveEvent]
+          event.eventName.name === ObserveEventNames.ExposureStart.name
+          ExposureId(event(ObserveEventKeys.exposureId).head) shouldBe exposureId
+        }
+
+        eventually {
+          val event = testProbe.expectMessageType[ObserveEvent]
+          event.eventName.name === ObserveEventNames.ExposureAborted.name
+          ExposureId(event(ObserveEventKeys.exposureId).head) shouldBe exposureId
+        }
+
+        eventually {
+          val event = testProbe.expectMessageType[ObserveEvent]
+          event.eventName.name === ObserveEventNames.DataWriteStart.name
+          event(ObserveEventKeys.filename).head shouldBe filename
+          ExposureId(event(ObserveEventKeys.exposureId).head) shouldBe exposureId
+        }
+
+        eventually {
+          val event = testProbe.expectMessageType[ObserveEvent]
+          event.eventName.name === ObserveEventNames.DataWriteEnd.name
+          event(ObserveEventKeys.filename).head shouldBe filename
+          ExposureId(event(ObserveEventKeys.exposureId).head) shouldBe exposureId
+        }
+
+        val exposureAborted = commandService.queryFinal(exposureStarted.runId).futureValue
+        exposureAborted shouldBe a[Completed]
+
+        val shutdown = commandService.submit(Setup(testPrefix, Constants.Shutdown)).futureValue
+        shutdown shouldBe a[Started]
+
+        commandService.queryFinal(shutdown.runId).futureValue shouldBe a[Completed]
+      }
+
+      test(s"$detectorPrefix - behaviour should return Invalid when concurrent (Start Exposure) commands received | ESW-552, ESW-553") {
         implicit val patienceConfig: PatienceConfig = PatienceConfig(10.seconds)
         val testPrefix                              = Prefix(IRIS, "darknight")
         val connection                              = AkkaConnection(ComponentId(detectorPrefix, ComponentType.Assembly))
@@ -151,10 +212,11 @@ class DetectorTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSui
         ObserveEventKeys.exposureId.set(exposureId.toString),
         ObserveEventKeys.filename.set(filename),
         Constants.rampsKey.set(5),
-        Constants.rampIntegrationTimeKey.set(5)
+        Constants.rampIntegrationTimeKey.set(1760)
       )
     )
-    val configureStarted  = commandService.submit(configure).futureValue
+    val configureStarted = commandService.submit(configure).futureValue
+    configureStarted shouldBe a[Started]
     val finalConfigureRes = commandService.queryFinal(configureStarted.runId).futureValue
     finalConfigureRes shouldBe a[Completed]
     commandService

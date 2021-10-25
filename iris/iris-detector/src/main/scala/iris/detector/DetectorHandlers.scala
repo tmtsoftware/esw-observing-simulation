@@ -16,6 +16,7 @@ import csw.params.events.ObserveEventKeys
 import csw.time.core.models.UTCTime
 import iris.detector.commands.{ControllerMessage, FitsMessage}
 import ControllerMessage._
+import csw.params.core.generics.Parameter
 
 import scala.concurrent.Await
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
@@ -34,42 +35,57 @@ class DetectorHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswConte
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {}
 
   override def validateCommand(runId: Id, controlCommand: ControlCommand): CommandResponse.ValidateCommandResponse = {
-    if (
-      controlCommand.maybeObsId.isEmpty &&
-      controlCommand.commandName != Constants.Initialize &&
-      controlCommand.commandName != Constants.Shutdown
-    ) {
-      return Invalid(runId, CommandIssue.WrongParameterTypeIssue("obsId not found"))
-    }
     controlCommand match {
       case setup: Setup     => validateSetup(runId, setup)
-      case observe: Observe => acceptCommand(runId, observe)
+      case observe: Observe => validateObserve(runId, observe)
     }
   }
 
-  private def acceptCommand(runId: Id, command: ControlCommand) = {
+  private def validateObserve(runId: Id, command: Observe) = {
     val timeout: FiniteDuration = 1.seconds
     implicit val value: Timeout = Timeout(timeout)
-    Await.result(controller ? (IsValid(runId, command.commandName, _)), timeout)
+
+    command.commandName match {
+      case Constants.StartExposure =>
+        command.maybeObsId match {
+          case Some(_) => Await.result(controller ? (IsValid(runId, command.commandName, _)), timeout)
+          case None    => Invalid(runId, CommandIssue.WrongParameterTypeIssue("obsId not found"))
+        }
+      case cmd => Invalid(runId, CommandIssue.UnsupportedCommandIssue(s"$cmd is not a valid observe command"))
+    }
+
   }
 
   private def validateSetup(runId: Id, setup: Setup): CommandResponse.ValidateCommandResponse = {
-    val validateCommandResponse = setup.commandName match {
+    setup.commandName match {
+      case Constants.StartExposure => Invalid(runId, CommandIssue.UnsupportedCommandIssue("StartExposure is not a valid setup command"))
+      case Constants.Initialize | Constants.Shutdown =>
+        Accepted(runId)
       case Constants.LoadConfiguration =>
         val issueOrAccepted = for {
-          _ <- validateExposureIdKey(setup)
-          _ <- setup.get(ObserveEventKeys.filename).toRight(CommandIssue.WrongParameterTypeIssue("filename not found"))
-          _ <- setup.get(Constants.rampsKey).toRight(CommandIssue.WrongParameterTypeIssue("ramps not found"))
-          _ <- setup.get(Constants.rampIntegrationTimeKey).toRight(CommandIssue.WrongParameterTypeIssue("rampIntegrationTime not found"))
+          _     <- setup.maybeObsId.toRight(CommandIssue.WrongParameterTypeIssue("obsId not found"))
+          _     <- validateExposureIdKey(setup)
+          _     <- setup.get(ObserveEventKeys.filename).toRight(CommandIssue.WrongParameterTypeIssue("filename not found"))
+          ramps <- setup.get(Constants.rampsKey).toRight(CommandIssue.WrongParameterTypeIssue("ramps not found"))
+          _     <- isGreaterThan(ramps, Constants.minRampsValue)
+          rampIntegrationTime <- setup
+            .get(Constants.rampIntegrationTimeKey)
+            .toRight(CommandIssue.WrongParameterTypeIssue("rampIntegrationTime not found"))
+          _ <- isGreaterThan(rampIntegrationTime, Constants.minRampIntegrationTime)
         } yield Accepted(runId)
         issueOrAccepted.fold(Invalid(runId, _), identity)
-      case _ => Accepted(runId)
+      case Constants.AbortExposure =>
+        setup.maybeObsId match {
+          case Some(_) => Accepted(runId)
+          case None    => Invalid(runId, CommandIssue.WrongParameterTypeIssue("obsId not found"))
+        }
+      case cmd => Invalid(runId, CommandIssue.UnsupportedCommandIssue(s"$cmd is not a valid setup command"))
     }
+  }
 
-    validateCommandResponse match {
-      case _: Accepted => acceptCommand(runId, setup)
-      case invalid     => invalid
-    }
+  private def isGreaterThan(parameter: Parameter[Int], minVal: Int) = {
+    if (parameter.head >= minVal) Right(parameter)
+    else Left(CommandIssue.WrongParameterTypeIssue(s"${parameter.keyName} should be >= $minVal"))
   }
 
   private def validateExposureIdKey(setup: Setup) =

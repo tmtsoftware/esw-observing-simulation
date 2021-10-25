@@ -23,7 +23,7 @@ import org.scalatest.funsuite.AnyFunSuiteLike
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class ImagerFilterTest extends ScalaTestFrameworkTestKit( EventServer) with AnyFunSuiteLike {
+class ImagerFilterTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSuiteLike {
 
   import frameworkTestKit._
 

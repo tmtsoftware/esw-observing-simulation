@@ -15,4 +15,6 @@ object Dependencies {
   )
 
   val IrisCommons = Seq(CSW.`csw-framework`)
+
+  val IrisDetector = Seq(Libs.`nom-tam-fits`) ++ IrisAssemblies
 }

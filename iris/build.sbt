@@ -45,7 +45,7 @@ lazy val `iris-detector` = project
   .in(file("iris-detector"))
   .dependsOn(`iris-commons`)
   .settings(
-    libraryDependencies ++= Dependencies.IrisAssemblies
+    libraryDependencies ++= Dependencies.IrisDetector
   )
 // deploy module
 lazy val `iris-irisdeploy` = project
