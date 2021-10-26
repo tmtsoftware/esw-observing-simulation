@@ -25,7 +25,7 @@ import scala.concurrent.duration._
 class FilterTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSuiteLike {
 
   import frameworkTestKit._
-  val redFilterPrefix: Prefix = Prefix(WFOS, "red.filter")
+  val redFilterPrefix: Prefix  = Prefix(WFOS, "red.filter")
   val blueFilterPrefix: Prefix = Prefix(WFOS, "blue.filter")
 
   val prefixes = List(redFilterPrefix, blueFilterPrefix)
@@ -56,9 +56,9 @@ class FilterTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSuite
       )
       // initially red filter is idle & at FilterWheelPosition.Z
       val currentEvent    = testProbe.expectMessageType[SystemEvent]
-      val demandPosition  = currentEvent.paramType.get(filterPositionEvent.DemandPositionKey).value.values.head.name
-      val currentPosition = currentEvent.paramType.get(filterPositionEvent.CurrentPositionKey).value.values.head.name
-      val dark            = currentEvent.paramType.get(filterPositionEvent.DarkKey).value.values.head
+      val demandPosition  = currentEvent(filterPositionEvent.DemandPositionKey).head.name
+      val currentPosition = currentEvent(filterPositionEvent.CurrentPositionKey).head.name
+      val dark            = currentEvent(filterPositionEvent.DarkKey).head
 
       demandPosition shouldBe FilterWheelPosition.Z.entryName
       currentPosition shouldBe FilterWheelPosition.Z.entryName
@@ -75,9 +75,9 @@ class FilterTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSuite
 
       eventually {
         val event1 = testProbe.expectMessageType[SystemEvent]
-        event1.paramType.get(filterPositionEvent.DemandPositionKey).value.values.head.name shouldBe H.entryName
-        event1.paramType.get(filterPositionEvent.CurrentPositionKey).value.values.head.name shouldBe Y.entryName
-        event1.paramType.get(filterPositionEvent.DarkKey).value.values.head shouldBe true
+        event1(filterPositionEvent.DemandPositionKey).head.name shouldBe H.entryName
+        event1(filterPositionEvent.CurrentPositionKey).head.name shouldBe Y.entryName
+        event1(filterPositionEvent.DarkKey).head shouldBe true
       }
 
       eventually {
@@ -147,9 +147,9 @@ class FilterTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSuite
       )
       // initially red filter is idle & at FilterWheelPosition.Z
       val currentEvent    = testProbe.expectMessageType[SystemEvent]
-      val demandPosition  = currentEvent.paramType.get(filterPositionEvent.DemandPositionKey).value.values.head.name
-      val currentPosition = currentEvent.paramType.get(filterPositionEvent.CurrentPositionKey).value.values.head.name
-      val dark            = currentEvent.paramType.get(filterPositionEvent.DarkKey).value.values.head
+      val demandPosition  = currentEvent(filterPositionEvent.DemandPositionKey).head.name
+      val currentPosition = currentEvent(filterPositionEvent.CurrentPositionKey).head.name
+      val dark            = currentEvent(filterPositionEvent.DarkKey).head
 
       demandPosition shouldBe FilterWheelPosition.Z.entryName
       currentPosition shouldBe FilterWheelPosition.Z.entryName
