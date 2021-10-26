@@ -39,7 +39,7 @@ jobs:
 
       - name: Tests
         working-directory: iris
-        run: sbt test:test
+        run: sbt -DenableFatalWarnings=true test:test
 
       - name: Notify slack
         if: always()

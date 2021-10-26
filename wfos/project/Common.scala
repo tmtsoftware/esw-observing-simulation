@@ -4,7 +4,7 @@ import sbt.plugins.JvmPlugin
 import sbt.{url, _}
 
 object Common extends AutoPlugin {
-
+  private val enableFatalWarnings: Boolean = sys.props.get("enableFatalWarnings").contains("true")
   override def trigger: PluginTrigger = allRequirements
 
   override def requires: Plugins = JvmPlugin
@@ -21,7 +21,13 @@ object Common extends AutoPlugin {
       "-unchecked",
       "-deprecation",
       "-Xlint",
-      "-Ywarn-dead-code"
+      "-Ywarn-dead-code",
+      //-W Options
+      if (enableFatalWarnings) "-Wconf:any:error" else "-Wconf:any:warning-verbose",
+      //-X Options
+      "-Xlint:_,-missing-interpolator",
+      "-Xcheckinit",
+      "-Xasync"
     ),
     Compile / doc / javacOptions ++= Seq("-Xdoclint:none"),
     Test / testOptions ++= Seq(

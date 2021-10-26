@@ -62,6 +62,7 @@ class FilterHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext
   override def onSubmit(runId: Id, controlCommand: ControlCommand): SubmitResponse =
     controlCommand match {
       case setup: Setup => handleSelect(runId, setup)
+      case observe      => Invalid(runId, UnsupportedCommandIssue(s"$observe command not supported."))
     }
 
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = {}
