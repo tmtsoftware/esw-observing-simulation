@@ -82,16 +82,16 @@ class FilterTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSuite
 
       eventually {
         val event2 = testProbe.expectMessageType[SystemEvent]
-        event2.paramType.get(filterPositionEvent.DemandPositionKey).value.values.head.name shouldBe H.entryName
-        event2.paramType.get(filterPositionEvent.CurrentPositionKey).value.values.head.name shouldBe J.entryName
-        event2.paramType.get(filterPositionEvent.DarkKey).value.values.head shouldBe true
+        event2(filterPositionEvent.DemandPositionKey).head.name shouldBe H.entryName
+        event2(filterPositionEvent.CurrentPositionKey).head.name shouldBe J.entryName
+        event2(filterPositionEvent.DarkKey).head shouldBe true
       }
 
       eventually {
         val event3 = testProbe.expectMessageType[SystemEvent]
-        event3.paramType.get(filterPositionEvent.DemandPositionKey).value.values.head.name shouldBe H.entryName
-        event3.paramType.get(filterPositionEvent.CurrentPositionKey).value.values.head.name shouldBe H.entryName
-        event3.paramType.get(filterPositionEvent.DarkKey).value.values.head shouldBe false
+        event3(filterPositionEvent.DemandPositionKey).head.name shouldBe H.entryName
+        event3(filterPositionEvent.CurrentPositionKey).head.name shouldBe H.entryName
+        event3(filterPositionEvent.DarkKey).head shouldBe false
       }
 
       val finalResponse = commandService.queryFinal(initialResponse.runId)(Timeout(2.seconds))
@@ -107,23 +107,23 @@ class FilterTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSuite
 
       eventually {
         val event1 = testProbe.expectMessageType[SystemEvent]
-        event1.paramType.get(filterPositionEvent.DemandPositionKey).value.values.head.name shouldBe Z.entryName
-        event1.paramType.get(filterPositionEvent.CurrentPositionKey).value.values.head.name shouldBe J.entryName
-        event1.paramType.get(filterPositionEvent.DarkKey).value.values.head shouldBe true
+        event1(filterPositionEvent.DemandPositionKey).head.name shouldBe Z.entryName
+        event1(filterPositionEvent.CurrentPositionKey).head.name shouldBe J.entryName
+        event1(filterPositionEvent.DarkKey).head shouldBe true
       }
 
       eventually {
         val event2 = testProbe.expectMessageType[SystemEvent]
-        event2.paramType.get(filterPositionEvent.DemandPositionKey).value.values.head.name shouldBe Z.entryName
-        event2.paramType.get(filterPositionEvent.CurrentPositionKey).value.values.head.name shouldBe Y.entryName
-        event2.paramType.get(filterPositionEvent.DarkKey).value.values.head shouldBe true
+        event2(filterPositionEvent.DemandPositionKey).head.name shouldBe Z.entryName
+        event2(filterPositionEvent.CurrentPositionKey).head.name shouldBe Y.entryName
+        event2(filterPositionEvent.DarkKey).head shouldBe true
       }
 
       eventually {
         val event3 = testProbe.expectMessageType[SystemEvent]
-        event3.paramType.get(filterPositionEvent.DemandPositionKey).value.values.head.name shouldBe Z.entryName
-        event3.paramType.get(filterPositionEvent.CurrentPositionKey).value.values.head.name shouldBe Z.entryName
-        event3.paramType.get(filterPositionEvent.DarkKey).value.values.head shouldBe false
+        event3(filterPositionEvent.DemandPositionKey).head.name shouldBe Z.entryName
+        event3(filterPositionEvent.CurrentPositionKey).head.name shouldBe Z.entryName
+        event3(filterPositionEvent.DarkKey).head shouldBe false
       }
 
       val finalResponse2 = commandService.queryFinal(initialResponse2.runId)(Timeout(2.seconds))
