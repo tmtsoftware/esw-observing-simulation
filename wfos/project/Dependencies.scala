@@ -13,6 +13,7 @@ object Dependencies {
     CSW.`csw-framework`,
     CSW.`csw-testkit` % Test
   )
+  val WfosDetector = Seq(Libs.`nom-tam-fits`) ++ WfosAssemblies
 
   val WfosCommons = Seq(CSW.`csw-framework`)
 }

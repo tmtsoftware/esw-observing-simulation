@@ -13,6 +13,7 @@ object Libs {
   val `junit-4-13`               = "org.scalatestplus"      %% "junit-4-13"               % "3.2.9.0"
   val `mockito-scala`            = "org.mockito"            %% "mockito-scala"            % "1.16.37"
   val `akka-actor-testkit-typed` = "com.typesafe.akka"      %% "akka-actor-testkit-typed" % "2.6.15"
+  val `nom-tam-fits`             = "gov.nasa.gsfc.heasarc"   % "nom-tam-fits"             % "1.15.2"
 }
 
 object CSW {
