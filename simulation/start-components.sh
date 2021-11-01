@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+ROOT="$(
+    cd "$(dirname "$0")" >/dev/null 2>&1 || exit
+    pwd -P
+)"
+cs launch esw-agent-akka-app:abe11d9 -- start -p "iris.machine99" -l --host-config-path "$ROOT/sample-configs/HostConfig.conf"
