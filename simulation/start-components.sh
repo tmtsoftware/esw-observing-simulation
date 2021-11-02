@@ -6,4 +6,5 @@ ROOT="$(
 
 export INTERFACE_NAME=en0
 export TMT_LOG_HOME=/tmp/tmt
-cs launch esw-agent-akka-app:abe11d9 -- start -p "iris.machine99" -l --host-config-path "$ROOT/../sample-configs/HostConfig.conf"
+
+cs launch esw-agent-akka-app:2c76965 -- start -p "iris.machine99" -l --host-config-path "$ROOT/../sample-configs/HostConfig.conf"
