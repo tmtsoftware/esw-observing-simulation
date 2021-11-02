@@ -6,5 +6,3 @@ ROOT="$(
 cd $ROOT/../apps
 curl -L -O https://github.com/tmtsoftware/esw-ocs-eng-ui/releases/download/v0.1.0/esw-ocs-eng-ui.zip
 unzip -o esw-ocs-eng-ui.zip
-
-python3 -m http.server 8000
