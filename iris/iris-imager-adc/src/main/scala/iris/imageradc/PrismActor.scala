@@ -27,6 +27,7 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
   def setup: Behavior[PrismCommands] = Behaviors.setup(ctx => outAndStopped(ctx.self))
 
   private def inAndStopped(self: ActorRef[PrismCommands]): Behavior[PrismCommands] = {
+    logger.info("Prism is now in Retracted IN position")
     publishPrismState(PrismState.STOPPED)
     publishRetractPosition(PrismPosition.IN)
     receiveWithDefaultBehavior("IN") {
@@ -59,6 +60,7 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
     }
 
   private def outAndStopped(self: ActorRef[PrismCommands]): Behavior[PrismCommands] = {
+    logger.info("Prism is now in Retracted OUT position")
     publishRetractPosition(PrismPosition.OUT)
     receiveWithDefaultBehavior("OUT") {
       case PrismCommands.RetractSelect(runId, position) =>
@@ -77,6 +79,7 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
   }
 
   private def inAndMoving(self: ActorRef[PrismCommands]): Behavior[PrismCommands] = {
+    logger.info("Prism is now following target")
     val targetModifier = scheduleJobForPrismMovement(self)
     receiveWithDefaultBehavior("moving") {
       case PrismCommands.IsValid(runId, command, replyTo) if command.commandName != ADCCommand.RetractSelect =>
@@ -92,6 +95,7 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
         publishEvent(PrismTargetEvent.make(prismAngle.target.toDouble))
         publishPrismState(MOVING)
         prismAngle.nextCurrent()
+        logger.info(s"Prism current angle ${prismAngle.currentAngle.toDouble}")
         publishEvent(PrismCurrentEvent.make(prismAngle.currentAngle.toDouble, getCurrentDiff.toDouble))
         prismAngle.nextTarget()
         Behaviors.same
