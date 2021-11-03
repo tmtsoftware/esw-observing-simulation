@@ -4,8 +4,6 @@ ROOT="$(
     pwd -P
 )"
 
-export INTERFACE_NAME=en0
-export TMT_LOG_HOME=/tmp/tmt
 sampleConfDir=$ROOT/../sample-configs
 hostConfPath=$sampleConfDir/HostConfig.conf
 irisContainerPath=$sampleConfDir/IrisContainer.conf
