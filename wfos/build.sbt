@@ -19,7 +19,8 @@ lazy val `wfos-filter` = project
 // deploy module
 lazy val `wfos-wfosdeploy` = project
   .dependsOn(
-    `wfos-filter`
+    `wfos-filter`,
+    `wfos-detector`
   )
   .enablePlugins(CswBuildInfo)
   .settings(
