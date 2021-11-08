@@ -49,10 +49,10 @@ object TestData {
   val directoryP: Parameter[String]          = StringKey.make("directory").set("/tmp")
   val imagerExposureIdP: Parameter[String]   = StringKey.make("imagerExposureId").set("2020A-001-123-IRIS-IMG-DRK1-0023")
   val ifsExposureIdP: Parameter[String]      = StringKey.make("ifsExposureId").set("2020A-001-123-IRIS-IMG-DRK1-0023")
-  val imagerIntegrationTimeP: Parameter[Int] = IntKey.make("imagerIntegrationTime").set(100)
-  val ifsIntegrationTimeP: Parameter[Int]    = IntKey.make("ifsIntegrationTime").set(100)
-  val imagerNumRampsP: Parameter[Int]        = IntKey.make("imagerNumRamps").set(10)
-  val ifsNumRampsP: Parameter[Int]           = IntKey.make("ifsNumRamps").set(10)
+  val imagerIntegrationTimeP: Parameter[Int] = IntKey.make("imagerIntegrationTime").set(2000)
+  val ifsIntegrationTimeP: Parameter[Int]    = IntKey.make("ifsIntegrationTime").set(2000)
+  val imagerNumRampsP: Parameter[Int]        = IntKey.make("imagerNumRamps").set(2)
+  val ifsNumRampsP: Parameter[Int]           = IntKey.make("ifsNumRamps").set(2)
   val obsId: Option[ObsId]                   = Some(ObsId("2020A-001-123"))
 
   val setup: Setup = Setup(Prefix("IRIS.Imager"), CommandName("setupObservation"), obsId).madd(

@@ -4,7 +4,8 @@ import akka.actor.testkit.typed.scaladsl.TestProbe
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.logging.client.scaladsl.LoggingSystemFactory
-import csw.params.commands.CommandResponse.Started
+import csw.params.commands.CommandResponse
+import esw.sm.api.protocol.StartSequencerResponse.Started
 import csw.params.core.models.ExposureId
 import csw.params.events._
 import csw.prefix.models.{Prefix, Subsystem}
@@ -17,6 +18,7 @@ import esw.ocs.api.models.ObsMode
 import esw.ocs.testkit.EswTestKit
 import esw.ocs.testkit.Service.MachineAgent
 import esw.sm.impl.utils.{SequenceComponentAllocator, SequenceComponentUtil}
+import iris.irisdeploy.IrisContainerCmdApp
 
 import java.nio.file.Paths
 import scala.concurrent.duration.DurationInt
@@ -39,34 +41,19 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
 
   private val locationServiceUtil   = new LocationServiceUtil(locationService)
   private val sequenceComponentUtil = new SequenceComponentUtil(locationServiceUtil, new SequenceComponentAllocator())
+  private var seqCompLoc:Option[AkkaLocation] = None
 
-  override def beforeAll(): Unit = {
-    super.beforeAll()
-    LoggingSystemFactory.forTestingOnly()
+  override def afterAll(): Unit = {
+    agentClient.killComponent(seqCompLoc.get).futureValue
+    super.afterAll()
   }
 
   "IrisSequencer" must {
     "handle the submitted sequence | ESW-551" in {
       val containerConfPath = Paths.get(ClassLoader.getSystemResource("IrisContainer.conf").toURI)
 
-      val hostConfigStr =
-        s"""
-           |containers: [
-           |  {
-           |    orgName: "com.github.tmtsoftware.esw-observing-simulation"
-           |    deployModule: "iris-irisdeploy"
-           |    appName: "iris.irisdeploy.IrisContainerCmdApp"
-           |    version: "$containerAppSha"
-           |    mode: "Container"
-           |    configFilePath: "$containerConfPath"
-           |    configFileLocation: "Local"
-           |  }
-           |]
-           |""".stripMargin
-      val hostConfigFilePath = FileUtils.createTempConfFile("hostConfig.conf", hostConfigStr)
-
       //spawn the iris container
-      agentClient.spawnContainers(hostConfigFilePath.toString, isConfigLocal = true).futureValue
+      IrisContainerCmdApp.main(List("--local", containerConfPath.toString).toArray)
 
       Thread.sleep(10000)
       val containerLocation: AkkaLocation = locationService.resolve(TestData.irisContainerConnection, 5.seconds).futureValue.value
@@ -80,10 +67,10 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       //spawn iris sequencer
       agentClient.spawnSequenceComponent(seqComponentName, Some(sequencerScriptSha)).futureValue
 
-      val seqCompLoc = locationService.find(testSeqCompConnection).futureValue
+      seqCompLoc = locationService.find(testSeqCompConnection).futureValue
 
       val sequencerResponse = sequenceComponentUtil.loadScript(Subsystem.IRIS, obsMode, seqCompLoc.get).futureValue
-      sequencerResponse shouldBe a[Started]
+      sequencerResponse.rightValue shouldBe a[Started]
 
       //********************************************************************
 
@@ -105,7 +92,7 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       val sequencerApi = sequencerClient(Subsystem.IRIS, obsMode)
 
       val initialSubmitRes = sequencerApi.submit(TestData.sequence).futureValue
-      initialSubmitRes shouldBe a[Started]
+      initialSubmitRes shouldBe a[CommandResponse.Started]
 
       assertImagerFilterPosition(imagerFilterTestProbe)
       assertIfsResPosition(ifsResTestProbe)
@@ -113,12 +100,6 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       assertAdcPrism(imagerAdcTestProbe)
 
       assertDetectorEvents(ifsDetectorTestProbe, "/tmp", ExposureId("2020A-001-123-IRIS-IMG-DRK1-0023"))
-
-      // kill the spawned container
-      agentClient.killComponent(containerLocation).futureValue shouldBe Killed
-
-      // kill the spawned sequence comp and sequencer
-      agentClient.killComponent(seqCompLoc.get).futureValue shouldBe Killed
     }
   }
 
@@ -176,14 +157,18 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
   private def assertAdcPrism(testProbe: TestProbe[Event]) = {
 
     // initially prism is stopped & on target
-    val currentEvent      = testProbe.expectMessageType[SystemEvent]
-    val prismCurrentState = currentEvent(TestData.adcPrismStateKey).head.name
-    val isOnTarget        = currentEvent(TestData.adcPrismOnTargetKey).head
-    prismCurrentState shouldBe "STOPPED"
-    isOnTarget shouldBe true
+    eventually {
+      val stateEvent = testProbe.expectMessageType[SystemEvent]
+      stateEvent.eventName shouldBe TestData.ImagerADCStateEventName
+      val prismCurrentState = stateEvent(TestData.adcPrismStateKey).head.name
+      val isOnTarget = stateEvent(TestData.adcPrismOnTargetKey).head
+      prismCurrentState shouldBe "STOPPED"
+      isOnTarget shouldBe true
+    }
 
     eventually {
       val goingInEvent = testProbe.expectMessageType[SystemEvent]
+      goingInEvent.eventName shouldBe TestData.ImagerADCRetractEventName
       goingInEvent(TestData.adcPrismRetractKey).head.name shouldBe "IN"
     }
 
@@ -206,8 +191,8 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
     eventually {
       val currentEvent = testProbe.expectMessageType[SystemEvent]
       currentEvent.eventName shouldBe TestData.ImagerADCCurrentEventName
-      currentEvent(TestData.adcPrismAngleKey).head shouldBe 13.3
-      currentEvent(TestData.adcPrismAngleErrorKey).head shouldBe 27.7
+      currentEvent(TestData.adcPrismAngleKey).head should be > 0.0
+      currentEvent(TestData.adcPrismAngleErrorKey).head should be > 0.0
     }
   }
 
