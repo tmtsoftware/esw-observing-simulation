@@ -50,6 +50,7 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
 
   "IrisSequencer" must {
     "handle the submitted sequence | ESW-551" in {
+      LoggingSystemFactory.forTestingOnly()
       val containerConfPath = Paths.get(ClassLoader.getSystemResource("IrisContainer.conf").toURI)
 
       //spawn the iris container
