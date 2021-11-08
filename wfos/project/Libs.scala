@@ -12,7 +12,7 @@ object Libs {
   val `scala-async`              = "org.scala-lang.modules" %% "scala-async"              % "1.0.0-M1" //BSD 3-clause "New" or "Revised" License
   val `junit-4-13`               = "org.scalatestplus"      %% "junit-4-13"               % "3.2.9.0"
   val `mockito-scala`            = "org.mockito"            %% "mockito-scala"            % "1.16.37"
-  val `akka-actor-testkit-typed` = "com.typesafe.akka"      %% "akka-actor-testkit-typed" % "2.6.15"
+  val `akka-actor-testkit-typed` = "com.typesafe.akka"      %% "akka-actor-testkit-typed" % "2.6.17"
   val `nom-tam-fits`             = "gov.nasa.gsfc.heasarc"   % "nom-tam-fits"             % "1.15.2"
 }
 

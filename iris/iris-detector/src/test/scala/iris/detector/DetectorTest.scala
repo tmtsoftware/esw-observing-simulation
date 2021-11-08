@@ -30,7 +30,7 @@ class DetectorTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSui
   override implicit val patienceConfig: PatienceConfig = PatienceConfig(seconds)
   private val obsId                                    = ObsId("2020A-001-123")
   private val exposureId                               = ExposureId("2020A-001-123-IRIS-IMG-DRK1-0023")
-  private val filename                                 = "imagerFile1"
+  private val filename                                 = "/tmp/imagerFile1.fits"
   private val testPrefix                               = Prefix(IRIS, "darknight")
 
   override def beforeAll(): Unit = {
