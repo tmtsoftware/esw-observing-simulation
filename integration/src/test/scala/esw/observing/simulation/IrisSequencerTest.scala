@@ -39,18 +39,23 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
   private lazy val agentLoc    = locationService.find(agentConnection).futureValue
   private lazy val agentClient = new AgentClient(agentLoc.get)
 
-  private val locationServiceUtil   = new LocationServiceUtil(locationService)
-  private val sequenceComponentUtil = new SequenceComponentUtil(locationServiceUtil, new SequenceComponentAllocator())
-  private var seqCompLoc:Option[AkkaLocation] = None
+  private val locationServiceUtil              = new LocationServiceUtil(locationService)
+  private val sequenceComponentUtil            = new SequenceComponentUtil(locationServiceUtil, new SequenceComponentAllocator())
+  private var seqCompLoc: Option[AkkaLocation] = None
 
   override def afterAll(): Unit = {
-    agentClient.killComponent(seqCompLoc.get).futureValue
+    seqCompLoc.map(location => agentClient.killComponent(location).futureValue)
     super.afterAll()
+  }
+
+  override def beforeAll(): Unit = {
+    super.beforeAll()
+    LoggingSystemFactory.forTestingOnly()
   }
 
   "IrisSequencer" must {
     "handle the submitted sequence | ESW-551" in {
-      LoggingSystemFactory.forTestingOnly()
+
       val containerConfPath = Paths.get(ClassLoader.getSystemResource("IrisContainer.conf").toURI)
 
       //spawn the iris container
@@ -69,6 +74,8 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       agentClient.spawnSequenceComponent(seqComponentName, Some(sequencerScriptSha)).futureValue
 
       seqCompLoc = locationService.find(testSeqCompConnection).futureValue
+
+      seqCompLoc.isDefined shouldBe true
 
       val sequencerResponse = sequenceComponentUtil.loadScript(Subsystem.IRIS, obsMode, seqCompLoc.get).futureValue
       sequencerResponse.rightValue shouldBe a[Started]
@@ -162,7 +169,7 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       val stateEvent = testProbe.expectMessageType[SystemEvent]
       stateEvent.eventName shouldBe TestData.ImagerADCStateEventName
       val prismCurrentState = stateEvent(TestData.adcPrismStateKey).head.name
-      val isOnTarget = stateEvent(TestData.adcPrismOnTargetKey).head
+      val isOnTarget        = stateEvent(TestData.adcPrismOnTargetKey).head
       prismCurrentState shouldBe "STOPPED"
       isOnTarget shouldBe true
     }
