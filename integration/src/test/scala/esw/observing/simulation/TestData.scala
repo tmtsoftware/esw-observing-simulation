@@ -36,10 +36,11 @@ object TestData {
   val IfsScaleP: Parameter[Choice] = ChoiceKey.make("scale", Units.marcsec, ifsScaleChoices).set("9")
 
   // adc
-  val adcPrismRetractKey: GChoiceKey    = ChoiceKey.make("position", Choices.from("IN", "OUT"))
-  val adcPrismStateKey: GChoiceKey      = ChoiceKey.make("move", Choices.from("MOVING", "STOPPED"))
-  val adcPrismAngleKey: Key[Double]     = DoubleKey.make("angle")
-  val adcPrismOnTargetKey: Key[Boolean] = BooleanKey.make("onTarget")
+  val adcPrismRetractKey: GChoiceKey     = ChoiceKey.make("position", Choices.from("IN", "OUT"))
+  val adcPrismStateKey: GChoiceKey       = ChoiceKey.make("move", Choices.from("MOVING", "STOPPED"))
+  val adcPrismAngleKey: Key[Double]      = DoubleKey.make("angle")
+  val adcPrismAngleErrorKey: Key[Double] = DoubleKey.make("angle_error")
+  val adcPrismOnTargetKey: Key[Boolean]  = BooleanKey.make("onTarget")
 
   val scienceAdcFollowP: Parameter[Boolean] = BooleanKey.make("scienceAdcFollow").set(true)
   val scienceAdcTargetP: Parameter[Double]  = DoubleKey.make("scienceAdcTarget").set(40)

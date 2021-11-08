@@ -3,6 +3,7 @@ package esw.observing.simulation
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
+import csw.logging.client.scaladsl.LoggingSystemFactory
 import csw.params.commands.CommandResponse.Started
 import csw.params.core.models.ExposureId
 import csw.params.events._
@@ -11,9 +12,11 @@ import csw.testkit.scaladsl.CSWService.EventServer
 import esw.agent.akka.client.AgentClient
 import esw.agent.service.api.models.Killed
 import esw.commons.utils.files.FileUtils
+import esw.commons.utils.location.LocationServiceUtil
 import esw.ocs.api.models.ObsMode
 import esw.ocs.testkit.EswTestKit
 import esw.ocs.testkit.Service.MachineAgent
+import esw.sm.impl.utils.{SequenceComponentAllocator, SequenceComponentUtil}
 
 import java.nio.file.Paths
 import scala.concurrent.duration.DurationInt
@@ -22,18 +25,29 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
 
   override implicit def patienceConfig: PatienceConfig = PatienceConfig(1.minute, 100.millis)
 
+  private val sequencerScriptSha              = "aad9d5a"
+  private val containerAppSha                 = "d4d0cb9"
   private val obsMode                         = ObsMode("IRIS_IFSOnly")
+  private val seqComponentName                = "testComponent"
   private val agentConnection: AkkaConnection = AkkaConnection(ComponentId(agentSettings.prefix, ComponentType.Machine))
   private val testSeqCompConnection = AkkaConnection(
-    ComponentId(Prefix(agentSettings.prefix.subsystem, "testComponent"), ComponentType.SequenceComponent)
+    ComponentId(Prefix(agentSettings.prefix.subsystem, seqComponentName), ComponentType.SequenceComponent)
   )
 
   private lazy val agentLoc    = locationService.find(agentConnection).futureValue
   private lazy val agentClient = new AgentClient(agentLoc.get)
 
+  private val locationServiceUtil   = new LocationServiceUtil(locationService)
+  private val sequenceComponentUtil = new SequenceComponentUtil(locationServiceUtil, new SequenceComponentAllocator())
+
+  override def beforeAll(): Unit = {
+    super.beforeAll()
+    LoggingSystemFactory.forTestingOnly()
+  }
+
   "IrisSequencer" must {
-    "do something" in {
-      val containerConfPath = Paths.get(ClassLoader.getSystemResource("IrisIfsContainer.conf").toURI)
+    "handle the submitted sequence | ESW-551" in {
+      val containerConfPath = Paths.get(ClassLoader.getSystemResource("IrisContainer.conf").toURI)
 
       val hostConfigStr =
         s"""
@@ -42,7 +56,7 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
            |    orgName: "com.github.tmtsoftware.esw-observing-simulation"
            |    deployModule: "iris-irisdeploy"
            |    appName: "iris.irisdeploy.IrisContainerCmdApp"
-           |    version: "b6cd004"
+           |    version: "$containerAppSha"
            |    mode: "Container"
            |    configFilePath: "$containerConfPath"
            |    configFileLocation: "Local"
@@ -64,11 +78,13 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       //********************************************************************
 
       //spawn iris sequencer
-      agentClient.spawnSequenceComponent("testComponent", Some("aad9d5a")).futureValue
+      agentClient.spawnSequenceComponent(seqComponentName, Some(sequencerScriptSha)).futureValue
 
       val seqCompLoc = locationService.find(testSeqCompConnection).futureValue
 
-      loadScript(seqCompLoc.get, Subsystem.IRIS, obsMode)
+      val sequencerResponse = sequenceComponentUtil.loadScript(Subsystem.IRIS, obsMode, seqCompLoc.get).futureValue
+      sequencerResponse shouldBe a[Started]
+
       //********************************************************************
 
       val imagerFilterTestProbe = createTestProbe(Set(TestData.imagerFilterPositionEventKey))
@@ -84,7 +100,7 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
         )
       )
 
-//      val ifsDetectorTestProbe = createTestProbe(TestData.detectorObsEvents(TestData.IfsDetectorPrefix))
+      val ifsDetectorTestProbe = createTestProbe(TestData.detectorObsEvents(TestData.IfsDetectorPrefix))
 
       val sequencerApi = sequencerClient(Subsystem.IRIS, obsMode)
 
@@ -96,7 +112,7 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       assertIfsScalePosition(ifsScaleTestProbe)
       assertAdcPrism(imagerAdcTestProbe)
 
-//      assertDetectorEvents(ifsDetectorTestProbe, "/tmp", ExposureId("2020A-001-123-IRIS-IMG-DRK1-0023"))
+      assertDetectorEvents(ifsDetectorTestProbe, "/tmp", ExposureId("2020A-001-123-IRIS-IMG-DRK1-0023"))
 
       // kill the spawned container
       agentClient.killComponent(containerLocation).futureValue shouldBe Killed
@@ -184,6 +200,14 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       movingEvent.eventName shouldBe TestData.ImagerADCStateEventName
       movingEvent(TestData.adcPrismStateKey).head.name shouldBe "MOVING"
       movingEvent(TestData.adcPrismOnTargetKey).head shouldBe false
+    }
+
+    //verify current angle is changing
+    eventually {
+      val currentEvent = testProbe.expectMessageType[SystemEvent]
+      currentEvent.eventName shouldBe TestData.ImagerADCCurrentEventName
+      currentEvent(TestData.adcPrismAngleKey).head shouldBe 13.3
+      currentEvent(TestData.adcPrismAngleErrorKey).head shouldBe 27.7
     }
   }
 
