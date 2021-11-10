@@ -13,12 +13,12 @@ import csw.prefix.models.{Prefix, Subsystem}
 object TestData {
 
   //imager filter
-  private val filterChoices: Choices             = Choices.from("H")
+  private val filterChoices: Choices             = Choices.from("Ks", "CO")
   val ImagerFilterCurrentPositionKey: GChoiceKey = ChoiceKey.make("current", filterChoices)
   val ImagerFilterDemandPositionKey: GChoiceKey  = ChoiceKey.make("demand", filterChoices)
   val ImagerFilterDarkKey: Key[Boolean]          = BooleanKey.make("dark")
 
-  val filterP: Parameter[Choice] = ChoiceKey.make("filter", Units.NoUnits, filterChoices).set("H")
+  val filterKey: GChoiceKey = ChoiceKey.make("filter", Units.NoUnits, filterChoices)
 
   //ifs res
   private val ifsResChoices: Choices       = Choices.from("4000-H")
@@ -43,7 +43,7 @@ object TestData {
   val adcPrismOnTargetKey: Key[Boolean]  = BooleanKey.make("onTarget")
 
   val scienceAdcFollowP: Parameter[Boolean] = BooleanKey.make("scienceAdcFollow").set(true)
-  val scienceAdcTargetP: Parameter[Double]  = DoubleKey.make("scienceAdcTarget").set(40)
+  val scienceAdcTargetKey: Key[Double]      = DoubleKey.make("scienceAdcTarget")
 
   //***********
   val directoryP: Parameter[String]          = StringKey.make("directory").set("/tmp")
@@ -55,15 +55,28 @@ object TestData {
   val ifsNumRampsP: Parameter[Int]           = IntKey.make("ifsNumRamps").set(2)
   val obsId: Option[ObsId]                   = Some(ObsId("2020A-001-123"))
 
-  val setup: Setup = Setup(Prefix("IRIS.Imager"), CommandName("setupObservation"), obsId).madd(
-    filterP,
+  val setupAcquisition: Setup = Setup(Prefix("IRIS.Imager"), CommandName("setupAcquisition"), obsId).madd(
+    filterKey.set("Ks"),
+    scienceAdcFollowP,
+    scienceAdcTargetKey.set(40.0)
+  )
+
+  val setupObservation: Setup = Setup(Prefix("IRIS.Imager"), CommandName("setupObservation"), obsId).madd(
+    filterKey.set("CO"),
     IfsScaleP,
     spectralResolutionP,
     scienceAdcFollowP,
-    scienceAdcTargetP
+    scienceAdcTargetKey.set(50.0)
   )
 
-  val observe: Observe = Observe(Prefix("IRIS.Imager"), CommandName("singleExposure"), obsId).madd(
+  val acquisitionExposure: Observe = Observe(Prefix("IRIS.Imager"), CommandName("acquisitionExposure"), obsId).madd(
+    directoryP,
+    imagerExposureIdP,
+    imagerIntegrationTimeP,
+    imagerNumRampsP
+  )
+
+  val singleExposure: Observe = Observe(Prefix("IRIS.Imager"), CommandName("singleExposure"), obsId).madd(
     directoryP,
     imagerExposureIdP,
     ifsExposureIdP,
@@ -110,5 +123,5 @@ object TestData {
     EventKey(detectorPrefix, ObserveEventNames.DataWriteStart)
   )
 
-  val sequence: Sequence = Sequence(setup, observe)
+  val sequence: Sequence = Sequence(setupAcquisition, acquisitionExposure, setupObservation, singleExposure)
 }

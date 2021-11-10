@@ -8,7 +8,7 @@ sampleConfDir=$ROOT/../sample-configs
 hostConfPath=$sampleConfDir/HostConfig.conf
 irisContainerPath=$sampleConfDir/IrisContainer.conf
 wfosContainerPath=$sampleConfDir/WfosContainer.conf
-ESW_VERSION=2c76965
+ESW_VERSION=bb819c0
 
 awk  -v searchStr="irisContainerPath" -v replaceStr="$irisContainerPath" '{sub(searchStr,replaceStr); print;}' $hostConfPath > tempfile && mv tempfile $hostConfPath
 awk  -v searchStr="wfosContainerPath" -v replaceStr="$wfosContainerPath" '{sub(searchStr,replaceStr); print;}' $hostConfPath > tempfile && mv tempfile $hostConfPath
