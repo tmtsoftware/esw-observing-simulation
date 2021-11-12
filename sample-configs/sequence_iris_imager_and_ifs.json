@@ -1,0 +1,208 @@
+[ {
+  "_type": "Setup",
+  "source": "IRIS.IFSOnly",
+  "commandName": "observationStart",
+  "maybeObsId": "2020A-001-123",
+  "paramSet": []
+},
+  {
+    "_type": "Setup",
+    "source": "IRIS.ImagerAndIFS",
+    "commandName": "setupAcquisition",
+    "maybeObsId": "2020A-001-123",
+    "paramSet": [
+      {
+        "ChoiceKey": {
+          "keyName": "filter",
+          "values": [
+            "H"
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "BooleanKey": {
+          "keyName": "scienceAdcFollow",
+          "values": [
+            true
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "DoubleKey": {
+          "keyName": "scienceAdcTarget",
+          "values": [
+            40.0
+          ],
+          "units": "NoUnits"
+        }
+      }
+    ]
+  },
+  {
+    "_type": "Setup",
+    "source": "IRIS.ImagerAndIFS",
+    "commandName": "setupObservation",
+    "maybeObsId": "2020A-001-123",
+    "paramSet": [
+      {
+        "ChoiceKey": {
+          "keyName": "filter",
+          "values": [
+            "H"
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "ChoiceKey": {
+          "keyName": "scale",
+          "values": ["9"],
+          "units": "marcsec"
+        }
+      },
+      {
+        "ChoiceKey": {
+          "keyName": "spectralResolution",
+          "values": ["4000-K"],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "BooleanKey": {
+          "keyName": "scienceAdcFollow",
+          "values": [
+            true
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "DoubleKey": {
+          "keyName": "scienceAdcTarget",
+          "values": [
+            50.0
+          ],
+          "units": "NoUnits"
+        }
+      }
+    ]
+  },
+  {
+    "_type": "Observe",
+    "source": "IRIS.ImagerAndIFS",
+    "commandName": "acquisitionExposure",
+    "maybeObsId": "2020A-001-123",
+    "paramSet": [
+      {
+        "StringKey": {
+          "keyName": "directory",
+          "values": [
+            "/tmp/fits"
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "StringKey": {
+          "keyName": "imagerExposureId",
+          "values": [
+            "2020A-001-123-IRIS-IMG-DRK1-0023"
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "IntKey": {
+          "keyName": "imagerIntegrationTime",
+          "values": [
+            5000
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "IntKey": {
+          "keyName": "imagerNumRamps",
+          "values": [
+            1
+          ],
+          "units": "NoUnits"
+        }
+      }
+    ]
+  },
+  {
+    "_type": "Observe",
+    "source": "IRIS.ImagerAndIFS",
+    "commandName": "singleExposure",
+    "maybeObsId": "2020A-001-123",
+    "paramSet": [
+      {
+        "StringKey": {
+          "keyName": "directory",
+          "values": [
+            "/tmp/fits"
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "StringKey": {
+          "keyName": "ifsExposureId",
+          "values": ["2020A-001-123-IRIS-IMG-DRK1-0023"],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "IntKey": {
+          "keyName": "ifsIntegrationTime",
+          "values": [5000],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "IntKey": {
+          "keyName": "ifsNumRamps",
+          "values": [1],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "StringKey": {
+          "keyName": "imagerExposureId",
+          "values": [
+            "2020A-001-123-IRIS-IMG-DRK1-0023"
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "IntKey": {
+          "keyName": "imagerIntegrationTime",
+          "values": [
+            5000
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "IntKey": {
+          "keyName": "imagerNumRamps",
+          "values": [
+            1
+          ],
+          "units": "NoUnits"
+        }
+      }
+    ]
+  },
+  {
+    "_type": "Setup",
+    "source": "IRIS.ImagerAndIFS",
+    "commandName": "observationEnd",
+    "maybeObsId": "2020A-001-123",
+    "paramSet": []
+  }
+]

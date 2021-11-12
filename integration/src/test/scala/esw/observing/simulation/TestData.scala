@@ -55,6 +55,9 @@ object TestData {
   val ifsNumRampsP: Parameter[Int]           = IntKey.make("ifsNumRamps").set(2)
   val obsId: Option[ObsId]                   = Some(ObsId("2020A-001-123"))
 
+  val observationStart: Setup = Setup(Prefix("IRIS.Imager"), CommandName("observationStart"), obsId)
+  val observationEnd: Setup   = Setup(Prefix("IRIS.Imager"), CommandName("observationEnd"), obsId)
+
   val setupAcquisition: Setup = Setup(Prefix("IRIS.Imager"), CommandName("setupAcquisition"), obsId).madd(
     filterKey.set("Ks"),
     scienceAdcFollowP,
@@ -123,5 +126,22 @@ object TestData {
     EventKey(detectorPrefix, ObserveEventNames.DataWriteStart)
   )
 
-  val sequence: Sequence = Sequence(setupAcquisition, acquisitionExposure, setupObservation, singleExposure)
+  val sequence: Sequence = Sequence(
+    observationStart,
+    setupAcquisition,
+    acquisitionExposure,
+    setupObservation,
+    singleExposure,
+    setupObservation,
+    singleExposure,
+    observationEnd,
+    observationStart,
+    setupAcquisition,
+    acquisitionExposure,
+    setupObservation,
+    singleExposure,
+    setupObservation,
+    singleExposure,
+    observationEnd
+  )
 }

@@ -1,0 +1,173 @@
+[
+  {
+    "_type": "Setup",
+    "source": "ESW.IFSOnly",
+    "commandName": "observationStart",
+    "maybeObsId": "2020A-001-123",
+    "paramSet": []
+  },
+  {
+    "_type": "Setup",
+    "source": "ESW.IFSOnly",
+    "commandName": "preset",
+    "maybeObsId": "2020A-001-123",
+    "paramSet": [
+      {
+        "ChoiceKey": {
+          "keyName": "filter",
+          "values": [
+            "H"
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "BooleanKey": {
+          "keyName": "scienceAdcFollow",
+          "values": [
+            true
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "DoubleKey": {
+          "keyName": "scienceAdcTarget",
+          "values": [
+            40.0
+          ],
+          "units": "NoUnits"
+        }
+      }
+    ]
+  },
+  {
+    "_type": "Observe",
+    "source": "ESW.IFSOnly",
+    "commandName": "coarseAcquisition",
+    "maybeObsId": "2020A-001-123",
+    "paramSet": [
+      {
+        "StringKey": {
+          "keyName": "directory",
+          "values": ["/tmp/fits"],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "StringKey": {
+          "keyName": "imagerExposureType",
+          "values": ["SKY"],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "IntKey": {
+          "keyName": "imagerIntegrationTime",
+          "values": [5000],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "IntKey": {
+          "keyName": "imagerNumRamps",
+          "values": [1],
+          "units": "NoUnits"
+        }
+      }
+    ]
+  },
+  {
+    "_type": "Observe",
+    "source": "ESW.IFSOnly",
+    "commandName": "fineAcquisition",
+    "maybeObsId": "2020A-001-123",
+    "paramSet": []
+  },
+  {
+    "_type": "Setup",
+    "source": "ESW.IFSOnly",
+    "commandName": "setupObservation",
+    "maybeObsId": "2020A-001-123",
+    "paramSet": [
+      {
+        "ChoiceKey": {
+          "keyName": "filter",
+          "values": ["H"],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "ChoiceKey": {
+          "keyName": "scale",
+          "values": ["9"],
+          "units": "marcsec"
+        }
+      },
+      {
+        "ChoiceKey": {
+          "keyName": "spectralResolution",
+          "values": ["4000-K"],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "BooleanKey": {
+          "keyName": "scienceAdcFollow",
+          "values": [true],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "DoubleKey": {
+          "keyName": "scienceAdcTarget",
+          "values": [40.0],
+          "units": "NoUnits"
+        }
+      }
+    ]
+  },
+  {
+    "_type": "Observe",
+    "source": "ESW.IFSOnly",
+    "commandName": "observe",
+    "maybeObsId": "2020A-001-123",
+    "paramSet": [
+      {
+        "StringKey": {
+          "keyName": "directory",
+          "values": ["/tmp/fits"],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "StringKey": {
+          "keyName": "ifsExposureType",
+          "values": ["SKY"],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "IntKey": {
+          "keyName": "ifsIntegrationTime",
+          "values": [5000],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "IntKey": {
+          "keyName": "ifsNumRamps",
+          "values": [1],
+          "units": "NoUnits"
+        }
+      }
+    ]
+  },
+  {
+    "_type": "Setup",
+    "source": "ESW.IFSOnly",
+    "commandName": "observationEnd",
+    "maybeObsId": "2020A-001-123",
+    "paramSet": []
+  }
+]
