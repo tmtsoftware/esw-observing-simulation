@@ -29,6 +29,8 @@ class DetectorHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswConte
 
   private val fitsActor: ActorRef[FitsMessage]        = ctx.spawnAnonymous(new FitsActor(cswCtx, config).setup)
   private val controller: ActorRef[ControllerMessage] = ctx.spawnAnonymous(new ControllerActor(cswCtx, config).uninitialized)
+  private val timeout: FiniteDuration                 = 1.seconds
+  private implicit val value: Timeout                 = Timeout(timeout)
 
   override def initialize(): Unit = log.info(s"Initializing ${cswCtx.componentInfo.prefix}...")
 
@@ -42,13 +44,10 @@ class DetectorHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswConte
   }
 
   private def validateObserve(runId: Id, command: Observe) = {
-    val timeout: FiniteDuration = 1.seconds
-    implicit val value: Timeout = Timeout(timeout)
-
     command.commandName match {
       case Constants.StartExposure =>
         command.maybeObsId match {
-          case Some(_) => Await.result(controller ? (IsValid(runId, command.commandName, _)), timeout)
+          case Some(_) => sendIsValid(runId, command)
           case None    => Invalid(runId, CommandIssue.WrongParameterTypeIssue("obsId not found"))
         }
       case cmd => Invalid(runId, CommandIssue.UnsupportedCommandIssue(s"$cmd is not a valid observe command"))
@@ -56,11 +55,16 @@ class DetectorHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswConte
 
   }
 
+  private def sendIsValid(runId: Id, command: ControlCommand) = {
+    Await.result(controller ? (IsValid(runId, command.commandName, _)), timeout)
+  }
+
   private def validateSetup(runId: Id, setup: Setup): CommandResponse.ValidateCommandResponse = {
     setup.commandName match {
-      case Constants.StartExposure => Invalid(runId, CommandIssue.UnsupportedCommandIssue("StartExposure is not a valid setup command"))
+      case Constants.StartExposure =>
+        Invalid(runId, CommandIssue.UnsupportedCommandIssue("StartExposure is not a valid setup command"))
       case Constants.Initialize | Constants.Shutdown =>
-        Accepted(runId)
+        sendIsValid(runId, setup)
       case Constants.LoadConfiguration =>
         val issueOrAccepted = for {
           _     <- setup.maybeObsId.toRight(CommandIssue.WrongParameterTypeIssue("obsId not found"))
@@ -72,11 +76,11 @@ class DetectorHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswConte
             .get(Constants.rampIntegrationTimeKey)
             .toRight(CommandIssue.WrongParameterTypeIssue("rampIntegrationTime not found"))
           _ <- isGreaterThan(rampIntegrationTime, Constants.minRampIntegrationTime)
-        } yield Accepted(runId)
+        } yield sendIsValid(runId, setup)
         issueOrAccepted.fold(Invalid(runId, _), identity)
       case Constants.AbortExposure =>
         setup.maybeObsId match {
-          case Some(_) => Accepted(runId)
+          case Some(_) => sendIsValid(runId, setup)
           case None    => Invalid(runId, CommandIssue.WrongParameterTypeIssue("obsId not found"))
         }
       case cmd => Invalid(runId, CommandIssue.UnsupportedCommandIssue(s"$cmd is not a valid setup command"))

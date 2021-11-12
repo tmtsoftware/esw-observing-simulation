@@ -28,12 +28,14 @@ class FilterHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext
   import cswCtx._
   implicit val a: Scheduler = ctx.system.scheduler
 
-  implicit val ec: ExecutionContext    = ctx.executionContext
-  private val log                      = loggerFactory.getLogger
-  private val filterPrefix: Prefix     = cswCtx.componentInfo.prefix
-  private val filterWheelConfiguration = AssemblyConfiguration(ConfigFactory.load().getConfig(filterPrefix.toString().toLowerCase()))
-  private val filterPositionEvent      = new FilterPositionEvent(filterPrefix)
-  private val filterActor              = ctx.spawnAnonymous(FilterWheelActor.behavior(cswCtx, filterWheelConfiguration))
+  implicit val ec: ExecutionContext = ctx.executionContext
+  private val log                   = loggerFactory.getLogger
+  private val filterPrefix: Prefix  = cswCtx.componentInfo.prefix
+  private val filterWheelConfiguration = AssemblyConfiguration(
+    ConfigFactory.load().getConfig(filterPrefix.toString().toLowerCase())
+  )
+  private val filterPositionEvent = new FilterPositionEvent(filterPrefix)
+  private val filterActor         = ctx.spawnAnonymous(FilterWheelActor.behavior(cswCtx, filterWheelConfiguration))
 
   override def initialize(): Unit = {
     log.info(s"Initializing ${filterPrefix.componentName}...")
@@ -48,12 +50,12 @@ class FilterHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext
     val timeout: FiniteDuration = 1.seconds
     implicit val value: Timeout = Timeout(timeout)
 
-    val initialValidateRes = controlCommand match {
-      case cmd: Setup => validateSetupCommand(runId, cmd)
+    val validateParamsRes = controlCommand match {
+      case cmd: Setup => validateSetupParams(runId, cmd)
       case observe    => Invalid(runId, UnsupportedCommandIssue(s"$observe command not supported."))
     }
 
-    initialValidateRes match {
+    validateParamsRes match {
       case _: Accepted => Await.result(filterActor ? (IsValidMove(runId, _)), timeout)
       case invalidRes  => invalidRes
     }
@@ -86,7 +88,7 @@ class FilterHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext
       case Left(commandIssue) => Invalid(runId, commandIssue)
     }
 
-  private def validateSelect(runId: Id, setup: Setup) =
+  private def validateSelectParams(runId: Id, setup: Setup) =
     SelectCommand.getWheel1TargetPosition(setup) match {
       case Right(_) => Accepted(runId)
       case Left(commandIssue) =>
@@ -94,8 +96,8 @@ class FilterHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext
         Invalid(runId, commandIssue)
     }
 
-  private def validateSetupCommand(runId: Id, setup: Setup) = setup.commandName match {
-    case SelectCommand.Name => validateSelect(runId, setup)
+  private def validateSetupParams(runId: Id, setup: Setup) = setup.commandName match {
+    case SelectCommand.Name => validateSelectParams(runId, setup)
     case CommandName(name) =>
       val errMsg = s"Filter Assembly: Setup command: $name not supported."
       log.error(errMsg)
