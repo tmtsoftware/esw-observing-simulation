@@ -9,13 +9,13 @@ import csw.command.client.messages.TopLevelActorMessage
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models.TrackingEvent
-import csw.params.commands.CommandResponse.{Accepted, Invalid, Started, SubmitResponse}
+import csw.params.commands.CommandResponse.{Invalid, Started, SubmitResponse}
 import csw.params.commands._
+import csw.params.core.generics.Parameter
 import csw.params.core.models.{ExposureId, Id}
 import csw.params.events.ObserveEventKeys
 import csw.time.core.models.UTCTime
 import wfos.detector.commands.ControllerMessage._
-import csw.params.core.generics.Parameter
 import wfos.detector.commands.{ControllerMessage, FitsMessage}
 
 import scala.concurrent.Await
