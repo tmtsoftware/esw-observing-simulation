@@ -26,7 +26,7 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
 
   override implicit def patienceConfig: PatienceConfig = PatienceConfig(1.minute, 100.millis)
 
-  private val sequencerScriptSha              = "345bddb"
+  private val sequencerScriptSha              = "4756c1b"
   private val obsMode                         = ObsMode("IRIS_ImagerAndIFS")
   private val seqComponentName                = "testComponent"
   private val agentConnection: AkkaConnection = AkkaConnection(ComponentId(agentSettings.prefix, ComponentType.Machine))
