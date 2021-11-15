@@ -224,24 +224,24 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
 
     eventually {
       val event = testProbe.expectMessageType[ObserveEvent]
-      event.eventName.name === ObserveEventNames.ExposureStart.name
+      event.eventName.name shouldBe ObserveEventNames.ExposureStart.name
       ExposureId(event(ObserveEventKeys.exposureId).head) shouldBe exposureId
     }
     eventually {
       val event = testProbe.expectMessageType[ObserveEvent]
-      event.eventName.name === ObserveEventNames.ExposureEnd.name
+      event.eventName.name shouldBe ObserveEventNames.ExposureEnd.name
       ExposureId(event(ObserveEventKeys.exposureId).head) shouldBe exposureId
     }
     eventually {
       val event = testProbe.expectMessageType[ObserveEvent]
-      event.eventName.name === ObserveEventNames.DataWriteStart.name
+      event.eventName.name shouldBe ObserveEventNames.DataWriteStart.name
       event(ObserveEventKeys.filename).head shouldBe filename
       ExposureId(event(ObserveEventKeys.exposureId).head) shouldBe exposureId
     }
 
     eventually {
       val event = testProbe.expectMessageType[ObserveEvent]
-      event.eventName.name === ObserveEventNames.DataWriteEnd.name
+      event.eventName.name shouldBe ObserveEventNames.DataWriteEnd.name
       event(ObserveEventKeys.filename).head shouldBe filename
       ExposureId(event(ObserveEventKeys.exposureId).head) shouldBe exposureId
     }

@@ -69,24 +69,24 @@ class DetectorTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSui
 
         eventually {
           val event = testProbe.expectMessageType[ObserveEvent]
-          event.eventName.name === ObserveEventNames.ExposureStart.name
+          event.eventName.name shouldBe ObserveEventNames.ExposureStart.name
           ExposureId(event(ObserveEventKeys.exposureId).head) shouldBe exposureId
         }
         eventually {
           val event = testProbe.expectMessageType[ObserveEvent]
-          event.eventName.name === ObserveEventNames.ExposureEnd.name
+          event.eventName.name shouldBe ObserveEventNames.ExposureEnd.name
           ExposureId(event(ObserveEventKeys.exposureId).head) shouldBe exposureId
         }
         eventually {
           val event = testProbe.expectMessageType[ObserveEvent]
-          event.eventName.name === ObserveEventNames.DataWriteStart.name
+          event.eventName.name shouldBe ObserveEventNames.DataWriteStart.name
           event(ObserveEventKeys.filename).head shouldBe filename
           ExposureId(event(ObserveEventKeys.exposureId).head) shouldBe exposureId
         }
 
         eventually {
           val event = testProbe.expectMessageType[ObserveEvent]
-          event.eventName.name === ObserveEventNames.DataWriteEnd.name
+          event.eventName.name shouldBe ObserveEventNames.DataWriteEnd.name
           event(ObserveEventKeys.filename).head shouldBe filename
           ExposureId(event(ObserveEventKeys.exposureId).head) shouldBe exposureId
         }
@@ -128,32 +128,34 @@ class DetectorTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSui
 
         eventually {
           val event = testProbe.expectMessageType[ObserveEvent]
-          event.eventName.name === ObserveEventNames.ExposureStart.name
+          event.eventName.name shouldBe ObserveEventNames.ExposureStart.name
+          ExposureId(event(ObserveEventKeys.exposureId).head) shouldBe exposureId
+        }
+
+        val exposureAborted = commandService.submit(Observe(testPrefix, Constants.AbortExposure, Some(obsId))).futureValue
+        exposureAborted shouldBe a[Started]
+        eventually {
+          val event = testProbe.expectMessageType[ObserveEvent]
+          event.eventName.name shouldBe ObserveEventNames.ExposureAborted.name
           ExposureId(event(ObserveEventKeys.exposureId).head) shouldBe exposureId
         }
 
         eventually {
           val event = testProbe.expectMessageType[ObserveEvent]
-          event.eventName.name === ObserveEventNames.ExposureAborted.name
-          ExposureId(event(ObserveEventKeys.exposureId).head) shouldBe exposureId
-        }
-
-        eventually {
-          val event = testProbe.expectMessageType[ObserveEvent]
-          event.eventName.name === ObserveEventNames.DataWriteStart.name
+          event.eventName.name shouldBe ObserveEventNames.DataWriteStart.name
           event(ObserveEventKeys.filename).head shouldBe filename
           ExposureId(event(ObserveEventKeys.exposureId).head) shouldBe exposureId
         }
 
         eventually {
           val event = testProbe.expectMessageType[ObserveEvent]
-          event.eventName.name === ObserveEventNames.DataWriteEnd.name
+          event.eventName.name shouldBe ObserveEventNames.DataWriteEnd.name
           event(ObserveEventKeys.filename).head shouldBe filename
           ExposureId(event(ObserveEventKeys.exposureId).head) shouldBe exposureId
         }
 
-        val exposureAborted = commandService.queryFinal(exposureStarted.runId).futureValue
-        exposureAborted shouldBe a[Completed]
+        val exposureAbortedRes = commandService.queryFinal(exposureAborted.runId).futureValue
+        exposureAbortedRes shouldBe a[Completed]
 
         val shutdown = commandService.submit(Setup(testPrefix, Constants.Shutdown)).futureValue
         shutdown shouldBe a[Started]

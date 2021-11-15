@@ -45,7 +45,7 @@ class DetectorHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswConte
 
   private def validateObserve(runId: Id, command: Observe) = {
     command.commandName match {
-      case Constants.StartExposure =>
+      case Constants.StartExposure | Constants.AbortExposure =>
         command.maybeObsId match {
           case Some(_) => sendIsValid(runId, command)
           case None    => Invalid(runId, CommandIssue.WrongParameterTypeIssue("obsId not found"))
@@ -78,11 +78,6 @@ class DetectorHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswConte
           _ <- isGreaterThan(rampIntegrationTime, Constants.minRampIntegrationTime)
         } yield sendIsValid(runId, setup)
         issueOrAccepted.fold(Invalid(runId, _), identity)
-      case Constants.AbortExposure =>
-        setup.maybeObsId match {
-          case Some(_) => sendIsValid(runId, setup)
-          case None    => Invalid(runId, CommandIssue.WrongParameterTypeIssue("obsId not found"))
-        }
       case cmd => Invalid(runId, CommandIssue.UnsupportedCommandIssue(s"$cmd is not a valid setup command"))
     }
   }
