@@ -12,6 +12,8 @@ import csw.prefix.models.{Prefix, Subsystem}
 
 object TestData {
 
+  val sequencerScriptSha = "81de9b1"
+
   //imager filter
   private val filterChoices: Choices             = Choices.from("Ks", "CO")
   val ImagerFilterCurrentPositionKey: GChoiceKey = ChoiceKey.make("current", filterChoices)
@@ -111,6 +113,67 @@ object TestData {
   val ImagerADCCurrentEventName: EventName = EventName("prism_current")
   val ImagerADCCurrentEventKey: EventKey   = EventKey(ImagerADCAssemblyPrefix, ImagerADCCurrentEventName)
 
+  //ESW sequencer data
+  private val eswSequencerPrefix: Prefix = Prefix("ESW.IRIS_ImagerAndIFS")
+
+  val eswObservationStart: Setup = Setup(eswSequencerPrefix, CommandName("observationStart"), obsId)
+  val eswObservationEnd: Setup   = Setup(eswSequencerPrefix, CommandName("observationEnd"), obsId)
+
+  val preset: Setup = Setup(eswSequencerPrefix, CommandName("preset"), obsId).madd(
+    filterKey.set("Ks"),
+    scienceAdcFollowP,
+    scienceAdcTargetKey.set(40.0)
+  )
+
+  private val imagerExposureTypeKey = StringKey.make("imagerExposureType")
+  private val ifsExposureTypeKey    = StringKey.make("ifsExposureType")
+
+  val coarseAcquisition: Observe = Observe(eswSequencerPrefix, CommandName("coarseAcquisition"), obsId).madd(
+    directoryP,
+    imagerExposureIdP,
+    imagerIntegrationTimeP,
+    imagerNumRampsP,
+    imagerExposureTypeKey.set("SKY")
+  )
+
+  val fineAcquisition: Observe = Observe(eswSequencerPrefix, CommandName("fineAcquisition"), obsId)
+
+  val observe: Observe = Observe(eswSequencerPrefix, CommandName("observe"), obsId).madd(
+    directoryP,
+    imagerExposureIdP,
+    ifsExposureIdP,
+    imagerIntegrationTimeP,
+    ifsIntegrationTimeP,
+    imagerNumRampsP,
+    ifsNumRampsP,
+    imagerExposureTypeKey.set("SKY"),
+    ifsExposureTypeKey.set("SKY")
+  )
+
+  private val observationStartKey: EventKey  = EventKey(eswSequencerPrefix, ObserveEventNames.ObservationStart)
+  private val observationEndKey: EventKey    = EventKey(eswSequencerPrefix, ObserveEventNames.ObservationEnd)
+  private val presetStartKey: EventKey       = EventKey(eswSequencerPrefix, ObserveEventNames.PresetStart)
+  private val presetEndKey: EventKey         = EventKey(eswSequencerPrefix, ObserveEventNames.PresetEnd)
+  private val guidestarAcqStartKey: EventKey = EventKey(eswSequencerPrefix, ObserveEventNames.GuidestarAcqStart)
+  private val guidestarAcqEndKey: EventKey   = EventKey(eswSequencerPrefix, ObserveEventNames.GuidestarAcqEnd)
+  private val scitargetAcqStartKey: EventKey = EventKey(eswSequencerPrefix, ObserveEventNames.ScitargetAcqStart)
+  private val scitargetAcqEndKey: EventKey   = EventKey(eswSequencerPrefix, ObserveEventNames.ScitargetAcqEnd)
+  private val observeStartKey: EventKey      = EventKey(eswSequencerPrefix, ObserveEventNames.ObserveStart)
+  private val observeEndKey: EventKey        = EventKey(eswSequencerPrefix, ObserveEventNames.ObserveEnd)
+
+  val observeEventKeys = Set(
+    observationStartKey,
+    observationEndKey,
+    presetStartKey,
+    presetEndKey,
+    guidestarAcqStartKey,
+    guidestarAcqEndKey,
+    scitargetAcqStartKey,
+    scitargetAcqEndKey,
+    observeStartKey,
+    observeEndKey
+  )
+
   val ImagerDetectorPrefix: Prefix = Prefix("IRIS.imager.detector")
   val IfsDetectorPrefix: Prefix    = Prefix("IRIS.ifs.detector")
 
@@ -126,7 +189,7 @@ object TestData {
     EventKey(detectorPrefix, ObserveEventNames.DataWriteStart)
   )
 
-  val sequence: Sequence = Sequence(
+  val irisSequence: Sequence = Sequence(
     observationStart,
     setupAcquisition,
     acquisitionExposure,
@@ -142,6 +205,16 @@ object TestData {
     singleExposure,
     setupObservation,
     singleExposure,
+    observationEnd
+  )
+
+  val eswSequence: Sequence = Sequence(
+    eswObservationStart,
+    preset,
+    coarseAcquisition,
+    fineAcquisition,
+    setupObservation,
+    observe,
     observationEnd
   )
 }

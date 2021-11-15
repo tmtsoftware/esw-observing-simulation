@@ -26,7 +26,6 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
 
   override implicit def patienceConfig: PatienceConfig = PatienceConfig(1.minute, 100.millis)
 
-  private val sequencerScriptSha              = "4756c1b"
   private val obsMode                         = ObsMode("IRIS_ImagerAndIFS")
   private val seqComponentName                = "testComponent"
   private val agentConnection: AkkaConnection = AkkaConnection(ComponentId(agentSettings.prefix, ComponentType.Machine))
@@ -68,7 +67,7 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       //********************************************************************
 
       //spawn iris sequencer
-      agentClient.spawnSequenceComponent(seqComponentName, Some(sequencerScriptSha)).futureValue
+      agentClient.spawnSequenceComponent(seqComponentName, Some(TestData.sequencerScriptSha)).futureValue
 
       seqCompLoc = locationService.find(testSeqCompConnection).futureValue
 
@@ -97,7 +96,7 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
 
       val sequencerApi = sequencerClient(Subsystem.IRIS, obsMode)
 
-      val initialSubmitRes = sequencerApi.submit(TestData.sequence).futureValue
+      val initialSubmitRes = sequencerApi.submit(TestData.irisSequence).futureValue
       initialSubmitRes shouldBe a[CommandResponse.Started]
 
       //sequence : setupAcquisition, acquisitionExposure, setupObservation, singleExposure
