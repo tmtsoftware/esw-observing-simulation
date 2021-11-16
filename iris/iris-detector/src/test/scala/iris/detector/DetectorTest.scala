@@ -28,10 +28,9 @@ class DetectorTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSui
   private val seconds                                  = 10.seconds
   private implicit val timeout: Timeout                = Timeout(seconds)
   override implicit val patienceConfig: PatienceConfig = PatienceConfig(seconds)
-  private val obsId                                    = ObsId("2020A-001-123")
-  private val exposureId                               = ExposureId("2020A-001-123-IRIS-IMG-DRK1-0023")
   private val filename                                 = "/tmp/imagerFile1.fits"
   private val testPrefix                               = Prefix(IRIS, "darknight")
+  var obsIdCount                                       = 0
 
   override def beforeAll(): Unit = {
     super.beforeAll()
@@ -42,6 +41,9 @@ class DetectorTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSui
   detectors.foreach { detectorPrefix =>
     {
       test(s" $detectorPrefix - test the whole cycle of an observation | ESW-552, ESW-553") {
+        obsIdCount += 1
+        val obsId        = ObsId(s"2020A-001-12$obsIdCount")
+        val exposureId   = ExposureId(s"$obsId-IRIS-IMG-DRK1-0023")
         val connection   = AkkaConnection(ComponentId(detectorPrefix, ComponentType.Assembly))
         val akkaLocation = locationService.resolve(connection, seconds).futureValue.get
         akkaLocation.connection shouldBe connection
@@ -62,7 +64,7 @@ class DetectorTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSui
 
         subscription.ready().futureValue shouldBe Done
 
-        val commandService: CommandService = assertAssemblyIsConfigured(testPrefix, akkaLocation)
+        val commandService: CommandService = assertAssemblyIsConfigured(obsId, exposureId, testPrefix, akkaLocation)
 
         val exposureStarted = commandService.submit(Observe(testPrefix, Constants.StartExposure, Some(obsId))).futureValue
         exposureStarted shouldBe a[Started]
@@ -101,6 +103,9 @@ class DetectorTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSui
       }
 
       test(s" $detectorPrefix - test abort exposure within an observation | ESW-552, ESW-553") {
+        obsIdCount += 1
+        val obsId        = ObsId(s"2020A-001-12$obsIdCount")
+        val exposureId   = ExposureId(s"$obsId-IRIS-IMG-DRK1-0023")
         val connection   = AkkaConnection(ComponentId(detectorPrefix, ComponentType.Assembly))
         val akkaLocation = locationService.resolve(connection, seconds).futureValue.get
         akkaLocation.connection shouldBe connection
@@ -121,7 +126,7 @@ class DetectorTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSui
 
         subscription.ready().futureValue shouldBe Done
 
-        val commandService: CommandService = assertAssemblyIsConfigured(testPrefix, akkaLocation)
+        val commandService: CommandService = assertAssemblyIsConfigured(obsId, exposureId, testPrefix, akkaLocation)
 
         val exposureStarted = commandService.submit(Observe(testPrefix, Constants.StartExposure, Some(obsId))).futureValue
         exposureStarted shouldBe a[Started]
@@ -163,11 +168,16 @@ class DetectorTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSui
         commandService.queryFinal(shutdown.runId).futureValue shouldBe a[Completed]
       }
 
-      test(s"$detectorPrefix - behaviour should return Invalid when concurrent (Start Exposure) commands received | ESW-552, ESW-553") {
+      test(
+        s"$detectorPrefix - behaviour should return Invalid when concurrent (Start Exposure) commands received | ESW-552, ESW-553"
+      ) {
         implicit val patienceConfig: PatienceConfig = PatienceConfig(10.seconds)
-        val testPrefix                              = Prefix(IRIS, "darknight")
-        val connection                              = AkkaConnection(ComponentId(detectorPrefix, ComponentType.Assembly))
-        val akkaLocation                            = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
+        obsIdCount += 1
+        val obsId        = ObsId(s"2020A-001-12$obsIdCount")
+        val exposureId   = ExposureId(s"$obsId-IRIS-IMG-DRK1-0023")
+        val testPrefix   = Prefix(IRIS, "darknight")
+        val connection   = AkkaConnection(ComponentId(detectorPrefix, ComponentType.Assembly))
+        val akkaLocation = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
         akkaLocation.connection shouldBe connection
 
         val testProbe = TestProbe[Event]()
@@ -185,7 +195,7 @@ class DetectorTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSui
 
         subscription.ready().futureValue shouldBe Done
 
-        val commandService: CommandService = assertAssemblyIsConfigured(testPrefix, akkaLocation)
+        val commandService: CommandService = assertAssemblyIsConfigured(obsId, exposureId, testPrefix, akkaLocation)
 
         val startExposure = Observe(testPrefix, Constants.StartExposure, Some(obsId))
 
@@ -197,7 +207,7 @@ class DetectorTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSui
     }
   }
 
-  private def assertAssemblyIsConfigured(testPrefix: Prefix, akkaLocation: AkkaLocation) = {
+  private def assertAssemblyIsConfigured(obsId: ObsId, exposureId: ExposureId, testPrefix: Prefix, akkaLocation: AkkaLocation) = {
     val commandService = CommandServiceFactory.make(akkaLocation)
 
     val eventualResponse = commandService.submit(Setup(testPrefix, Constants.Initialize)).futureValue
