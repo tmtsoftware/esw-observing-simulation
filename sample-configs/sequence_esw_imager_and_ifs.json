@@ -178,6 +178,12 @@
           ],
           "units": "NoUnits"
         }
+      },{
+        "StringKey": {
+          "keyName": "imagerExposureType",
+          "values": ["SKY"],
+          "units": "NoUnits"
+        }
       },
       {
         "IntKey": {
