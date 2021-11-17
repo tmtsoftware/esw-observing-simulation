@@ -1,4 +1,4 @@
-package wfos.commons.models
+package wfos.filter.models
 
 import com.typesafe.config.Config
 

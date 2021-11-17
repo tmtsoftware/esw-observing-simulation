@@ -3,23 +3,40 @@ package wfos.filter.commands
 import csw.params.commands.CommandIssue.{MissingKeyIssue, ParameterValueOutOfRangeIssue}
 import csw.params.commands.{CommandIssue, CommandName, Setup}
 import csw.params.core.generics.GChoiceKey
-import wfos.filter.models.FilterWheelPosition
+import wfos.filter.models.{BlueFilterWheelPosition, FilterWheelPosition, RedFilterWheelPosition}
 
-object SelectCommand {
-  val Name: CommandName     = CommandName("SELECT")
-  val Wheel1Key: GChoiceKey = FilterWheelPosition.makeChoiceKey("wheel1")
+abstract class SelectCommand {
+  val Name: CommandName = CommandName("SELECT")
+  val Wheel1Key: GChoiceKey
+  def getWheel1TargetPosition(setup: Setup): Either[CommandIssue, FilterWheelPosition]
+}
 
-  private def getTargetPosition(setup: Setup, key: GChoiceKey): Either[CommandIssue, FilterWheelPosition] = {
+object RedSelectCommand extends SelectCommand {
+  override val Wheel1Key: GChoiceKey = RedFilterWheelPosition.makeChoiceKey("wheel1")
+
+  override def getWheel1TargetPosition(setup: Setup): Either[CommandIssue, FilterWheelPosition] = {
     val cmdName = setup.commandName.name
     for {
-      param          <- setup.get(key).toRight(MissingKeyIssue(s"$Wheel1Key not found in command: $cmdName"))
+      param          <- setup.get(Wheel1Key).toRight(MissingKeyIssue(s"$Wheel1Key not found in command: $cmdName"))
       positionChoice <- param.get(0).toRight(ParameterValueOutOfRangeIssue(s"Command: $cmdName does not contain target position"))
-      position <- FilterWheelPosition
+      position <- RedFilterWheelPosition
         .withNameInsensitiveOption(positionChoice.name)
         .toRight(ParameterValueOutOfRangeIssue(s"$positionChoice is not a valid position"))
     } yield position
   }
+}
 
-  def getWheel1TargetPosition(setup: Setup): Either[CommandIssue, FilterWheelPosition] =
-    getTargetPosition(setup, Wheel1Key)
+object BlueSelectCommand extends SelectCommand {
+  override val Wheel1Key: GChoiceKey = BlueFilterWheelPosition.makeChoiceKey("wheel1")
+
+  override def getWheel1TargetPosition(setup: Setup): Either[CommandIssue, FilterWheelPosition] = {
+    val cmdName = setup.commandName.name
+    for {
+      param          <- setup.get(Wheel1Key).toRight(MissingKeyIssue(s"$Wheel1Key not found in command: $cmdName"))
+      positionChoice <- param.get(0).toRight(ParameterValueOutOfRangeIssue(s"Command: $cmdName does not contain target position"))
+      position <- BlueFilterWheelPosition
+        .withNameInsensitiveOption(positionChoice.name)
+        .toRight(ParameterValueOutOfRangeIssue(s"$positionChoice is not a valid position"))
+    } yield position
+  }
 }

@@ -3,45 +3,73 @@ package wfos.filter.models
 import csw.params.core.generics.GChoiceKey
 import csw.params.core.generics.KeyType.ChoiceKey
 import csw.params.core.models.Choices
-import enumeratum.Enum
-import wfos.commons.models.{LinearPosition, Position}
+import enumeratum.{Enum, EnumEntry}
 
 import scala.collection.immutable.IndexedSeq
 
-sealed abstract class FilterWheelPosition(override val entryName: String) extends LinearPosition[FilterWheelPosition] {
+sealed trait FilterWheelPosition extends EnumEntry {
+  protected def getIndexOf(currentPos: FilterWheelPosition): Int
+  protected def nextPosition(step: Int): FilterWheelPosition
 
-  override def getIndexOf(currentPos: Position[FilterWheelPosition]): Int = FilterWheelPosition.values.indexOf(currentPos)
+  final def nextPosition(target: FilterWheelPosition): FilterWheelPosition = nextPosition(nextIndexDiff(target))
 
-  override def nextPosition(step: Int): FilterWheelPosition = {
+  private final def nextIndexDiff(target: FilterWheelPosition): Int = {
+    val currId   = getIndexOf(this)
+    val targetId = getIndexOf(target)
+
+    if (this == target) 0
+    else if (currId > targetId) -1
+    else +1
+  }
+}
+
+sealed abstract class RedFilterWheelPosition(override val entryName: String) extends FilterWheelPosition {
+
+  override def getIndexOf(currentPos: FilterWheelPosition): Int =
+    RedFilterWheelPosition.values.indexOf(currentPos)
+
+  override def nextPosition(step: Int): RedFilterWheelPosition = {
     val currId = getIndexOf(this)
     val nextId = currId + step
-    if (nextId < 0 || nextId >= FilterWheelPosition.values.length) this
-    else FilterWheelPosition.values(nextId)
+    if (nextId < 0 || nextId >= RedFilterWheelPosition.values.length) this
+    else RedFilterWheelPosition.values(nextId)
   }
 
 }
 
-object FilterWheelPosition extends Enum[FilterWheelPosition] {
-  override def values: IndexedSeq[FilterWheelPosition] = findValues
+sealed abstract class BlueFilterWheelPosition(override val entryName: String) extends FilterWheelPosition {
 
-  private lazy val choices: Choices              = Choices.from(FilterWheelPosition.values.map(_.entryName): _*)
+  override def getIndexOf(currentPos: FilterWheelPosition): Int =
+    BlueFilterWheelPosition.values.indexOf(currentPos)
+
+  override def nextPosition(step: Int): BlueFilterWheelPosition = {
+    val currId = getIndexOf(this)
+    val nextId = currId + step
+    if (nextId < 0 || nextId >= BlueFilterWheelPosition.values.length) this
+    else BlueFilterWheelPosition.values(nextId)
+  }
+
+}
+
+object RedFilterWheelPosition extends Enum[RedFilterWheelPosition] {
+  override def values: IndexedSeq[RedFilterWheelPosition] = findValues
+
+  private lazy val choices: Choices              = Choices.from(values.map(_.entryName): _*)
   def makeChoiceKey(keyName: String): GChoiceKey = ChoiceKey.make(keyName, choices)
 
-  case object Z        extends FilterWheelPosition("Z")
-  case object Y        extends FilterWheelPosition("Y")
-  case object J        extends FilterWheelPosition("J")
-  case object H        extends FilterWheelPosition("H")
-  case object K        extends FilterWheelPosition("K")
-  case object Ks       extends FilterWheelPosition("Ks")
-  case object HKNotch  extends FilterWheelPosition("H+K notch")
-  case object CO       extends FilterWheelPosition("CO")
-  case object BrGamma  extends FilterWheelPosition("BrGamma")
-  case object PaBeta   extends FilterWheelPosition("PaBeta")
-  case object H2       extends FilterWheelPosition("H2")
-  case object FeII     extends FilterWheelPosition("FeII")
-  case object HeI      extends FilterWheelPosition("HeI")
-  case object CaIITrip extends FilterWheelPosition("CaII Trip")
-  case object JCont    extends FilterWheelPosition("J Cont")
-  case object HCont    extends FilterWheelPosition("H Cont")
-  case object KCont    extends FilterWheelPosition("K Cont")
+  case object RPrime      extends RedFilterWheelPosition("r'")
+  case object IPrime      extends RedFilterWheelPosition("i'")
+  case object ZPrime      extends RedFilterWheelPosition("z'")
+  case object FusedSilica extends RedFilterWheelPosition("fused-silica")
+}
+
+object BlueFilterWheelPosition extends Enum[BlueFilterWheelPosition] {
+  override def values: IndexedSeq[BlueFilterWheelPosition] = findValues
+
+  private lazy val choices: Choices              = Choices.from(values.map(_.entryName): _*)
+  def makeChoiceKey(keyName: String): GChoiceKey = ChoiceKey.make(keyName, choices)
+
+  case object UPrime      extends BlueFilterWheelPosition("u'")
+  case object GPrime      extends BlueFilterWheelPosition("g'")
+  case object FusedSilica extends BlueFilterWheelPosition("fused-silica")
 }
