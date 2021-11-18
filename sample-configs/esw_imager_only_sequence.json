@@ -127,15 +127,6 @@
         }
       },
       {
-        "StringKey": {
-          "keyName": "imagerExposureId",
-          "values": [
-            "2020A-001-123-IRIS-IMG-DRK1-0023"
-          ],
-          "units": "NoUnits"
-        }
-      },
-      {
         "IntKey": {
           "keyName": "imagerIntegrationTime",
           "values": [
