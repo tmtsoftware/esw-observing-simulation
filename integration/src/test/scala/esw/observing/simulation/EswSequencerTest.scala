@@ -59,7 +59,7 @@ class EswSequencerTest extends EswTestKit(EventServer, MachineAgent) {
    We subscribe and validate all observe events are published by ESW sequencer and in correct order.
    */
   "EswSequencer" must {
-    "handle the submitted sequence | ESW-554" in {
+    "handle the submitted sequence | ESW-554, ESW-82" in {
 
       val containerConfPath = Paths.get(getClass.getResource("/IrisContainer.conf").toURI)
 
