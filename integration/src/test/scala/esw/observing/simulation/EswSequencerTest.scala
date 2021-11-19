@@ -66,9 +66,8 @@ class EswSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       //spawn the iris container
       containerCmd = Some(ContainerCmd.start("iris_container_cmd_app", IRIS, List("--local", containerConfPath.toString).toArray))
 
-      Thread.sleep(10000)
       val containerLocation: Option[AkkaLocation] =
-        locationService.resolve(TestData.irisContainerConnection, 5.seconds).futureValue
+        locationService.resolve(TestData.irisContainerConnection, 15.seconds).futureValue
       containerLocation.isDefined shouldBe true
 
       locationService

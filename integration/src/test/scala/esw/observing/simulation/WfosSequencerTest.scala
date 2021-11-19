@@ -61,9 +61,8 @@ class WfosSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       //spawn the wfos container
       containerCmd = Some(ContainerCmd.start("wfos_container_cmd_app", WFOS, List("--local", containerConfPath.toString).toArray))
 
-      Thread.sleep(10000)
       val containerLocation: Option[AkkaLocation] =
-        locationService.resolve(WFOSTestData.wfosContainerConnection, 5.seconds).futureValue
+        locationService.resolve(WFOSTestData.wfosContainerConnection, 15.seconds).futureValue
       containerLocation.isDefined shouldBe true
 
       locationService
@@ -83,7 +82,6 @@ class WfosSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       sequencerResponse.rightValue shouldBe a[Started]
 
       //********************************************************************
-
 
       val sequencerApi = sequencerClient(Subsystem.WFOS, obsMode)
 
@@ -123,7 +121,6 @@ class WfosSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       event(WFOSTestData.filterDarkKey).head shouldBe false
     }
   }
-
 
   private def assertDetectorEvents(testProbe: TestProbe[Event], directory: String, exposureId: ExposureId) = {
     val filename = s"$directory/$exposureId.fits"
