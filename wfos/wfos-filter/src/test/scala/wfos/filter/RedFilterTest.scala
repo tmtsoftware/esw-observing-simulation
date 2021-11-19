@@ -33,7 +33,7 @@ class RedFilterTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
     // uncomment if you want one Assembly run for all tests
     spawnStandalone(com.typesafe.config.ConfigFactory.load("RedFilterStandalone.conf"))
   }
-  test(s"$prefix - Assembly behaviour | ESW-556, ESW-557") {
+  test(s"$prefix - Assembly behaviour | ESW-556") {
     implicit val patienceConfig: PatienceConfig = PatienceConfig(10.seconds)
     val sequencerPrefix                         = Prefix(WFOS, "darknight")
     val connection                              = AkkaConnection(ComponentId(prefix, ComponentType.Assembly))
@@ -127,7 +127,7 @@ class RedFilterTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
     finalResponse2.futureValue shouldBe a[Completed]
   }
 
-  test(s"${prefix} - Assembly behaviour should return Invalid when concurrent commands received | ESW-556, ESW-557") {
+  test(s"${prefix} - Assembly behaviour should return Invalid when concurrent commands received | ESW-556") {
     implicit val patienceConfig: PatienceConfig = PatienceConfig(10.seconds)
     val sequencerPrefix                         = Prefix(WFOS, "darknight")
     val connection                              = AkkaConnection(ComponentId(prefix, ComponentType.Assembly))

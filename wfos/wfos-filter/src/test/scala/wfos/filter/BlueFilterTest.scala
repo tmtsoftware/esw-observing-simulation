@@ -33,7 +33,7 @@ class BlueFilterTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunS
     // uncomment if you want one Assembly run for all tests
     spawnStandalone(com.typesafe.config.ConfigFactory.load("BlueFilterStandalone.conf"))
   }
-  test(s"$prefix - Assembly behaviour | ESW-556, ESW-557") {
+  test(s"$prefix - Assembly behaviour | ESW-557") {
     implicit val patienceConfig: PatienceConfig = PatienceConfig(10.seconds)
     val sequencerPrefix                         = Prefix(WFOS, "darknight")
     val connection                              = AkkaConnection(ComponentId(prefix, ComponentType.Assembly))
@@ -113,7 +113,7 @@ class BlueFilterTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunS
     finalResponse2.futureValue shouldBe a[Completed]
   }
 
-  test(s"${prefix} - Assembly behaviour should return Invalid when concurrent commands received | ESW-556, ESW-557") {
+  test(s"${prefix} - Assembly behaviour should return Invalid when concurrent commands received | ESW-557") {
     implicit val patienceConfig: PatienceConfig = PatienceConfig(10.seconds)
     val sequencerPrefix                         = Prefix(WFOS, "darknight")
     val connection                              = AkkaConnection(ComponentId(prefix, ComponentType.Assembly))
