@@ -11,4 +11,4 @@ else
     echo "Error: Directory esw-ocs-eng-ui does not exists. downloading..."
     sh $ROOT/install-eng-ui.sh
 fi
-python3 -m http.server 8000
+./serve.py
