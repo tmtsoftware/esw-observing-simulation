@@ -66,7 +66,7 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       //********************************************************************
 
       //spawn iris sequencer
-      agentClient.spawnSequenceComponent(seqComponentName, Some(TestData.sequencerScriptSha)).futureValue
+      agentClient.spawnSequenceComponent(seqComponentName, Some(ScriptVersion.value)).futureValue
 
       seqCompLoc = locationService.find(testSeqCompConnection).futureValue
 

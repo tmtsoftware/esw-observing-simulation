@@ -12,8 +12,6 @@ import csw.prefix.models.{Prefix, Subsystem}
 
 object TestData {
 
-  val sequencerScriptSha = "81de9b1"
-
   //imager filter
   private val filterChoices: Choices             = Choices.from("Ks", "CO")
   val ImagerFilterCurrentPositionKey: GChoiceKey = ChoiceKey.make("current", filterChoices)

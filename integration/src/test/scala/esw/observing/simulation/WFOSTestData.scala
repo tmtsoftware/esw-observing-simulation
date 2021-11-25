@@ -11,6 +11,8 @@ import csw.prefix.models.Subsystem.Container
 import csw.prefix.models.{Prefix, Subsystem}
 
 object WFOSTestData {
+  val eswSequencerPrefix: Prefix = Prefix(Subsystem.ESW, "WFOS_Science")
+
   val filterPositionEventName: EventName = EventName("Wheel1Position")
   val filterDarkKey: Key[Boolean]        = BooleanKey.make("dark")
 
@@ -38,11 +40,12 @@ object WFOSTestData {
   val obsId: Option[ObsId]          = Some(ObsId("2020A-001-123"))
   val directoryP: Parameter[String] = StringKey.make("directory").set("/tmp")
 
-  val blueExposureIdP: Parameter[String]   = StringKey.make("blueExposureId").set("2020A-001-123-IRIS-IMG-DRK1-0023")
+  val exposureIdStr: String = "2020A-001-123-IRIS-BLU-SKY1-0002"
+  val blueExposureIdP: Parameter[String]   = StringKey.make("blueExposureId").set(exposureIdStr)
   val blueIntegrationTimeP: Parameter[Int] = IntKey.make("blueIntegrationTime").set(2000)
   val blueNumRampsP: Parameter[Int]        = IntKey.make("blueNumRamps").set(2)
 
-  val redExposureIdP: Parameter[String]   = StringKey.make("redExposureId").set("2020A-001-123-IRIS-IMG-DRK1-0023")
+  val redExposureIdP: Parameter[String]   = StringKey.make("redExposureId").set(exposureIdStr)
   val redIntegrationTimeP: Parameter[Int] = IntKey.make("redIntegrationTime").set(2000)
   val redNumRampsP: Parameter[Int]        = IntKey.make("redNumRamps").set(2)
 
@@ -82,6 +85,68 @@ object WFOSTestData {
     EventKey(detectorPrefix, ObserveEventNames.DataWriteStart)
   )
 
+  private val observationStartKey: EventKey  = EventKey(eswSequencerPrefix, ObserveEventNames.ObservationStart)
+  private val observationEndKey: EventKey    = EventKey(eswSequencerPrefix, ObserveEventNames.ObservationEnd)
+  private val presetStartKey: EventKey       = EventKey(eswSequencerPrefix, ObserveEventNames.PresetStart)
+  private val presetEndKey: EventKey         = EventKey(eswSequencerPrefix, ObserveEventNames.PresetEnd)
+  private val guidestarAcqStartKey: EventKey = EventKey(eswSequencerPrefix, ObserveEventNames.GuidestarAcqStart)
+  private val guidestarAcqEndKey: EventKey   = EventKey(eswSequencerPrefix, ObserveEventNames.GuidestarAcqEnd)
+  private val scitargetAcqStartKey: EventKey = EventKey(eswSequencerPrefix, ObserveEventNames.ScitargetAcqStart)
+  private val scitargetAcqEndKey: EventKey   = EventKey(eswSequencerPrefix, ObserveEventNames.ScitargetAcqEnd)
+  private val observeStartKey: EventKey      = EventKey(eswSequencerPrefix, ObserveEventNames.ObserveStart)
+  private val observeEndKey: EventKey        = EventKey(eswSequencerPrefix, ObserveEventNames.ObserveEnd)
+
+  val observeEventKeys = Set(
+    observationStartKey,
+    observationEndKey,
+    presetStartKey,
+    presetEndKey,
+    guidestarAcqStartKey,
+    guidestarAcqEndKey,
+    scitargetAcqStartKey,
+    scitargetAcqEndKey,
+    observeStartKey,
+    observeEndKey
+  )
+
+  private val blueExposureTypeKey = StringKey.make("blueExposureType")
+  private val redExposureTypeKey  = StringKey.make("redExposureType")
+
+  val eswObservationStart: Setup = Setup(eswSequencerPrefix, CommandName("observationStart"), obsId)
+  val eswObservationEnd: Setup   = Setup(eswSequencerPrefix, CommandName("observationEnd"), obsId)
+  val preset: Setup              = Setup(eswSequencerPrefix, CommandName("preset"), obsId).add(blueFilterKey.set("fused-silica"))
+
+  val coarseAcquisition: Observe = Observe(eswSequencerPrefix, CommandName("coarseAcquisition"), obsId).madd(
+    directoryP,
+    blueExposureIdP,
+    blueIntegrationTimeP,
+    blueNumRampsP,
+    blueExposureTypeKey.set("SKY")
+  )
+
+  val fineAcquisition: Observe = Observe(eswSequencerPrefix, CommandName("fineAcquisition"), obsId)
+
+  val observe: Observe = Observe(eswSequencerPrefix, CommandName("observe"), obsId).madd(
+    directoryP,
+    blueExposureIdP,
+    redExposureIdP,
+    blueIntegrationTimeP,
+    redIntegrationTimeP,
+    blueNumRampsP,
+    redNumRampsP,
+    blueExposureTypeKey.set("SKY"),
+    redExposureTypeKey.set("SKY")
+  )
+
   val sequence: Sequence = Sequence(setupAcquisition, acquisitionExposure, setupObservation, singleExposure)
 
+  val eswSequence: Sequence = Sequence(
+    eswObservationStart,
+    preset,
+    coarseAcquisition,
+    fineAcquisition,
+    setupObservation,
+    observe,
+    eswObservationEnd
+  )
 }

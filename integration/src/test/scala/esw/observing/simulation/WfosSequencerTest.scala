@@ -26,7 +26,6 @@ class WfosSequencerTest extends EswTestKit(EventServer, MachineAgent) {
 
   override implicit def patienceConfig: PatienceConfig = PatienceConfig(1.minute, 100.millis)
 
-  private val sequencerScriptSha              = "87ac72f"
   private val obsMode                         = ObsMode("WFOS_Science")
   private val seqComponentName                = "testComponent"
   private val agentConnection: AkkaConnection = AkkaConnection(ComponentId(agentSettings.prefix, ComponentType.Machine))
@@ -49,7 +48,7 @@ class WfosSequencerTest extends EswTestKit(EventServer, MachineAgent) {
   }
 
   "wfos sequencer" must {
-    "handle the submitted sequence | ESW-551" in {
+    "handle the submitted sequence | ESW-563" in {
       val wfosBlueFilterTestProbe = createTestProbe(Set(WFOSTestData.wfosBluePositionEventKey))
       val wfosRedFilterTestProbe  = createTestProbe(Set(WFOSTestData.wfosRedPositionEventKey))
 
@@ -72,7 +71,7 @@ class WfosSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       //********************************************************************
 
       //spawn wfos sequencer
-      agentClient.spawnSequenceComponent(seqComponentName, Some(sequencerScriptSha)).futureValue
+      agentClient.spawnSequenceComponent(seqComponentName, Some(ScriptVersion.value)).futureValue
 
       seqCompLoc = locationService.find(testSeqCompConnection).futureValue
 
@@ -92,15 +91,15 @@ class WfosSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       assertBlueFilterPosition(wfosBlueFilterTestProbe, "g'")
 
       //assert events for acquisitionExposure
-      assertDetectorEvents(wfosBlueDetectorTestProbe, "/tmp", ExposureId("2020A-001-123-IRIS-IMG-DRK1-0023"))
+      assertDetectorEvents(wfosBlueDetectorTestProbe, "/tmp", ExposureId(WFOSTestData.exposureIdStr))
 
       //assert events for setupObservation
       assertBlueFilterPosition(wfosBlueFilterTestProbe, "fused-silica")
       assertRedFilterPosition(wfosRedFilterTestProbe, "z'")
 
       //assert events for singleExposure
-      assertDetectorEvents(wfosBlueDetectorTestProbe, "/tmp", ExposureId("2020A-001-123-IRIS-IMG-DRK1-0023"))
-      assertDetectorEvents(wfosRedDetectorTestProbe, "/tmp", ExposureId("2020A-001-123-IRIS-IMG-DRK1-0023"))
+      assertDetectorEvents(wfosBlueDetectorTestProbe, "/tmp", ExposureId(WFOSTestData.exposureIdStr))
+      assertDetectorEvents(wfosRedDetectorTestProbe, "/tmp", ExposureId(WFOSTestData.exposureIdStr))
     }
   }
 

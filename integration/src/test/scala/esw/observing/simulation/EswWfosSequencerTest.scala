@@ -5,9 +5,9 @@ import csw.framework.deploy.containercmd.ContainerCmd
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.params.commands.CommandResponse
-import csw.params.events.ObserveEventNames.{ExposureEnd, ExposureStart}
-import csw.params.events._
-import csw.prefix.models.Subsystem.IRIS
+import csw.params.core.models.ExposureId
+import csw.params.events.{Event, ObserveEvent, ObserveEventKeys, ObserveEventNames}
+import csw.prefix.models.Subsystem.WFOS
 import csw.prefix.models.{Prefix, Subsystem}
 import csw.testkit.scaladsl.CSWService.EventServer
 import esw.agent.akka.client.AgentClient
@@ -22,11 +22,11 @@ import java.io.Closeable
 import java.nio.file.Paths
 import scala.concurrent.duration.DurationInt
 
-class EswSequencerTest extends EswTestKit(EventServer, MachineAgent) {
+class EswWfosSequencerTest extends EswTestKit(EventServer, MachineAgent) {
 
   override implicit def patienceConfig: PatienceConfig = PatienceConfig(1.minute, 100.millis)
 
-  private val obsMode                         = ObsMode("IRIS_ImagerAndIFS")
+  private val obsMode                         = ObsMode("WFOS_Science")
   private val seqComponentName1               = "testComponent1"
   private val seqComponentName2               = "testComponent2"
   private val agentConnection: AkkaConnection = AkkaConnection(ComponentId(agentSettings.prefix, ComponentType.Machine))
@@ -58,35 +58,36 @@ class EswSequencerTest extends EswTestKit(EventServer, MachineAgent) {
    command to downstream sequencer i.e. IRIS in our case. Now, IRIS sequencer send commands to respective assemblies.
    We subscribe and validate all observe events are published by ESW sequencer and in correct order.
    */
-  "EswSequencer" must {
-    "handle the submitted sequence | ESW-554, ESW-82" in {
+  "Wfos top level esw sequencer" must {
+    "handle the submitted sequence | ESW-564" in {
 
-      val containerConfPath = Paths.get(getClass.getResource("/IrisContainer.conf").toURI)
+      val containerConfPath = Paths.get(getClass.getResource("/WfosContainer.conf").toURI)
 
-      //spawn the iris container
-      containerCmd = Some(ContainerCmd.start("iris_container_cmd_app", IRIS, List("--local", containerConfPath.toString).toArray))
+      //spawn the wfos container
+      containerCmd = Some(ContainerCmd.start("wfos_container_cmd_app", WFOS, List("--local", containerConfPath.toString).toArray))
 
+      Thread.sleep(10000)
       val containerLocation: Option[AkkaLocation] =
-        locationService.resolve(TestData.irisContainerConnection, 15.seconds).futureValue
+        locationService.resolve(WFOSTestData.wfosContainerConnection, 5.seconds).futureValue
       containerLocation.isDefined shouldBe true
 
       locationService
-        .resolve(AkkaConnection(ComponentId(TestData.imagerFilterPrefix, ComponentType.Assembly)), 5.seconds)
+        .resolve(AkkaConnection(ComponentId(WFOSTestData.wfosBlueFilterPrefix, ComponentType.Assembly)), 5.seconds)
         .futureValue
         .value
 
       locationService
-        .resolve(AkkaConnection(ComponentId(TestData.IfsDetectorPrefix, ComponentType.Assembly)), 5.seconds)
+        .resolve(AkkaConnection(ComponentId(WFOSTestData.wfosRedFilterPrefix, ComponentType.Assembly)), 5.seconds)
         .futureValue
         .value
 
       locationService
-        .resolve(AkkaConnection(ComponentId(TestData.ImagerDetectorPrefix, ComponentType.Assembly)), 5.seconds)
+        .resolve(AkkaConnection(ComponentId(WFOSTestData.wfosRedDetectorPrefix, ComponentType.Assembly)), 5.seconds)
         .futureValue
         .value
 
       locationService
-        .resolve(AkkaConnection(ComponentId(TestData.ImagerADCAssemblyPrefix, ComponentType.Assembly)), 5.seconds)
+        .resolve(AkkaConnection(ComponentId(WFOSTestData.wfosBlueDetectorPrefix, ComponentType.Assembly)), 5.seconds)
         .futureValue
         .value
 
@@ -105,19 +106,23 @@ class EswSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       val eswSequencerResponse = sequenceComponentUtil.loadScript(Subsystem.ESW, obsMode, seqComp1Loc.get).futureValue
       eswSequencerResponse.rightValue shouldBe a[Started]
 
-      val irisSequencerResponse = sequenceComponentUtil.loadScript(Subsystem.IRIS, obsMode, seqComp2Loc.get).futureValue
-      irisSequencerResponse.rightValue shouldBe a[Started]
+      val wfosSequencerResponse = sequenceComponentUtil.loadScript(Subsystem.WFOS, obsMode, seqComp2Loc.get).futureValue
+      wfosSequencerResponse.rightValue shouldBe a[Started]
 
       //********************************************************************
 
-      val dmsConsumerProbe = createTestProbe(TestData.observeEventKeys ++ TestData.detectorObsEvents(Prefix("IRIS.ifs.detector")))
+      val dmsConsumerProbe          = createTestProbe(WFOSTestData.observeEventKeys)
+      val wfosBlueDetectorTestProbe = createTestProbe(WFOSTestData.detectorObsEvents(WFOSTestData.wfosBlueDetectorPrefix))
+      val wfosRedDetectorTestProbe  = createTestProbe(WFOSTestData.detectorObsEvents(WFOSTestData.wfosRedDetectorPrefix))
 
       val sequencerApi = sequencerClient(Subsystem.ESW, obsMode)
 
-      val initialSubmitRes = sequencerApi.submit(TestData.eswSequence).futureValue
+      val initialSubmitRes = sequencerApi.submit(WFOSTestData.eswSequence).futureValue
       initialSubmitRes shouldBe a[CommandResponse.Started]
 
       assertObserveEvents(dmsConsumerProbe)
+      assertDetectorEvents(wfosBlueDetectorTestProbe, "/tmp", ExposureId("2020A-001-123-IRIS-BLU-SKY1-0002"))
+      assertDetectorEvents(wfosRedDetectorTestProbe, "/tmp", ExposureId("2020A-001-123-IRIS-RED-SKY1-0002"))
     }
   }
 
@@ -166,16 +171,6 @@ class EswSequencerTest extends EswTestKit(EventServer, MachineAgent) {
 
     eventually {
       val event = testProbe.expectMessageType[ObserveEvent]
-      event.eventName.name shouldBe ExposureStart.name
-    }
-
-    eventually {
-      val event = testProbe.expectMessageType[ObserveEvent]
-      event.eventName.name shouldBe ExposureEnd.name
-    }
-
-    eventually {
-      val event = testProbe.expectMessageType[ObserveEvent]
       event.eventName.name shouldBe ObserveEventNames.ObserveEnd.name
     }
 
@@ -185,4 +180,34 @@ class EswSequencerTest extends EswTestKit(EventServer, MachineAgent) {
     }
   }
 
+  private def assertDetectorEvents(testProbe: TestProbe[Event], directory: String, exposureId: ExposureId) = {
+    val filename = s"$directory/$exposureId.fits"
+
+    eventually {
+      val event = testProbe.expectMessageType[ObserveEvent]
+      event.eventName.name === ObserveEventNames.ExposureStart.name
+      ExposureId(event(ObserveEventKeys.exposureId).head) shouldBe exposureId
+    }
+
+    eventually {
+      val event = testProbe.expectMessageType[ObserveEvent]
+      event.eventName.name === ObserveEventNames.ExposureEnd.name
+      ExposureId(event(ObserveEventKeys.exposureId).head) shouldBe exposureId
+    }
+
+    eventually {
+      val event = testProbe.expectMessageType[ObserveEvent]
+      event.eventName.name === ObserveEventNames.DataWriteStart.name
+      event(ObserveEventKeys.filename).head shouldBe filename
+      ExposureId(event(ObserveEventKeys.exposureId).head) shouldBe exposureId
+    }
+
+    eventually {
+      val event = testProbe.expectMessageType[ObserveEvent]
+      event.eventName.name === ObserveEventNames.DataWriteEnd.name
+      event(ObserveEventKeys.filename).head shouldBe filename
+      ExposureId(event(ObserveEventKeys.exposureId).head) shouldBe exposureId
+    }
+
+  }
 }
