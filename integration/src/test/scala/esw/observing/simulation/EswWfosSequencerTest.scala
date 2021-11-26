@@ -55,7 +55,7 @@ class EswWfosSequencerTest extends EswTestKit(EventServer, MachineAgent) {
 
   /*
    This test submits the sequence to top level ESW sequencer for an observation, it internally submits sequences corresponding to each
-   command to downstream sequencer i.e. IRIS in our case. Now, IRIS sequencer send commands to respective assemblies.
+   command to downstream sequencer i.e. WFOS in our case. Now, WFOS sequencer send commands to respective assemblies.
    We subscribe and validate all observe events are published by ESW sequencer and in correct order.
    */
   "Wfos top level esw sequencer" must {
@@ -93,7 +93,7 @@ class EswWfosSequencerTest extends EswTestKit(EventServer, MachineAgent) {
 
       //********************************************************************
 
-      //spawn esw and iris sequencer
+      //spawn esw and wfos sequencer
       agentClient.spawnSequenceComponent(seqComponentName1, Some(ScriptVersion.value)).futureValue
       agentClient.spawnSequenceComponent(seqComponentName2, Some(ScriptVersion.value)).futureValue
 
