@@ -22,7 +22,7 @@ import java.io.Closeable
 import java.nio.file.Paths
 import scala.concurrent.duration.DurationInt
 
-class EswSequencerTest extends EswTestKit(EventServer, MachineAgent) {
+class EswIrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
 
   override implicit def patienceConfig: PatienceConfig = PatienceConfig(1.minute, 100.millis)
 

@@ -4,5 +4,5 @@ ROOT="$(
     pwd -P
 )"
 ESW_VERSION=bb819c0
-SEQ_SCRIPT_VERSION=81de9b1
+SEQ_SCRIPT_VERSION=b3d5d1e
 cs launch esw-services:$ESW_VERSION -- start-eng-ui-services --scripts-version $SEQ_SCRIPT_VERSION --obs-mode-config $ROOT/../sample-configs/smObsModeConfig.conf

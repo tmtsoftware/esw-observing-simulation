@@ -1,0 +1,208 @@
+[
+  {
+    "_type": "Setup",
+    "source": "ESW.WFOS_Science",
+    "commandName": "observationStart",
+    "maybeObsId": "2020A-001-123",
+    "paramSet": []
+  },
+  {
+    "_type": "Setup",
+    "source": "ESW.WFOS_Science",
+    "commandName": "preset",
+    "maybeObsId": "2020A-001-123",
+    "paramSet": [
+      {
+        "ChoiceKey": {
+          "keyName": "blueFilter",
+          "values": [
+            "fused-silica"
+          ],
+          "units": "NoUnits"
+        }
+      }
+    ]
+  },
+  {
+    "_type": "Observe",
+    "source": "ESW.WFOS_Science",
+    "commandName": "coarseAcquisition",
+    "maybeObsId": "2020A-001-123",
+    "paramSet": [
+      {
+        "StringKey": {
+          "keyName": "directory",
+          "values": [
+            "/tmp"
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "IntKey": {
+          "keyName": "blueNumRamps",
+          "values": [
+            2
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "StringKey": {
+          "keyName": "blueExposureType",
+          "values": [
+            "SKY"
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "IntKey": {
+          "keyName": "blueIntegrationTime",
+          "values": [
+            2000
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "StringKey": {
+          "keyName": "blueExposureId",
+          "values": [
+            "2020A-001-123-IRIS-BLU-SKY1-0002"
+          ],
+          "units": "NoUnits"
+        }
+      }
+    ]
+  },
+  {
+    "_type": "Observe",
+    "source": "ESW.WFOS_Science",
+    "commandName": "fineAcquisition",
+    "maybeObsId": "2020A-001-123",
+    "paramSet": []
+  },
+  {
+    "_type": "Setup",
+    "source": "ESW.WFOS_Science",
+    "commandName": "setupObservation",
+    "maybeObsId": "2020A-001-123",
+    "paramSet": [
+      {
+        "ChoiceKey": {
+          "keyName": "blueFilter",
+          "values": [
+            "fused-silica"
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "ChoiceKey": {
+          "keyName": "redFilter",
+          "values": [
+            "z'"
+          ],
+          "units": "NoUnits"
+        }
+      }
+    ]
+  },
+  {
+    "_type": "Observe",
+    "source": "ESW.WFOS_Science",
+    "commandName": "observe",
+    "maybeObsId": "2020A-001-123",
+    "paramSet": [
+      {
+        "StringKey": {
+          "keyName": "redExposureType",
+          "values": [
+            "SKY"
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "StringKey": {
+          "keyName": "directory",
+          "values": [
+            "/tmp"
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "IntKey": {
+          "keyName": "blueNumRamps",
+          "values": [
+            2
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "IntKey": {
+          "keyName": "redNumRamps",
+          "values": [
+            2
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "IntKey": {
+          "keyName": "blueIntegrationTime",
+          "values": [
+            2000
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "StringKey": {
+          "keyName": "blueExposureId",
+          "values": [
+            "2020A-001-123-IRIS-BLU-SKY1-0002"
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "IntKey": {
+          "keyName": "redIntegrationTime",
+          "values": [
+            2000
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "StringKey": {
+          "keyName": "redExposureId",
+          "values": [
+            "2020A-001-123-IRIS-BLU-SKY1-0002"
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "StringKey": {
+          "keyName": "blueExposureType",
+          "values": [
+            "SKY"
+          ],
+          "units": "NoUnits"
+        }
+      }
+    ]
+  },
+  {
+    "_type": "Setup",
+    "source": "ESW.WFOS_Science",
+    "commandName": "observationEnd",
+    "maybeObsId": "2020A-001-123",
+    "paramSet": []
+  }
+]

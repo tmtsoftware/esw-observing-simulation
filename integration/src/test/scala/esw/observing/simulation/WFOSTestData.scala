@@ -40,7 +40,7 @@ object WFOSTestData {
   val obsId: Option[ObsId]          = Some(ObsId("2020A-001-123"))
   val directoryP: Parameter[String] = StringKey.make("directory").set("/tmp")
 
-  val exposureIdStr: String = "2020A-001-123-IRIS-BLU-SKY1-0002"
+  val exposureIdStr: String                = "2020A-001-123-IRIS-BLU-SKY1-0002"
   val blueExposureIdP: Parameter[String]   = StringKey.make("blueExposureId").set(exposureIdStr)
   val blueIntegrationTimeP: Parameter[Int] = IntKey.make("blueIntegrationTime").set(2000)
   val blueNumRampsP: Parameter[Int]        = IntKey.make("blueNumRamps").set(2)
@@ -49,7 +49,7 @@ object WFOSTestData {
   val redIntegrationTimeP: Parameter[Int] = IntKey.make("redIntegrationTime").set(2000)
   val redNumRampsP: Parameter[Int]        = IntKey.make("redNumRamps").set(2)
 
-  private val wfosSourcePrefix: Prefix = Prefix("ESW.wfos_science")
+  private val wfosSourcePrefix: Prefix = Prefix("ESW.WFOS_Science")
 
   val setupAcquisition: Setup = Setup(wfosSourcePrefix, CommandName("setupAcquisition"), obsId).add(
     blueFilterKey.set("g'")
