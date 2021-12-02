@@ -117,6 +117,8 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       //assert events for singleExposure
       assertDetectorEvents(imagerDetectorTestProbe, "/tmp", ExposureId("2020A-001-123-IRIS-IMG-DRK1-0023"))
       assertDetectorEvents(ifsDetectorTestProbe, "/tmp", ExposureId("2020A-001-123-IRIS-IMG-DRK1-0023"))
+
+      assertAdcShutdown(imagerAdcTestProbe)
     }
   }
 
@@ -174,6 +176,24 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       isOnTarget shouldBe true
     }
   }
+  private def assertAdcShutdown(testProbe: TestProbe[Event]): Unit = {
+    eventually {
+      val stateEvent = testProbe.expectMessageType[SystemEvent]
+      stateEvent.eventName shouldBe TestData.ImagerADCStateEventName
+      val prismCurrentState = stateEvent(TestData.adcPrismStateKey).head.name
+      val isOnTarget        = stateEvent(TestData.adcPrismOnTargetKey).head
+      prismCurrentState shouldBe "STOPPED"
+      isOnTarget shouldBe true
+    }
+
+    eventually {
+      val retractEvent = testProbe.expectMessageType[SystemEvent]
+      retractEvent.eventName shouldBe TestData.ImagerADCRetractEventName
+      val prismCurrentState = retractEvent(TestData.adcPrismRetractKey).head.name
+      prismCurrentState shouldBe "OUT"
+    }
+  }
+
   private def assertAdcPrism(testProbe: TestProbe[Event], acquisition: Boolean, targetAngle: Double): Unit = {
 
     // initially prism is stopped & on target

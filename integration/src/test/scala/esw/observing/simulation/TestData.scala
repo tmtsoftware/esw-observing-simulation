@@ -195,14 +195,6 @@ object TestData {
     singleExposure,
     setupObservation,
     singleExposure,
-    observationEnd,
-    observationStart,
-    setupAcquisition,
-    acquisitionExposure,
-    setupObservation,
-    singleExposure,
-    setupObservation,
-    singleExposure,
     observationEnd
   )
 
