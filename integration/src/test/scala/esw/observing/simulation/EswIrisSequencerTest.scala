@@ -58,7 +58,7 @@ class EswIrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
    command to downstream sequencer i.e. IRIS in our case. Now, IRIS sequencer send commands to respective assemblies.
    We subscribe and validate all observe events are published by ESW sequencer and in correct order.
    */
-  "EswSequencer" must {
+  "Iris top level esw sequencer" must {
     "handle the submitted sequence | ESW-554, ESW-82" in {
 
       val containerConfPath = Paths.get(getClass.getResource("/IrisContainer.conf").toURI)
@@ -121,6 +121,7 @@ class EswIrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
     }
   }
 
+  //ESW-82
   private def assertObserveEvents(testProbe: TestProbe[Event]) = {
     //sequence : eswObservationStart,preset,coarseAcquisition,fineAcquisition,setupObservation,observe,observationEnd
 

@@ -59,7 +59,7 @@ class EswWfosSequencerTest extends EswTestKit(EventServer, MachineAgent) {
    We subscribe and validate all observe events are published by ESW sequencer and in correct order.
    */
   "Wfos top level esw sequencer" must {
-    "handle the submitted sequence | ESW-564" in {
+    "handle the submitted sequence | ESW-564, ESW-82" in {
 
       val containerConfPath = Paths.get(getClass.getResource("/WfosContainer.conf").toURI)
 
@@ -126,6 +126,7 @@ class EswWfosSequencerTest extends EswTestKit(EventServer, MachineAgent) {
     }
   }
 
+  //ESW-82
   private def assertObserveEvents(testProbe: TestProbe[Event]) = {
     //sequence : eswObservationStart,preset,coarseAcquisition,fineAcquisition,setupObservation,observe,observationEnd
 
