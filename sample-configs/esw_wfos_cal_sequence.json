@@ -40,32 +40,6 @@
     ]
   },
   {
-    "_type": "Setup",
-    "source": "ESW.WFOS_Cal",
-    "commandName": "setupObservation",
-    "maybeObsId": "2020A-001-123",
-    "paramSet": [
-      {
-        "ChoiceKey": {
-          "keyName": "blueFilter",
-          "values": [
-            "fused-silica"
-          ],
-          "units": "NoUnits"
-        }
-      },
-      {
-        "ChoiceKey": {
-          "keyName": "redFilter",
-          "values": [
-            "z'"
-          ],
-          "units": "NoUnits"
-        }
-      }
-    ]
-  },
-  {
     "_type": "Observe",
     "source": "ESW.WFOS_Cal",
     "commandName": "observe",

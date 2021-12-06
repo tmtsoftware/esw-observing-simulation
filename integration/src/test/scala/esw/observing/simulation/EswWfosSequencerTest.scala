@@ -120,63 +120,68 @@ class EswWfosSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       val initialSubmitRes = sequencerApi.submit(WFOSTestData.eswSequence).futureValue
       initialSubmitRes shouldBe a[CommandResponse.Started]
 
-      assertObserveEvents(dmsConsumerProbe)
-      assertDetectorEvents(wfosBlueDetectorTestProbe, "/tmp", ExposureId("2020A-001-123-IRIS-BLU-SKY1-0002"))
-      assertDetectorEvents(wfosRedDetectorTestProbe, "/tmp", ExposureId("2020A-001-123-IRIS-RED-SKY1-0002"))
+      assertObserveEvents(dmsConsumerProbe, wfosBlueDetectorTestProbe, wfosRedDetectorTestProbe)
     }
   }
 
   //ESW-82
-  private def assertObserveEvents(testProbe: TestProbe[Event]) = {
+  private def assertObserveEvents(
+      seqTestProbe: TestProbe[Event],
+      blueTestProbe: TestProbe[Event],
+      redTesProbe: TestProbe[Event]
+  ) = {
     //sequence : eswObservationStart,preset,coarseAcquisition,fineAcquisition,setupObservation,observe,observationEnd
 
     eventually {
-      val event = testProbe.expectMessageType[ObserveEvent]
+      val event = seqTestProbe.expectMessageType[ObserveEvent]
       event.eventName.name shouldBe ObserveEventNames.ObservationStart.name
     }
 
     eventually {
-      val event = testProbe.expectMessageType[ObserveEvent]
+      val event = seqTestProbe.expectMessageType[ObserveEvent]
       event.eventName.name shouldBe ObserveEventNames.PresetStart.name
     }
 
     eventually {
-      val event = testProbe.expectMessageType[ObserveEvent]
+      val event = seqTestProbe.expectMessageType[ObserveEvent]
       event.eventName.name shouldBe ObserveEventNames.PresetEnd.name
     }
 
     eventually {
-      val event = testProbe.expectMessageType[ObserveEvent]
+      val event = seqTestProbe.expectMessageType[ObserveEvent]
       event.eventName.name shouldBe ObserveEventNames.GuidestarAcqStart.name
     }
 
     eventually {
-      val event = testProbe.expectMessageType[ObserveEvent]
+      val event = seqTestProbe.expectMessageType[ObserveEvent]
       event.eventName.name shouldBe ObserveEventNames.GuidestarAcqEnd.name
     }
 
     eventually {
-      val event = testProbe.expectMessageType[ObserveEvent]
+      val event = seqTestProbe.expectMessageType[ObserveEvent]
       event.eventName.name shouldBe ObserveEventNames.ScitargetAcqStart.name
     }
 
     eventually {
-      val event = testProbe.expectMessageType[ObserveEvent]
+      val event = seqTestProbe.expectMessageType[ObserveEvent]
       event.eventName.name shouldBe ObserveEventNames.ScitargetAcqEnd.name
     }
 
     eventually {
-      val event = testProbe.expectMessageType[ObserveEvent]
+      val event = seqTestProbe.expectMessageType[ObserveEvent]
       event.eventName.name shouldBe ObserveEventNames.ObserveStart.name
     }
 
+    assertDetectorEvents(blueTestProbe, "/tmp", ExposureId("2020A-001-123-IRIS-BLU-SKY1-0002"))
+    assertDetectorEvents(redTesProbe, "/tmp", ExposureId("2020A-001-123-IRIS-RED-SKY1-0002"))
+
     eventually {
-      val event = testProbe.expectMessageType[ObserveEvent]
+      val event = seqTestProbe.expectMessageType[ObserveEvent]
       event.eventName.name shouldBe ObserveEventNames.ObserveEnd.name
     }
 
     eventually {
-      val event = testProbe.expectMessageType[ObserveEvent]
+      val event = seqTestProbe.expectMessageType[ObserveEvent]
       event.eventName.name shouldBe ObserveEventNames.ObservationEnd.name
     }
   }
