@@ -3,6 +3,6 @@ ROOT="$(
     cd "$(dirname "$0")" >/dev/null 2>&1 || exit
     pwd -P
 )"
-ESW_VERSION=bb819c0
-SEQ_SCRIPT_VERSION=b3d5d1e
-cs launch esw-services:$ESW_VERSION -- start-eng-ui-services --scripts-version $SEQ_SCRIPT_VERSION --obs-mode-config $ROOT/../sample-configs/smObsModeConfig.conf
+ESW_VERSION=cd601b9
+SEQ_SCRIPT_VERSION=a145d79
+cs launch esw-services:$ESW_VERSION -- start-eng-ui-services  --scripts-version $SEQ_SCRIPT_VERSION --obs-mode-config $ROOT/../sample-configs/smObsModeConfig.conf

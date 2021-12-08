@@ -40,5 +40,5 @@ bin/
 *.rdb
 .bloop
 metals.sbt
-apps/esw-ocs-eng-ui
-apps/esw-ocs-eng-ui.zip
+apps/esw-ocs-eng-ui*
+apps/*.zip
