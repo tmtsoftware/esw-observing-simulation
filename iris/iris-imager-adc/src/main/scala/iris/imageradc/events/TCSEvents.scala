@@ -8,7 +8,7 @@ import iris.imageradc.Constants.TCSPointingKernelPrefix
 object TCSEvents {
   val posKey: Key[AltAzCoord]         = KeyType.AltAzCoordKey.make("pos")
   val MountDemandEventName: EventName = EventName("MountDemandPosition")
-  val MountDemandKey: EventKey             = EventKey(TCSPointingKernelPrefix, MountDemandEventName)
+  val MountDemandKey: EventKey        = EventKey(TCSPointingKernelPrefix, MountDemandEventName)
 
   def make(angle: AltAzCoord): SystemEvent =
     SystemEvent(

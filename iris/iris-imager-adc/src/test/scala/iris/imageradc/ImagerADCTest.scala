@@ -15,10 +15,15 @@ import csw.prefix.models.Subsystem.IRIS
 import csw.testkit.scaladsl.CSWService.EventServer
 import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
 import iris.imageradc.commands.ADCCommand
-import iris.imageradc.events.PrismCurrentEvent.{ImagerADCCurrentEventKey, ImagerADCCurrentEventName, angleErrorKey}
+import iris.imageradc.events.PrismCurrentEvent.{
+  ImagerADCCurrentEventKey,
+  ImagerADCCurrentEventName,
+  angleErrorKey,
+  currentAngleKey,
+  targetAngleKey
+}
 import iris.imageradc.events.PrismRetractEvent.{ImagerADCRetractEventKey, ImagerADCRetractEventName}
 import iris.imageradc.events.PrismStateEvent.{ImagerADCStateEventKey, ImagerADCStateEventName, moveKey, onTargetKey}
-import iris.imageradc.events.PrismTargetEvent.{ImagerADCTargetEventKey, ImagerADCTargetEventName, angleKey}
 import iris.imageradc.events.TCSEvents
 import iris.imageradc.models.PrismState.MOVING
 import iris.imageradc.models.{PrismPosition, PrismState}
@@ -48,7 +53,6 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
     eventService.defaultSubscriber.subscribeActorRef(
       Set(
         ImagerADCStateEventKey,
-        ImagerADCTargetEventKey,
         ImagerADCRetractEventKey,
         ImagerADCCurrentEventKey
       ),
@@ -83,16 +87,16 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
 //        .add(ADCCommand.targetAngleKey.set(50.0))
     val followResponse = commandService.submit(followCommand)
     followResponse.futureValue shouldBe a[Completed]
-    import Angle._
     // simulate tcs event by publishing it
     // this implicitly asserts the subscription
+    import Angle._
     eventService.defaultPublisher.publish(TCSEvents.make(AltAzCoord(BASE, 40.degree, 20.degree)))
 
-    //verify targetAngle is set to 20.0
+    //verify targetAngle is set to 50.0
     eventually {
-      val targetEvent = testProbe.expectMessageType[SystemEvent]
-      targetEvent.eventName shouldBe ImagerADCTargetEventName
-      targetEvent(angleKey).head shouldBe 50.0 // we set target to  90 - alt.degree so here in test, it comes out 50, 90 - 40
+      val currentEvent = testProbe.expectMessageType[SystemEvent]
+      currentEvent.eventName shouldBe ImagerADCCurrentEventName
+      currentEvent(targetAngleKey).head shouldBe 50.0 // we set target to  90 - alt.degree so here in test, it comes out 50, 90 - 40
     }
 
     //verify whether prism has started moving
@@ -108,7 +112,7 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
     eventually {
       val current = testProbe.expectMessageType[SystemEvent]
       current.eventName shouldBe ImagerADCCurrentEventName
-      current(angleKey).head shouldBe 50.0
+      current(currentAngleKey).head shouldBe 50.0
       current(angleErrorKey).head shouldBe 0.0
     }
 
@@ -118,9 +122,8 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
     //assertion to check if prism follows the new target
     eventually {
       val current = testProbe.expectMessageType[SystemEvent]
-      println(current)
       current.eventName shouldBe ImagerADCCurrentEventName
-      current(angleKey).head shouldBe 10.0
+      current(currentAngleKey).head shouldBe 10.0
       current(angleErrorKey).head shouldBe 0.0
     }
 
@@ -164,7 +167,6 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
     eventService.defaultSubscriber.subscribeActorRef(
       Set(
         ImagerADCStateEventKey,
-        ImagerADCTargetEventKey,
         ImagerADCRetractEventKey,
         ImagerADCCurrentEventKey
       ),
