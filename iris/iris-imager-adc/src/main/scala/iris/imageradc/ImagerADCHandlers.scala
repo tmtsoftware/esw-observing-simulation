@@ -5,17 +5,20 @@ import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.AskPattern.Askable
 import akka.util.Timeout
 import csw.command.client.messages.TopLevelActorMessage
+import csw.event.api.scaladsl.EventSubscription
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models.TrackingEvent
 import csw.params.commands.CommandIssue.UnsupportedCommandIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandName, ControlCommand, Setup}
-import csw.params.core.models.Id
+import csw.params.core.models.{Angle, Id}
+import csw.params.events.{Event, ObserveEvent, SystemEvent}
 import csw.time.core.models.UTCTime
 import iris.imageradc.commands.PrismCommands.IsValid
 import iris.imageradc.commands.{ADCCommand, PrismCommands}
 import iris.imageradc.events.PrismStateEvent
+import iris.imageradc.events.TCSEvents.{MountDemandKey, posKey}
 import iris.imageradc.models.{AssemblyConfiguration, PrismState}
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
@@ -26,16 +29,40 @@ class ImagerADCHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
   import cswCtx._
   implicit val a: Scheduler = ctx.system.scheduler
 
-  implicit val ec: ExecutionContext  = ctx.executionContext
-  private val log                    = loggerFactory.getLogger
-  private val adcImagerConfiguration = AssemblyConfiguration(ctx.system.settings.config.getConfig("iris.imager.ADC"))
-  private val adcActor               = ctx.spawnAnonymous(PrismActor.behavior(cswCtx, adcImagerConfiguration, log))
-
+  implicit val ec: ExecutionContext                        = ctx.executionContext
+  private val log                                          = loggerFactory.getLogger
+  private val adcImagerConfiguration                       = AssemblyConfiguration(ctx.system.settings.config.getConfig("iris.imager.ADC"))
+  private val adcActor                                     = ctx.spawnAnonymous(PrismActor.behavior(cswCtx, adcImagerConfiguration, log))
+  private var eventSubscription: Option[EventSubscription] = None
   override def initialize(): Unit = {
     log.info("Initializing imager.adc...")
     cswCtx.eventService.defaultPublisher.publish(
       PrismStateEvent.make(PrismState.STOPPED, onTarget = true)
     )
+  }
+
+  private def subscribeToTCSEvents(): Unit = {
+    if (eventSubscription.isEmpty)
+      eventSubscription = Some(cswCtx.eventService.defaultSubscriber.subscribeCallback(Set(MountDemandKey), onEvent))
+  }
+
+  private def unSubscribeTCSEvents(): Unit = {
+    eventSubscription.foreach(s => s.unsubscribe())
+  }
+
+  private def onEvent(event: Event): Unit = {
+    import Angle._
+    event match {
+      case e: SystemEvent =>
+        e.eventKey match {
+          case MountDemandKey =>
+            val altAzCoordDemand = e(posKey).head
+            val targetAngle      = (90.degree - altAzCoordDemand.alt).toDegree
+            adcActor ! PrismCommands.PrismFollow(targetAngle)
+          case _ => log.warn("Unexpected event received.")
+        }
+      case _: ObserveEvent => log.warn("Unexpected ObserveEvent received.")
+    }
   }
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {}
@@ -55,7 +82,7 @@ class ImagerADCHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
 
   override def onOneway(runId: Id, controlCommand: ControlCommand): Unit = {}
 
-  override def onShutdown(): Unit = {}
+  override def onShutdown(): Unit = unSubscribeTCSEvents()
 
   override def onGoOffline(): Unit = {}
 
@@ -75,12 +102,8 @@ class ImagerADCHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
             Started(runId)
         }
       case ADCCommand.PrismFollow =>
-        ADCCommand.getTargetAngle(setup) match {
-          case Left(commandIssue) => Invalid(runId, commandIssue)
-          case Right(value) =>
-            adcActor ! PrismCommands.PrismFollow(value)
-            Completed(runId)
-        }
+        subscribeToTCSEvents()
+        Completed(runId)
 
       case ADCCommand.PrismStop =>
         adcActor ! PrismCommands.PrismStop(runId)
@@ -104,14 +127,8 @@ class ImagerADCHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
           case Right(_) =>
             sendIsValid
         }
-      case ADCCommand.PrismFollow =>
-        ADCCommand.getTargetAngle(setup) match {
-          case Left(commandIssue) =>
-            log.error(s"Failed to retrieve target angle, reason: ${commandIssue.reason}")
-            Invalid(runId, commandIssue)
-          case Right(_) => sendIsValid
-        }
-      case _ => sendIsValid
+      case ADCCommand.PrismFollow => sendIsValid
+      case _                      => sendIsValid
     }
   }
 

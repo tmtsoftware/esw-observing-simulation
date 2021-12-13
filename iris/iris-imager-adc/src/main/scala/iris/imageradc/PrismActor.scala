@@ -18,7 +18,7 @@ import iris.imageradc.models.{AssemblyConfiguration, PrismAngle, PrismPosition, 
 
 class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfiguration, logger: Logger) {
   private val targetVelocity: Double = adcImagerConfiguration.targetMovementAngle
-  private val tolerance: BigDecimal  = 0.2
+  private val tolerance: BigDecimal  = adcImagerConfiguration.toleranceAngle
   private val prismAngle             = new PrismAngle(0.0, BigDecimal(targetVelocity), BigDecimal(targetVelocity), tolerance)
   private val timeServiceScheduler   = cswContext.timeServiceScheduler
   private val crm                    = cswContext.commandResponseManager

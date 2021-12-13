@@ -8,6 +8,6 @@ import csw.prefix.models.Subsystem.{IRIS, TCS}
 
 object Constants {
   val ImagerADCAssemblyPrefix: Prefix             = Prefix(IRIS, "imager.adc")
-  val TCSPrefix: Prefix                           = Prefix(TCS, "mcs")
+  val TCSPointingKernelPrefix: Prefix             = Prefix(TCS, "PointingKernelAssembly")
   val ImagerADCAssemblyConnection: AkkaConnection = AkkaConnection(ComponentId(ImagerADCAssemblyPrefix, Assembly))
 }

@@ -7,6 +7,8 @@ import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{ComponentId, ComponentType}
 import csw.params.commands.CommandResponse.{Completed, Invalid, Started}
 import csw.params.commands.Setup
+import csw.params.core.models.Angle
+import csw.params.core.models.Coords.{AltAzCoord, BASE}
 import csw.params.events.{Event, SystemEvent}
 import csw.prefix.models.Prefix
 import csw.prefix.models.Subsystem.IRIS
@@ -17,6 +19,7 @@ import iris.imageradc.events.PrismCurrentEvent.{ImagerADCCurrentEventKey, Imager
 import iris.imageradc.events.PrismRetractEvent.{ImagerADCRetractEventKey, ImagerADCRetractEventName}
 import iris.imageradc.events.PrismStateEvent.{ImagerADCStateEventKey, ImagerADCStateEventName, moveKey, onTargetKey}
 import iris.imageradc.events.PrismTargetEvent.{ImagerADCTargetEventKey, ImagerADCTargetEventName, angleKey}
+import iris.imageradc.events.TCSEvents
 import iris.imageradc.models.PrismState.MOVING
 import iris.imageradc.models.{PrismPosition, PrismState}
 import org.scalatest.funsuite.AnyFunSuiteLike
@@ -33,7 +36,7 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
     spawnStandalone(com.typesafe.config.ConfigFactory.load("ImagerADCStandalone.conf"))
   }
 
-  test("ADC Assembly behaviour | ESW-547") {
+  test("ADC Assembly behaviour | ESW-547, ESW-566") {
     implicit val patienceConfig: PatienceConfig = PatienceConfig(10.seconds)
     val sequencerPrefix                         = Prefix(IRIS, "darknight")
     val connection                              = AkkaConnection(ComponentId(Prefix("IRIS.imager.adc"), ComponentType.Assembly))
@@ -76,15 +79,20 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
     }
     //Send Follow command to prism with target angle. This command is immediately completed.
     val followCommand =
-      Setup(sequencerPrefix, ADCCommand.PrismFollow, None).add(ADCCommand.targetAngleKey.set(50.0))
+      Setup(sequencerPrefix, ADCCommand.PrismFollow, None)
+//        .add(ADCCommand.targetAngleKey.set(50.0))
     val followResponse = commandService.submit(followCommand)
     followResponse.futureValue shouldBe a[Completed]
+    import Angle._
+    // simulate tcs event by publishing it
+    // this implicitly asserts the subscription
+    eventService.defaultPublisher.publish(TCSEvents.make(AltAzCoord(BASE, 40.degree, 20.degree)))
 
     //verify targetAngle is set to 20.0
     eventually {
       val targetEvent = testProbe.expectMessageType[SystemEvent]
       targetEvent.eventName shouldBe ImagerADCTargetEventName
-      targetEvent(angleKey).head shouldBe 50.0
+      targetEvent(angleKey).head shouldBe 50.0 // we set target to  90 - alt.degree so here in test, it comes out 50, 90 - 40
     }
 
     //verify whether prism has started moving
@@ -104,15 +112,13 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
       current(angleErrorKey).head shouldBe 0.0
     }
 
-    //assertion to check if prism takes another follow command in moving state
-    val followCommand1 =
-      Setup(sequencerPrefix, ADCCommand.PrismFollow, None).add(ADCCommand.targetAngleKey.set(10.0))
-    val followResponse1 = commandService.submit(followCommand1)
-    followResponse1.futureValue shouldBe a[Completed]
+    // update target to 10 degrees (90 - 80)
+    eventService.defaultPublisher.publish(TCSEvents.make(AltAzCoord(BASE, 80.degree, 50.degree)))
 
     //assertion to check if prism follows the new target
     eventually {
       val current = testProbe.expectMessageType[SystemEvent]
+      println(current)
       current.eventName shouldBe ImagerADCCurrentEventName
       current(angleKey).head shouldBe 10.0
       current(angleErrorKey).head shouldBe 0.0
