@@ -11,6 +11,7 @@ cd $ROOT/../apps
 
 
 ## use following for installing latest eng-ui
+rm -rf esw-ocs-eng-ui
 curl -L -O https://github.com/tmtsoftware/esw-ocs-eng-ui/archive/refs/heads/main.zip
 unzip -o main.zip
 cd esw-ocs-eng-ui-main && npm install && npm run build
