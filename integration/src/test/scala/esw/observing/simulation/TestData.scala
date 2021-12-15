@@ -1,5 +1,6 @@
 package esw.observing.simulation
 
+import csw.location.api.models.ComponentType.Assembly
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{ComponentId, ComponentType}
 import csw.params.commands.{CommandName, Observe, Sequence, Setup}
@@ -7,7 +8,7 @@ import csw.params.core.generics.KeyType._
 import csw.params.core.generics.{GChoiceKey, Key, Parameter}
 import csw.params.core.models.{Choice, Choices, ObsId, Units}
 import csw.params.events.{EventKey, EventName, ObserveEventNames}
-import csw.prefix.models.Subsystem.{Container, IRIS}
+import csw.prefix.models.Subsystem.{Container, IRIS, TCS}
 import csw.prefix.models.{Prefix, Subsystem}
 
 object TestData {
@@ -36,11 +37,12 @@ object TestData {
   val IfsScaleP: Parameter[Choice] = ChoiceKey.make("scale", Units.marcsec, ifsScaleChoices).set("9")
 
   // adc
-  val adcPrismRetractKey: GChoiceKey     = ChoiceKey.make("position", Choices.from("IN", "OUT"))
-  val adcPrismStateKey: GChoiceKey       = ChoiceKey.make("move", Choices.from("MOVING", "STOPPED"))
-  val adcPrismAngleKey: Key[Double]      = DoubleKey.make("angle")
-  val adcPrismAngleErrorKey: Key[Double] = DoubleKey.make("angle_error")
-  val adcPrismOnTargetKey: Key[Boolean]  = BooleanKey.make("onTarget")
+  val adcPrismRetractKey: GChoiceKey      = ChoiceKey.make("position", Choices.from("IN", "OUT"))
+  val adcPrismStateKey: GChoiceKey        = ChoiceKey.make("move", Choices.from("MOVING", "STOPPED"))
+  val adcPrismAngleKey: Key[Double]       = DoubleKey.make("currentAngle")
+  val adcPrismTargetAngleKey: Key[Double] = DoubleKey.make("targetAngle")
+  val adcPrismAngleErrorKey: Key[Double]  = DoubleKey.make("errorAngle")
+  val adcPrismOnTargetKey: Key[Boolean]   = BooleanKey.make("onTarget")
 
   val scienceAdcFollowP: Parameter[Boolean] = BooleanKey.make("scienceAdcFollow").set(true)
   val scienceAdcTargetKey: Key[Double]      = DoubleKey.make("scienceAdcTarget")
@@ -104,8 +106,6 @@ object TestData {
   val ImagerADCAssemblyPrefix: Prefix      = Prefix(IRIS, "imager.adc")
   val ImagerADCStateEventName: EventName   = EventName("prism_state")
   val ImagerADCStateEventKey: EventKey     = EventKey(ImagerADCAssemblyPrefix, ImagerADCStateEventName)
-  val ImagerADCTargetEventName: EventName  = EventName("prism_target")
-  val ImagerADCTargetEventKey: EventKey    = EventKey(ImagerADCAssemblyPrefix, ImagerADCTargetEventName)
   val ImagerADCRetractEventName: EventName = EventName("prism_position")
   val ImagerADCRetractEventKey: EventKey   = EventKey(ImagerADCAssemblyPrefix, ImagerADCRetractEventName)
   val ImagerADCCurrentEventName: EventName = EventName("prism_current")
@@ -177,6 +177,10 @@ object TestData {
 
   val irisContainerConnection: AkkaConnection = AkkaConnection(
     ComponentId(Prefix(Container, "IrisContainer"), ComponentType.Container)
+  )
+
+  val tcsPkAssemblyConnection: AkkaConnection = AkkaConnection(
+    ComponentId(Prefix(TCS, "PointingKernelAssembly"), ComponentType.Assembly)
   )
 
   def detectorObsEvents(detectorPrefix: Prefix) = Set(
