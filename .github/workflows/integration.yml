@@ -13,6 +13,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          repository: manish3323/tcs-vslice
+          path: tcs-vslice
       - uses: laughedelic/coursier-setup@v1
         with:
           jvm: 11
@@ -28,6 +31,11 @@ jobs:
           source "/home/runner/.sdkman/bin/sdkman-init.sh"
           sdk install kotlin
           sudo ln -s $(which kotlinc) /usr/local/bin/kotlinc
+
+      - name: Install tcs pk assembly native libs
+        working-directory: tcs-vslice
+        run: |
+          ./install.sh
 
       - name: Build
         working-directory: integration

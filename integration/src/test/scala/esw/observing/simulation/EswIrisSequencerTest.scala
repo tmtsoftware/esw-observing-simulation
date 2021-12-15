@@ -96,6 +96,7 @@ class EswIrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       agentClient.spawnSequenceComponent(seqComponentName1, Some(ScriptVersion.value)).futureValue
       agentClient.spawnSequenceComponent(seqComponentName2, Some(ScriptVersion.value)).futureValue
 
+
       seqComp1Loc = locationService.find(testSeqCompConnection1).futureValue
       seqComp2Loc = locationService.find(testSeqCompConnection2).futureValue
 
