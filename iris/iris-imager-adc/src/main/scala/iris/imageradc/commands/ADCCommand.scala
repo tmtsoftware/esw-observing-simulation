@@ -1,8 +1,7 @@
 package iris.imageradc.commands
 import csw.params.commands.CommandIssue.{MissingKeyIssue, ParameterValueOutOfRangeIssue}
 import csw.params.commands.{CommandIssue, CommandName, Setup}
-import csw.params.core.generics.KeyType.DoubleKey
-import csw.params.core.generics.{GChoiceKey, Key}
+import csw.params.core.generics.GChoiceKey
 import iris.imageradc.models.PrismPosition
 import iris.imageradc.models.PrismPosition.RetractKey
 
