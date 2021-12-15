@@ -107,6 +107,7 @@ class ImagerADCHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
 
       case ADCCommand.PrismStop =>
         adcActor ! PrismCommands.PrismStop(runId)
+        unSubscribeTCSEvents()
         Completed(runId)
       case CommandName(name) => Invalid(runId, UnsupportedCommandIssue(s"Setup command: $name not supported."))
     }

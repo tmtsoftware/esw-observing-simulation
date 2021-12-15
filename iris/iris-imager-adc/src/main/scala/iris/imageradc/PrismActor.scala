@@ -30,6 +30,7 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
     logger.info("Prism is now in Retracted IN position")
     publishPrismState(PrismState.STOPPED)
     publishRetractPosition(PrismPosition.IN)
+    //start subscription
     receiveWithDefaultBehavior("IN") {
       case PrismCommands.RetractSelect(runId, position) =>
         position match {
@@ -37,6 +38,7 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
             crm.updateCommand(Completed(runId))
             Behaviors.same
           case PrismPosition.OUT =>
+            //stop subscription
             startRetracting(runId)(self ! GoingOut)
             goingOut(self)
         }
@@ -62,6 +64,7 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
   private def outAndStopped(self: ActorRef[PrismCommands]): Behavior[PrismCommands] = {
     logger.info("Prism is now in Retracted OUT position")
     publishRetractPosition(PrismPosition.OUT)
+    // stop subscription
     receiveWithDefaultBehavior("OUT") {
       case PrismCommands.RetractSelect(runId, position) =>
         position match {
@@ -96,7 +99,6 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
         prismAngle.nextCurrent()
         logger.info(s"Prism current angle ${prismAngle.currentAngle.toDouble}")
         publishEvent(PrismCurrentEvent.make(prismAngle.currentAngle.toDouble, prismAngle.target.toDouble, getCurrentDiff.toDouble))
-        prismAngle.nextTarget()
         Behaviors.same
     }
   }
@@ -130,7 +132,9 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
 
   private def scheduleJobForPrismMovement(self: ActorRef[PrismCommands]): Cancellable = {
     timeServiceScheduler.schedulePeriodically(adcImagerConfiguration.targetMovementDelay) {
-      self ! PrismCommands.FollowTarget
+      if (getCurrentDiff != 0.0) {
+        self ! PrismCommands.FollowTarget
+      }
     }
   }
 

@@ -23,10 +23,6 @@ class PrismAngle(initialAngle: BigDecimal, defaultSpeed: BigDecimal, targetVeloc
     if ((_targetAngle - _currentAngle).abs <= tolerance) velocity = calculateVelocity(_targetAngle)
   }
 
-  def nextTarget(): Unit = {
-    if (_currentAngle == _targetAngle) _targetAngle += targetVelocity
-  }
-
   private def getToFirstDecimalPoint(value: BigDecimal) = (value % 360).setScale(1, RoundingMode.DOWN)
   private def round(value: BigDecimal) = {
     (360 + getToFirstDecimalPoint(value)) % 360
