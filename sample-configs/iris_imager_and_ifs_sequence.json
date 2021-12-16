@@ -28,15 +28,6 @@
           ],
           "units": "NoUnits"
         }
-      },
-      {
-        "DoubleKey": {
-          "keyName": "scienceAdcTarget",
-          "values": [
-            40.0
-          ],
-          "units": "NoUnits"
-        }
       }
     ]
   },
@@ -74,15 +65,6 @@
           "keyName": "scienceAdcFollow",
           "values": [
             true
-          ],
-          "units": "NoUnits"
-        }
-      },
-      {
-        "DoubleKey": {
-          "keyName": "scienceAdcTarget",
-          "values": [
-            50.0
           ],
           "units": "NoUnits"
         }

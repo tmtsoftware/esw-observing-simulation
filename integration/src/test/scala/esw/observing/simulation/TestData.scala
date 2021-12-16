@@ -1,6 +1,5 @@
 package esw.observing.simulation
 
-import csw.location.api.models.ComponentType.Assembly
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{ComponentId, ComponentType}
 import csw.params.commands.{CommandName, Observe, Sequence, Setup}
@@ -45,7 +44,6 @@ object TestData {
   val adcPrismOnTargetKey: Key[Boolean]   = BooleanKey.make("onTarget")
 
   val scienceAdcFollowP: Parameter[Boolean] = BooleanKey.make("scienceAdcFollow").set(true)
-  val scienceAdcTargetKey: Key[Double]      = DoubleKey.make("scienceAdcTarget")
 
   //***********
   val directoryP: Parameter[String]          = StringKey.make("directory").set("/tmp")
@@ -63,15 +61,13 @@ object TestData {
   val setupAcquisition: Setup = Setup(Prefix("IRIS.Imager"), CommandName("setupAcquisition"), obsId).madd(
     filterKey.set("Ks"),
     scienceAdcFollowP,
-    scienceAdcTargetKey.set(40.0)
   )
 
   val setupObservation: Setup = Setup(Prefix("IRIS.Imager"), CommandName("setupObservation"), obsId).madd(
     filterKey.set("CO"),
     IfsScaleP,
     spectralResolutionP,
-    scienceAdcFollowP,
-    scienceAdcTargetKey.set(50.0)
+    scienceAdcFollowP
   )
 
   val acquisitionExposure: Observe = Observe(Prefix("IRIS.Imager"), CommandName("acquisitionExposure"), obsId).madd(
@@ -119,8 +115,7 @@ object TestData {
 
   val preset: Setup = Setup(eswSequencerPrefix, CommandName("preset"), obsId).madd(
     filterKey.set("Ks"),
-    scienceAdcFollowP,
-    scienceAdcTargetKey.set(40.0)
+    scienceAdcFollowP
   )
 
   private val imagerExposureTypeKey = StringKey.make("imagerExposureType")

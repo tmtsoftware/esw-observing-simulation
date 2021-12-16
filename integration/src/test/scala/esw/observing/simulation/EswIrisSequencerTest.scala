@@ -102,10 +102,10 @@ class EswIrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       seqComp1Loc.isDefined shouldBe true
       seqComp2Loc.isDefined shouldBe true
 
-      val eswSequencerResponse = sequenceComponentUtil.loadScript(Subsystem.ESW, obsMode, seqComp1Loc.get).futureValue
+      val eswSequencerResponse = sequenceComponentUtil.loadScript(Subsystem.ESW, obsMode, None, seqComp1Loc.get).futureValue
       eswSequencerResponse.rightValue shouldBe a[Started]
 
-      val irisSequencerResponse = sequenceComponentUtil.loadScript(Subsystem.IRIS, obsMode, seqComp2Loc.get).futureValue
+      val irisSequencerResponse = sequenceComponentUtil.loadScript(Subsystem.IRIS, obsMode, None, seqComp2Loc.get).futureValue
       irisSequencerResponse.rightValue shouldBe a[Started]
 
       //********************************************************************

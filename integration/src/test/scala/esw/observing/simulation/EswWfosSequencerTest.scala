@@ -103,10 +103,10 @@ class EswWfosSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       seqComp1Loc.isDefined shouldBe true
       seqComp2Loc.isDefined shouldBe true
 
-      val eswSequencerResponse = sequenceComponentUtil.loadScript(Subsystem.ESW, obsMode, seqComp1Loc.get).futureValue
+      val eswSequencerResponse = sequenceComponentUtil.loadScript(Subsystem.ESW, obsMode,None, seqComp1Loc.get).futureValue
       eswSequencerResponse.rightValue shouldBe a[Started]
 
-      val wfosSequencerResponse = sequenceComponentUtil.loadScript(Subsystem.WFOS, obsMode, seqComp2Loc.get).futureValue
+      val wfosSequencerResponse = sequenceComponentUtil.loadScript(Subsystem.WFOS, obsMode,None, seqComp2Loc.get).futureValue
       wfosSequencerResponse.rightValue shouldBe a[Started]
 
       //********************************************************************
