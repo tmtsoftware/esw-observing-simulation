@@ -23,7 +23,6 @@ Repository has the following contents:
 - `sample-configs` folder has sample configuration files which will be used while providing neccessary configs to start simulation
   also these files are for future reference. All these files in production would be present in svn of config service.
 - `apps` & `simulation` folder's has pre-configured setup for starting a simulation. These folders need not require any modification for an observation.
-- `integration` folder has automated integration tests which demonstrates, commands(Setup/Observe) flowing from top level component(esw-sequencer) to the lowest component(assembly).
 
 ## Run complete simulation
 
@@ -52,20 +51,17 @@ Once, everything is up and running, You can login to Eng UI app at this [Browser
 - Click on `ESW.IRIS_ImagerAndIFS` box on Manage Infrastructure page to go to Observation Detail page of `ESW.IRIS_ImagerAndIFS`.
 - On this page `sample-configs/esw_imager_and_ifs_sequence.json` sequence can be loaded using `Load Sequence` submit.
 - Once loaded, User can Start sequence from the left panel on Observation Detail page, and visualise how each steps getting executed.
- 
-## How to run automated test
 
-The following command will execute automated tests in their respective folders.
+### Integration project
+
+`integration` project has automated integration tests which demonstrates, commands(Setup/Observe) flowing from top level component(esw-sequencer) to the lowest component(assembly).
+Following tests inside integration project verifies that the communication is properly happening between the following components.
+- IrisSequencerTest : iris-assemblies <-> iris-sequencer.
+- WfosSequencerTest : wfos-assemblies <-> wfof-sequencer.
+- EswIrisSequencerTest : esw-sequencer <-> iris-sequencer.
+- EswWfosSequencerTest : esw-sequencer <-> iris-sequencer.
+
 > cd ~/esw-observation-simulation/integration
-> 
+>
 > sbt test
 ---
-> cd ~/esw-observation-simulation/iris
-> 
-> sbt test
----
-> cd ~/esw-observation-simulation/wfos
-> 
-> sbt test
-
-
