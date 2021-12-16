@@ -1,14 +1,14 @@
 [
   {
     "_type": "Setup",
-    "source": "ESW.ImagerAndIFS",
+    "source": "ESW.ImagerOnly",
     "commandName": "observationStart",
     "maybeObsId": "2020A-001-123",
     "paramSet": []
   },
   {
     "_type": "Setup",
-    "source": "ESW.ImagerAndIFS",
+    "source": "ESW.ImagerOnly",
     "commandName": "preset",
     "maybeObsId": "2020A-001-123",
     "paramSet": [
@@ -34,7 +34,7 @@
   },
   {
     "_type": "Observe",
-    "source": "ESW.ImagerAndIFS",
+    "source": "ESW.ImagerOnly",
     "commandName": "coarseAcquisition",
     "maybeObsId": "2020A-001-123",
     "paramSet": [
@@ -48,7 +48,7 @@
       {
         "StringKey": {
           "keyName": "imagerExposureType",
-          "values": ["SKY"],
+          "values": ["SCI"],
           "units": "NoUnits"
         }
       },
@@ -70,14 +70,14 @@
   },
   {
     "_type": "Observe",
-    "source": "ESW.ImagerAndIFS",
+    "source": "ESW.ImagerOnly",
     "commandName": "fineAcquisition",
     "maybeObsId": "2020A-001-123",
     "paramSet": []
   },
   {
     "_type": "Setup",
-    "source": "ESW.ImagerAndIFS",
+    "source": "ESW.ImagerOnly",
     "commandName": "setupObservation",
     "maybeObsId": "2020A-001-123",
     "paramSet": [
@@ -99,7 +99,7 @@
   },
   {
     "_type": "Observe",
-    "source": "ESW.ImagerAndIFS",
+    "source": "ESW.ImagerOnly",
     "commandName": "observe",
     "maybeObsId": "2020A-001-123",
     "paramSet": [
@@ -111,27 +111,139 @@
         }
       },
       {
-        "IntKey": {
-          "keyName": "imagerIntegrationTime",
-          "values": [
-            5000
-          ],
+        "StringKey": {
+          "keyName": "imagerExposureType",
+          "values": ["SCI"],
           "units": "NoUnits"
         }
       },
       {
-        "StringKey": {
-          "keyName": "imagerExposureType",
-          "values": ["SKY"],
+        "IntKey": {
+          "keyName": "imagerIntegrationTime",
+          "values": [5000],
           "units": "NoUnits"
         }
       },
       {
         "IntKey": {
           "keyName": "imagerNumRamps",
-          "values": [
-            1
-          ],
+          "values": [1],
+          "units": "NoUnits"
+        }
+      }
+    ]
+  },
+  {
+    "_type": "Setup",
+    "source": "ESW.ImagerOnly",
+    "commandName": "setupObservation",
+    "maybeObsId": "2020A-001-123",
+    "paramSet": [
+      {
+        "ChoiceKey": {
+          "keyName": "filter",
+          "values": ["CO"],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "BooleanKey": {
+          "keyName": "scienceAdcFollow",
+          "values": [true],
+          "units": "NoUnits"
+        }
+      }
+    ]
+  },
+  {
+    "_type": "Observe",
+    "source": "ESW.ImagerOnly",
+    "commandName": "observe",
+    "maybeObsId": "2020A-001-123",
+    "paramSet": [
+      {
+        "StringKey": {
+          "keyName": "directory",
+          "values": ["/tmp/fits"],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "StringKey": {
+          "keyName": "imagerExposureType",
+          "values": ["SCI"],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "IntKey": {
+          "keyName": "imagerIntegrationTime",
+          "values": [5000],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "IntKey": {
+          "keyName": "imagerNumRamps",
+          "values": [1],
+          "units": "NoUnits"
+        }
+      }
+    ]
+  },
+  {
+    "_type": "Setup",
+    "source": "ESW.ImagerOnly",
+    "commandName": "setupObservation",
+    "maybeObsId": "2020A-001-123",
+    "paramSet": [
+      {
+        "ChoiceKey": {
+          "keyName": "filter",
+          "values": ["FeII"],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "BooleanKey": {
+          "keyName": "scienceAdcFollow",
+          "values": [true],
+          "units": "NoUnits"
+        }
+      }
+    ]
+  },
+  {
+    "_type": "Observe",
+    "source": "ESW.ImagerOnly",
+    "commandName": "observe",
+    "maybeObsId": "2020A-001-123",
+    "paramSet": [
+      {
+        "StringKey": {
+          "keyName": "directory",
+          "values": ["/tmp/fits"],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "StringKey": {
+          "keyName": "imagerExposureType",
+          "values": ["SCI"],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "IntKey": {
+          "keyName": "imagerIntegrationTime",
+          "values": [5000],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "IntKey": {
+          "keyName": "imagerNumRamps",
+          "values": [1],
           "units": "NoUnits"
         }
       }
