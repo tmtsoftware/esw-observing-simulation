@@ -4,7 +4,7 @@ This repo is a part of Simulated Observing package.
 
 Simulation for an observation requires sequencer's script written for that particular observation.
 These scripts required for this observation can be found [here](https://github.com/tmtsoftware/sequencer-scripts/tree/esw-observing-simulation).
-The simulation also depends on `TCS` assemblies which are part of separate [repository](https://github.com/tmtsoftware/tcs-vslice).
+The simulation also depends on `TCS` assemblies which are part of separate [repository](https://github.com/tmtsoftware/tcs-vslice-0.4).
 Apart from the scripts & tcs assemblies, All the other components required for the simulation are part of this repository.
 
 Repository has the following contents:
