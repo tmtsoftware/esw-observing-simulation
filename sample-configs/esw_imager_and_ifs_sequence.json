@@ -22,6 +22,20 @@
         }
       },
       {
+        "ChoiceKey": {
+          "keyName": "scale",
+          "values": ["9"],
+          "units": "marcsec"
+        }
+      },
+      {
+        "ChoiceKey": {
+          "keyName": "spectralResolution",
+          "values": ["4000-K"],
+          "units": "NoUnits"
+        }
+      },
+      {
         "BooleanKey": {
           "keyName": "scienceAdcFollow",
           "values": [
@@ -48,7 +62,7 @@
       {
         "StringKey": {
           "keyName": "imagerExposureType",
-          "values": ["SKY"],
+          "values": ["SCI"],
           "units": "NoUnits"
         }
       },
@@ -91,7 +105,7 @@
       {
         "ChoiceKey": {
           "keyName": "scale",
-          "values": ["9"],
+          "values": ["4"],
           "units": "marcsec"
         }
       },
@@ -127,7 +141,7 @@
       {
         "StringKey": {
           "keyName": "ifsExposureType",
-          "values": ["SKY"],
+          "values": ["SCI"],
           "units": "NoUnits"
         }
       },
@@ -156,7 +170,7 @@
       },{
         "StringKey": {
           "keyName": "imagerExposureType",
-          "values": ["SKY"],
+          "values": ["SCI"],
           "units": "NoUnits"
         }
       },
@@ -187,14 +201,14 @@
       {
         "StringKey": {
           "keyName": "ifsExposureType",
-          "values": ["SKY"],
+          "values": ["SCI"],
           "units": "NoUnits"
         }
       },
       {
         "IntKey": {
           "keyName": "ifsIntegrationTime",
-          "values": [5000],
+          "values": [3000],
           "units": "NoUnits"
         }
       },
@@ -209,14 +223,14 @@
         "IntKey": {
           "keyName": "imagerIntegrationTime",
           "values": [
-            5000
+            3000
           ],
           "units": "NoUnits"
         }
       },{
         "StringKey": {
           "keyName": "imagerExposureType",
-          "values": ["SKY"],
+          "values": ["SCI"],
           "units": "NoUnits"
         }
       },
@@ -240,7 +254,7 @@
       {
         "ChoiceKey": {
           "keyName": "filter",
-          "values": ["H"],
+          "values": ["H2"],
           "units": "NoUnits"
         }
       },
@@ -283,7 +297,7 @@
       {
         "StringKey": {
           "keyName": "ifsExposureType",
-          "values": ["SKY"],
+          "values": ["SCI"],
           "units": "NoUnits"
         }
       },
@@ -312,7 +326,7 @@
       },{
         "StringKey": {
           "keyName": "imagerExposureType",
-          "values": ["SKY"],
+          "values": ["SCI"],
           "units": "NoUnits"
         }
       },
@@ -343,14 +357,14 @@
       {
         "StringKey": {
           "keyName": "ifsExposureType",
-          "values": ["SKY"],
+          "values": ["SCI"],
           "units": "NoUnits"
         }
       },
       {
         "IntKey": {
           "keyName": "ifsIntegrationTime",
-          "values": [5000],
+          "values": [3000],
           "units": "NoUnits"
         }
       },
@@ -365,14 +379,14 @@
         "IntKey": {
           "keyName": "imagerIntegrationTime",
           "values": [
-            5000
+            3000
           ],
           "units": "NoUnits"
         }
       },{
         "StringKey": {
           "keyName": "imagerExposureType",
-          "values": ["SKY"],
+          "values": ["SCI"],
           "units": "NoUnits"
         }
       },

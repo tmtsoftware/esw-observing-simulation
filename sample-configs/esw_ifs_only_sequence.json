@@ -48,7 +48,7 @@
       {
         "StringKey": {
           "keyName": "imagerExposureType",
-          "values": ["SKY"],
+          "values": ["SCI"],
           "units": "NoUnits"
         }
       },
@@ -91,7 +91,79 @@
       {
         "ChoiceKey": {
           "keyName": "scale",
-          "values": ["9"],
+          "values": ["25"],
+          "units": "marcsec"
+        }
+      },
+      {
+        "ChoiceKey": {
+          "keyName": "spectralResolution",
+          "values": ["4000-H"],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "BooleanKey": {
+          "keyName": "scienceAdcFollow",
+          "values": [true],
+          "units": "NoUnits"
+        }
+      }
+    ]
+  },
+  {
+    "_type": "Observe",
+    "source": "ESW.IFSOnly",
+    "commandName": "observe",
+    "maybeObsId": "2020A-001-123",
+    "paramSet": [
+      {
+        "StringKey": {
+          "keyName": "directory",
+          "values": ["/tmp/fits"],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "StringKey": {
+          "keyName": "ifsExposureType",
+          "values": ["SCI"],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "IntKey": {
+          "keyName": "ifsIntegrationTime",
+          "values": [5000],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "IntKey": {
+          "keyName": "ifsNumRamps",
+          "values": [1],
+          "units": "NoUnits"
+        }
+      }
+    ]
+  },
+  {
+    "_type": "Setup",
+    "source": "ESW.IFSOnly",
+    "commandName": "setupObservation",
+    "maybeObsId": "2020A-001-123",
+    "paramSet": [
+      {
+        "ChoiceKey": {
+          "keyName": "filter",
+          "values": ["K"],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "ChoiceKey": {
+          "keyName": "scale",
+          "values": ["50"],
           "units": "marcsec"
         }
       },
@@ -127,14 +199,14 @@
       {
         "StringKey": {
           "keyName": "ifsExposureType",
-          "values": ["SKY"],
+          "values": ["SCI"],
           "units": "NoUnits"
         }
       },
       {
         "IntKey": {
           "keyName": "ifsIntegrationTime",
-          "values": [5000],
+          "values": [4000],
           "units": "NoUnits"
         }
       },
