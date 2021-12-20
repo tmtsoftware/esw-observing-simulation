@@ -5,7 +5,8 @@ import csw.location.api.models.{ComponentId, ComponentType}
 import csw.params.commands.{CommandName, Observe, Sequence, Setup}
 import csw.params.core.generics.KeyType._
 import csw.params.core.generics.{GChoiceKey, Key, Parameter}
-import csw.params.core.models.{Choice, Choices, ObsId, Units}
+import csw.params.core.models.Coords.{AltAzCoord, BASE}
+import csw.params.core.models.{Choice, Choices, Coords, ObsId, Units}
 import csw.params.events.{EventKey, EventName, ObserveEventNames}
 import csw.prefix.models.Subsystem.{Container, IRIS, TCS}
 import csw.prefix.models.{Prefix, Subsystem}
@@ -55,12 +56,30 @@ object TestData {
   val ifsNumRampsP: Parameter[Int]           = IntKey.make("ifsNumRamps").set(2)
   val obsId: Option[ObsId]                   = Some(ObsId("2020A-001-123"))
 
+  //TCS Sequencer data
+
+  private val baseCoords: Key[Coords.Coord] = CoordKey.make("baseCoords")
+  private val tcsSequencerPrefix: Prefix    = Prefix("TCS.IRIS_ImagerAndIFS")
+  import csw.params.core.models.Angle._
+  val tcsPreset: Setup = Setup(tcsSequencerPrefix, CommandName("preset"), obsId).madd(
+    baseCoords.set(AltAzCoord(BASE, 90.degree, 60.degree))
+  )
+
+  private val pKey: Key[Float] = FloatKey.make("p")
+  private val qKey: Key[Float] = FloatKey.make("q")
+  val tcsSetupObservation: Setup = Setup(tcsSequencerPrefix, CommandName("setupObservation"), obsId).madd(
+    pKey.set(90.0f),
+    qKey.set(60.0f)
+  )
+
+  //IRIS Sequencer data
+
   val observationStart: Setup = Setup(Prefix("IRIS.Imager"), CommandName("observationStart"), obsId)
   val observationEnd: Setup   = Setup(Prefix("IRIS.Imager"), CommandName("observationEnd"), obsId)
 
   val setupAcquisition: Setup = Setup(Prefix("IRIS.Imager"), CommandName("setupAcquisition"), obsId).madd(
     filterKey.set("Ks"),
-    scienceAdcFollowP,
+    scienceAdcFollowP
   )
 
   val setupObservation: Setup = Setup(Prefix("IRIS.Imager"), CommandName("setupObservation"), obsId).madd(
@@ -86,6 +105,10 @@ object TestData {
     imagerNumRampsP,
     ifsNumRampsP
   )
+
+  val pkAssemblyPrefix: Prefix                = Prefix(Subsystem.TCS, "PointingKernelAssembly")
+  val mountDemandPositionEventName: EventName = EventName("MountDemandPosition")
+  val mountDemandPositionEventKey: EventKey   = EventKey(pkAssemblyPrefix, mountDemandPositionEventName)
 
   val imagerFilterPrefix: Prefix               = Prefix(Subsystem.IRIS, "imager.filter")
   val imagerFilterPositionEventName: EventName = EventName("Wheel1Position")
@@ -174,6 +197,10 @@ object TestData {
     ComponentId(Prefix(Container, "IrisContainer"), ComponentType.Container)
   )
 
+  val tcsContainerConnection: AkkaConnection = AkkaConnection(
+    ComponentId(Prefix(Container, "TcsContainer"), ComponentType.Container)
+  )
+
   val tcsPkAssemblyConnection: AkkaConnection = AkkaConnection(
     ComponentId(Prefix(TCS, "PointingKernelAssembly"), ComponentType.Assembly)
   )
@@ -184,6 +211,11 @@ object TestData {
     EventKey(detectorPrefix, ObserveEventNames.ExposureAborted),
     EventKey(detectorPrefix, ObserveEventNames.DataWriteEnd),
     EventKey(detectorPrefix, ObserveEventNames.DataWriteStart)
+  )
+
+  val tcsSequence: Sequence = Sequence(
+    tcsPreset,
+    tcsSetupObservation
   )
 
   val irisSequence: Sequence = Sequence(
