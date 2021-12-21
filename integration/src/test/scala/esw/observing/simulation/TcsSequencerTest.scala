@@ -5,7 +5,7 @@ import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.LoggerFactory
 import csw.params.commands.CommandResponse
-import csw.params.events._
+import csw.params.events.{Event, SystemEvent}
 import csw.prefix.models.Subsystem.Container
 import csw.prefix.models.{Prefix, Subsystem}
 import csw.testkit.scaladsl.CSWService.EventServer
@@ -23,7 +23,7 @@ import scala.concurrent.duration.DurationInt
 
 class TcsSequencerTest extends EswTestKit(EventServer, MachineAgent) {
 
-  override implicit def patienceConfig: PatienceConfig = PatienceConfig(1.minute, 200.millis)
+  override implicit def patienceConfig: PatienceConfig = PatienceConfig(50.minute, 200.millis)
   lazy val processOutput                               = new ProcessOutput()
   implicit lazy val log: Logger                        = new LoggerFactory(agentSettings.prefix).getLogger
   lazy val processExecutor                             = new ProcessExecutor(processOutput)
@@ -48,7 +48,7 @@ class TcsSequencerTest extends EswTestKit(EventServer, MachineAgent) {
     super.afterAll()
   }
 
-  "TcsSequencer" ignore {
+  "TcsSequencer" must {
     "handle the submitted sequence | ESW-569" in {
 
       val containerConfPath = Paths.get(getClass.getResource("/TcsContainer.conf").toURI)
@@ -64,6 +64,17 @@ class TcsSequencerTest extends EswTestKit(EventServer, MachineAgent) {
         .resolve(TestData.tcsPkAssemblyConnection, 5.seconds)
         .futureValue
         .value
+
+      locationService
+        .resolve(TestData.tcsMcsAssemblyConnection, 5.seconds)
+        .futureValue
+        .value
+
+      locationService
+        .resolve(TestData.tcsEncAssemblyConnection, 5.seconds)
+        .futureValue
+        .value
+
       //********************************************************************
 
       //spawn iris sequencer
@@ -78,21 +89,23 @@ class TcsSequencerTest extends EswTestKit(EventServer, MachineAgent) {
 
       //********************************************************************
 
-      val pkAssemblyTestProbe = createTestProbe(Set(TestData.mountDemandPositionEventKey))
+      val pkAssemblyTestProbe = createTestProbe(
+        Set(TestData.mountDemandPositionEventKey, TestData.encDemandPositionEventKey, TestData.mcsDemandPositionEventKey)
+      )
 
       val sequencerApi     = sequencerClient(Subsystem.TCS, obsMode)
       val initialSubmitRes = sequencerApi.submit(TestData.tcsSequence).futureValue
-      initialSubmitRes shouldBe a[CommandResponse.Started]
+//      initialSubmitRes shouldBe a[CommandResponse.Completed]
       //sequence : preset, setupObservation
 
-      val eventualResponse = sequencerApi.queryFinal(initialSubmitRes.runId)(30.seconds).futureValue
-      eventualResponse shouldBe a[CommandResponse.Completed]
-
-//      eventually {
-//        val event1 = pkAssemblyTestProbe.expectMessageType[SystemEvent]
-//        println("received")
-//        println(event1.toString())
-//      }
+//      val eventualResponse = sequencerApi.queryFinal(initialSubmitRes.runId)(30.seconds).futureValue
+//      eventualResponse shouldBe a[CommandResponse.Completed]
+      Thread.sleep(Int.MaxValue)
+      eventually {
+        val event1 = pkAssemblyTestProbe.expectMessageType[Event]
+        println("received----")
+        println(event1.toString())
+      }
 //
 //      Thread.sleep(20000)
     }
