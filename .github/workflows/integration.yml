@@ -3,9 +3,9 @@ name: integration
 on:
   workflow_dispatch:
   pull_request:
-    branches: [main]
+    branches: [ main ]
   push:
-    branches: [main, 'branch-*']
+    branches: [ main, 'branch-*' ]
 
 jobs:
   build:
@@ -13,6 +13,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          path: main
+
+      - uses: actions/checkout@v2
+        with:
+          repository: tmtsoftware/tcs-vslice-0.4
+          path: tcs-vslice-0.4
+
       - uses: laughedelic/coursier-setup@v1
         with:
           jvm: 11
@@ -29,14 +37,18 @@ jobs:
           sdk install kotlin
           sudo ln -s $(which kotlinc) /usr/local/bin/kotlinc
 
+      - name: Setup OS Libs for TCS Assemblies
+        working-directory: tcs-vslice-0.4
+        run: ./install.sh
+
       - name: Build
-        working-directory: integration
+        working-directory: main/integration
         run: |
           sbtn clean
           sbtn scalafmtCheck
 
       - name: Tests
-        working-directory: integration
+        working-directory: main/integration
         run: sbt -DenableFatalWarnings=true "testOnly esw.observing.simulation.TcsSequencerTest"
 
       - name: Notify slack
