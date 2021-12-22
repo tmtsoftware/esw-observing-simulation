@@ -94,7 +94,7 @@ class TcsSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       val sequencerApi     = sequencerClient(Subsystem.TCS, obsMode)
       val initialSubmitRes = sequencerApi.submit(TestData.tcsSequence).futureValue
       initialSubmitRes shouldBe a[CommandResponse.Started]
-//      sequence : preset, setupObservation
+      //sequence : preset, setupObservation
 
       //Assert MountPosition for setOffset command
       eventually {

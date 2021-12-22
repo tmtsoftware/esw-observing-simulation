@@ -1,4 +1,16 @@
 #!/usr/bin/env bash
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  export INTERFACE_NAME=en0
+  export AAS_INTERFACE_NAME=en0
+else
+  export INTERFACE_NAME=eth0
+  export AAS_INTERFACE_NAME=eth0
+fi
+
+echo "INTERFACE_NAME:"$INTERFACE_NAME
+echo "AAS_INTERFACE_NAME:"$AAS_INTERFACE_NAME
+
 ROOT="$(
     cd "$(dirname "$0")" >/dev/null 2>&1 || exit
     pwd -P
