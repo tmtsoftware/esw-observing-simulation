@@ -16,12 +16,14 @@ ROOT="$(
     pwd -P
 )"
 
+CONTAINER_CONF_PATH=$1
+
 if [[ "$OSTYPE" == "darwin"* ]]; then
 
   cd $ROOT/../../../target
 
   V_SLICE_ZIP=https://github.com/tmtsoftware/tcs-vslice-0.4/releases/download/v0.4/tcs-vslice-04.zip
-  CONTAINER_CONF_PATH=$1
+
 
   if [ -d "tcs-vslice-04" ]
   then
@@ -36,7 +38,6 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 else
   echo $ROOT
   cd $ROOT/../../../../../tcs-vslice-0.4
-  echo "after switching to tcs vslice folder"
-  echo pwd
+  echo "after switching to tcs vslice folder ${PWD}"
   ./install/tcs-vslice-04/bin/tcs-deploy --local $CONTAINER_CONF_PATH
 fi
