@@ -64,11 +64,11 @@ object TestData {
     baseCoords.set(EqCoord("10:11:12", "15:21:22"))
   )
 
-  private val pKey: Key[Float] = FloatKey.make("p")
-  private val qKey: Key[Float] = FloatKey.make("q")
+  private val pKey: Key[Double] = DoubleKey.make("p")
+  private val qKey: Key[Double] = DoubleKey.make("q")
   val tcsSetupObservation: Setup = Setup(tcsSequencerPrefix, CommandName("setupObservation"), obsId).madd(
-    pKey.set(90.0f),
-    qKey.set(60.0f)
+    pKey.set(200.0),
+    qKey.set(100.0)
   )
 
   //IRIS Sequencer data
@@ -105,11 +105,7 @@ object TestData {
     ifsNumRampsP
   )
 
-  val pkAssemblyPrefix: Prefix                = Prefix(Subsystem.TCS, "PointingKernelAssembly")
-  val mountDemandPositionEventName: EventName = EventName("MountDemandPosition")
-  val mountDemandPositionEventKey: EventKey   = EventKey(pkAssemblyPrefix, mountDemandPositionEventName)
-  val mcsDemandPositionEventKey: EventKey     = EventKey(Prefix("TCS.MCSAssembly"), EventName("MountPosition"))
-  val encDemandPositionEventKey: EventKey     = EventKey(Prefix("TCS.ENCAssembly"), EventName("CurrentPosition"))
+  val mcsDemandPositionEventKey: EventKey = EventKey(Prefix("TCS.MCSAssembly"), EventName("MountPosition"))
 
   val imagerFilterPrefix: Prefix               = Prefix(Subsystem.IRIS, "imager.filter")
   val imagerFilterPositionEventName: EventName = EventName("Wheel1Position")
@@ -223,7 +219,8 @@ object TestData {
   )
 
   val tcsSequence: Sequence = Sequence(
-    tcsPreset
+    tcsPreset,
+    tcsSetupObservation
   )
 
   val irisSequence: Sequence = Sequence(

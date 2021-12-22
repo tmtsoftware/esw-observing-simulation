@@ -103,10 +103,10 @@ class EswWfosSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       seqComp1Loc.isDefined shouldBe true
       seqComp2Loc.isDefined shouldBe true
 
-      val eswSequencerResponse = sequenceComponentUtil.loadScript(Subsystem.ESW, obsMode,None, seqComp1Loc.get).futureValue
+      val eswSequencerResponse = sequenceComponentUtil.loadScript(Subsystem.ESW, obsMode, None, seqComp1Loc.get).futureValue
       eswSequencerResponse.rightValue shouldBe a[Started]
 
-      val wfosSequencerResponse = sequenceComponentUtil.loadScript(Subsystem.WFOS, obsMode,None, seqComp2Loc.get).futureValue
+      val wfosSequencerResponse = sequenceComponentUtil.loadScript(Subsystem.WFOS, obsMode, None, seqComp2Loc.get).futureValue
       wfosSequencerResponse.rightValue shouldBe a[Started]
 
       //********************************************************************
@@ -191,26 +191,26 @@ class EswWfosSequencerTest extends EswTestKit(EventServer, MachineAgent) {
 
     eventually {
       val event = testProbe.expectMessageType[ObserveEvent]
-      event.eventName.name === ObserveEventNames.ExposureStart.name
+      event.eventName.name shouldBe ObserveEventNames.ExposureStart.name
       ExposureId(event(ObserveEventKeys.exposureId).head) shouldBe exposureId
     }
 
     eventually {
       val event = testProbe.expectMessageType[ObserveEvent]
-      event.eventName.name === ObserveEventNames.ExposureEnd.name
+      event.eventName.name shouldBe ObserveEventNames.ExposureEnd.name
       ExposureId(event(ObserveEventKeys.exposureId).head) shouldBe exposureId
     }
 
     eventually {
       val event = testProbe.expectMessageType[ObserveEvent]
-      event.eventName.name === ObserveEventNames.DataWriteStart.name
+      event.eventName.name shouldBe ObserveEventNames.DataWriteStart.name
       event(ObserveEventKeys.filename).head shouldBe filename
       ExposureId(event(ObserveEventKeys.exposureId).head) shouldBe exposureId
     }
 
     eventually {
       val event = testProbe.expectMessageType[ObserveEvent]
-      event.eventName.name === ObserveEventNames.DataWriteEnd.name
+      event.eventName.name shouldBe ObserveEventNames.DataWriteEnd.name
       event(ObserveEventKeys.filename).head shouldBe filename
       ExposureId(event(ObserveEventKeys.exposureId).head) shouldBe exposureId
     }
