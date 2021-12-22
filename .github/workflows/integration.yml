@@ -13,13 +13,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-        with:
-          path: main
-
-      - uses: actions/checkout@v2
-        with:
-          repository: tmtsoftware/tcs-vslice-0.4
-          path: tcs-vslice-0.4
 
       - uses: laughedelic/coursier-setup@v1
         with:
@@ -37,19 +30,15 @@ jobs:
           sdk install kotlin
           sudo ln -s $(which kotlinc) /usr/local/bin/kotlinc
 
-      - name: Setup OS Libs for TCS Assemblies
-        working-directory: tcs-vslice-0.4
-        run: ./install.sh
-
       - name: Build
-        working-directory: main/integration
+        working-directory: integration
         run: |
           sbtn clean
           sbtn scalafmtCheck
 
       - name: Tests
-        working-directory: main/integration
-        run: sbt -DenableFatalWarnings=true "testOnly esw.observing.simulation.TcsSequencerTest"
+        working-directory: integration
+        run: sbt -DenableFatalWarnings=true test:test
 
       - name: Notify slack
         if: always()

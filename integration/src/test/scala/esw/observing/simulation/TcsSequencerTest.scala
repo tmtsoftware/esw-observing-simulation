@@ -48,7 +48,7 @@ class TcsSequencerTest extends EswTestKit(EventServer, MachineAgent) {
     super.afterAll()
   }
 
-  "TcsSequencer" must {
+  "TcsSequencer" ignore {
     "handle the submitted sequence | ESW-569" in {
 
       val containerConfPath = Paths.get(getClass.getResource("/TcsContainer.conf").toURI)
