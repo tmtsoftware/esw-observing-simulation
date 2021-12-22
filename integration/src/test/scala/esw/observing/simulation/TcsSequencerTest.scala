@@ -96,13 +96,13 @@ class TcsSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       initialSubmitRes shouldBe a[CommandResponse.Started]
       //sequence : preset, setupObservation
 
-      //Assert MountPosition for setOffset command
+      //Assert MountPosition for SlewToTarget command
       eventually {
         val event = pkAssemblyTestProbe.expectMessageType[SystemEvent]
         event.eventName.name shouldBe "MountPosition"
       }
 
-      //Assert MountPosition for setOffset command
+      //Assert MountPosition for SetOffset command
       eventually {
         val event = pkAssemblyTestProbe.expectMessageType[SystemEvent]
         event.eventName.name shouldBe "MountPosition"
