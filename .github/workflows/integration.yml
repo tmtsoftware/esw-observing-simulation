@@ -38,15 +38,8 @@ jobs:
 
       - name: Check port
         run: |
-          echo "CHECKING IF FREE PORT:6379"
-          ps aux | grep 6379
-          echo "CHECKING IF FREE PORT:6380"
-          ps aux | grep 6380
           sudo service redis-server stop
-          echo "CHECKING IF FREE PORT with sudo:6379"
-          ps aux | grep 6379
-          killall redis-server
-          echo "CHECKING IF FREE PORT with kill:6379"
+          echo "CHECKING IF FREE PORT:6379"
           ps aux | grep 6379
 
       - name: Tests
