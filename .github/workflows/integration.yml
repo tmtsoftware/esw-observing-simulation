@@ -36,6 +36,13 @@ jobs:
           sbtn clean
           sbtn scalafmtCheck
 
+      -name: Check port
+        run: |
+          echo "CHECKING IF FREE PORT:6379"
+          ps aux | grep 6379
+          echo "CHECKING IF FREE PORT:6380"
+          ps aux | grep 6380
+
       - name: Tests
         working-directory: integration
         run: sbt -DenableFatalWarnings=true test:test
