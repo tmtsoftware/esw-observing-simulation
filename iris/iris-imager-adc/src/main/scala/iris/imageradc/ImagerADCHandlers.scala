@@ -47,7 +47,8 @@ class ImagerADCHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
   }
 
   private def unSubscribeTCSEvents(): Unit = {
-    eventSubscription.foreach(s => s.unsubscribe())
+    eventSubscription.foreach(s => Await.result(s.unsubscribe(), 1.seconds))
+    eventSubscription = None
   }
 
   private def onEvent(event: Event): Unit = {
@@ -106,8 +107,8 @@ class ImagerADCHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
         Completed(runId)
 
       case ADCCommand.PrismStop =>
-        adcActor ! PrismCommands.PrismStop(runId)
         unSubscribeTCSEvents()
+        adcActor ! PrismCommands.PrismStop(runId)
         Completed(runId)
       case CommandName(name) => Invalid(runId, UnsupportedCommandIssue(s"Setup command: $name not supported."))
     }
