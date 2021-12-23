@@ -42,9 +42,6 @@ jobs:
           ps aux | grep 6379
           echo "CHECKING IF FREE PORT:6380"
           ps aux | grep 6380
-          service redis-server stop
-          echo "CHECKING IF FREE PORT without sudo :6379"
-          ps aux | grep 6379
           sudo service redis-server stop
           echo "CHECKING IF FREE PORT with sudo:6379"
           ps aux | grep 6379
