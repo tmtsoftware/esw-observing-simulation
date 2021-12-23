@@ -30,7 +30,7 @@ then
     echo "starting tcs-vslice container"
 else
    echo "downloading.." $V_SLICE_ZIP
-   curl -L -O $V_SLICE_ZIP -o tcs-vslice-04.zip
+   curl -L $V_SLICE_ZIP -o tcs-vslice-04.zip
    unzip -o tcs-vslice-04.zip
 fi
 
