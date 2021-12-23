@@ -89,7 +89,7 @@ class TcsSequencerTest extends EswTestKit(EventServer, MachineAgent) {
 
       //********************************************************************
 
-      val pkAssemblyTestProbe = createTestProbe(Set(TestData.mcsDemandPositionEventKey))
+      val pkAssemblyTestProbe = createTestProbe(Set(TestData.mcsDemandPositionEventKey, TestData.encCurrentPositionEventKey))
 
       val sequencerApi     = sequencerClient(Subsystem.TCS, obsMode)
       val initialSubmitRes = sequencerApi.submit(TestData.tcsSequence).futureValue
@@ -100,6 +100,12 @@ class TcsSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       eventually {
         val event = pkAssemblyTestProbe.expectMessageType[SystemEvent]
         event.eventName.name shouldBe "MountPosition"
+      }
+
+      //Assert CurrentPosition for SlewToTarget command
+      eventually {
+        val event = pkAssemblyTestProbe.expectMessageType[SystemEvent]
+        event.eventName.name shouldBe "CurrentPosition"
       }
 
       //Assert MountPosition for SetOffset command
