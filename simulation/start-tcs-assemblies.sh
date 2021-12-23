@@ -17,10 +17,7 @@ ROOT="$(
     pwd -P
 )"
 
-CONTAINER_CONF_PATH=$1
-
-
-cd $ROOT/../../../target
+cd $ROOT/../
 
 if [ -d "tcs-vslice-04" ]
 then
@@ -31,4 +28,4 @@ else
    unzip -o tcs-vslice-04.zip
 fi
 
-tcs-vslice-04/bin/tcs-deploy --local $CONTAINER_CONF_PATH
+tcs-vslice-04/bin/tcs-deploy --local tcs-vslice-04/conf/McsEncPkContainer.conf

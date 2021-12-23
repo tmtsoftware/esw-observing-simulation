@@ -37,9 +37,9 @@ Run the shell scripts in this order in different terminals.
 3. sh simulation/start-components.sh
     - this scripts starts the container containing all the `WFOS` & `IRIS` assemblies using `esw-agent-akka-app`.
     - this script uses `HostConfig.conf` which has entries of the `IRIS` & `WFOS` container.
-4. To start tcs assemblies, refer the following [document](https://github.com/tmtsoftware/tcs-vslice-0.4#running-the-pk-assembly).
->   ⚠️ `HostConfig.conf` file has a placeholder field `configFilePath` which gets updated according to the **user's working directory** on the very first run of `start-components.sh`, so Do not check in the locally changed `sample-configs/HostConfig.conf`.
-
+>⚠️ `HostConfig.conf` file has a placeholder field `configFilePath` which gets updated according to the **user's working directory** on the very first run of `start-components.sh`, so Do not check in the locally changed `sample-configs/HostConfig.conf`.
+4. sh simulation/start-tcs-assemblies.sh
+    - this download tcs assemblies release zip and start them. For mac users, refer the following for pre-requisites [document](https://github.com/tmtsoftware/tcs-vslice-0.4#macos-12-monterey-intel-homebrew-installation-of-shared-library-dependencies).
 5. sh simulation/start-eng-ui.sh
     - It builds `esw-ocs-eng-ui` app using the latest code from esw-ocs-eng-ui repo & starts serving it on `http:localhost:8000/esw-ocs-eng-ui/` to manage observation from browser.
 
@@ -58,8 +58,9 @@ Once, everything is up and running, You can login to Eng UI app at this [Browser
 Following tests inside integration project verifies that the communication is properly happening between the following components.
 - IrisSequencerTest : iris-assemblies <-> iris-sequencer.
 - WfosSequencerTest : wfos-assemblies <-> wfof-sequencer.
-- EswIrisSequencerTest : esw-sequencer <-> iris-sequencer.
-- EswWfosSequencerTest : esw-sequencer <-> iris-sequencer.
+- TcsSequencerTest : tcs-assemblies <-> tcs-sequencer
+- EswIrisSequencerTest : esw-sequencer <-> iris-sequencer && tcs-sequencer
+- EswWfosSequencerTest : esw-sequencer <-> wfos-sequencer.
 
 > cd ~/esw-observation-simulation/integration
 >

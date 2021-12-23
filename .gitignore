@@ -42,3 +42,5 @@ bin/
 metals.sbt
 apps/esw-ocs-eng-ui*
 apps/*.zip
+
+tcs-vslice-04*
