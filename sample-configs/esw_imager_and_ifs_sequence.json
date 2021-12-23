@@ -24,14 +24,18 @@
       {
         "ChoiceKey": {
           "keyName": "scale",
-          "values": ["9"],
+          "values": [
+            "9"
+          ],
           "units": "marcsec"
         }
       },
       {
         "ChoiceKey": {
           "keyName": "spectralResolution",
-          "values": ["4000-K"],
+          "values": [
+            "4000-K"
+          ],
           "units": "NoUnits"
         }
       },
@@ -40,6 +44,26 @@
           "keyName": "scienceAdcFollow",
           "values": [
             true
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "CoordKey": {
+          "keyName": "targetCoords",
+          "values": [
+            {
+              "_type": "EqCoord",
+              "tag": "BASE",
+              "ra": 864000000000,
+              "dec": 432000000000,
+              "frame": "ICRS",
+              "catalogName": "none",
+              "pm": {
+                "pmx": 0.0,
+                "pmy": 0.0
+              }
+            }
           ],
           "units": "NoUnits"
         }
@@ -55,28 +79,36 @@
       {
         "StringKey": {
           "keyName": "directory",
-          "values": ["/tmp/fits"],
+          "values": [
+            "/tmp/fits"
+          ],
           "units": "NoUnits"
         }
       },
       {
         "StringKey": {
           "keyName": "imagerExposureType",
-          "values": ["SCI"],
+          "values": [
+            "SCI"
+          ],
           "units": "NoUnits"
         }
       },
       {
         "IntKey": {
           "keyName": "imagerIntegrationTime",
-          "values": [5000],
+          "values": [
+            5000
+          ],
           "units": "NoUnits"
         }
       },
       {
         "IntKey": {
           "keyName": "imagerNumRamps",
-          "values": [1],
+          "values": [
+            1
+          ],
           "units": "NoUnits"
         }
       }
@@ -98,28 +130,54 @@
       {
         "ChoiceKey": {
           "keyName": "filter",
-          "values": ["H"],
+          "values": [
+            "H"
+          ],
           "units": "NoUnits"
         }
       },
       {
         "ChoiceKey": {
           "keyName": "scale",
-          "values": ["4"],
+          "values": [
+            "4"
+          ],
           "units": "marcsec"
         }
       },
       {
         "ChoiceKey": {
           "keyName": "spectralResolution",
-          "values": ["4000-K"],
+          "values": [
+            "4000-K"
+          ],
           "units": "NoUnits"
         }
       },
       {
         "BooleanKey": {
           "keyName": "scienceAdcFollow",
-          "values": [true],
+          "values": [
+            true
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "DoubleKey": {
+          "keyName": "p",
+          "values": [
+            200.0
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "DoubleKey": {
+          "keyName": "q",
+          "values": [
+            100.0
+          ],
           "units": "NoUnits"
         }
       }
@@ -134,28 +192,36 @@
       {
         "StringKey": {
           "keyName": "directory",
-          "values": ["/tmp/fits"],
+          "values": [
+            "/tmp/fits"
+          ],
           "units": "NoUnits"
         }
       },
       {
         "StringKey": {
           "keyName": "ifsExposureType",
-          "values": ["SCI"],
+          "values": [
+            "SCI"
+          ],
           "units": "NoUnits"
         }
       },
       {
         "IntKey": {
           "keyName": "ifsIntegrationTime",
-          "values": [5000],
+          "values": [
+            5000
+          ],
           "units": "NoUnits"
         }
       },
       {
         "IntKey": {
           "keyName": "ifsNumRamps",
-          "values": [1],
+          "values": [
+            1
+          ],
           "units": "NoUnits"
         }
       },
@@ -167,10 +233,13 @@
           ],
           "units": "NoUnits"
         }
-      },{
+      },
+      {
         "StringKey": {
           "keyName": "imagerExposureType",
-          "values": ["SCI"],
+          "values": [
+            "SCI"
+          ],
           "units": "NoUnits"
         }
       },
@@ -194,28 +263,36 @@
       {
         "StringKey": {
           "keyName": "directory",
-          "values": ["/tmp/fits"],
+          "values": [
+            "/tmp/fits"
+          ],
           "units": "NoUnits"
         }
       },
       {
         "StringKey": {
           "keyName": "ifsExposureType",
-          "values": ["SCI"],
+          "values": [
+            "SCI"
+          ],
           "units": "NoUnits"
         }
       },
       {
         "IntKey": {
           "keyName": "ifsIntegrationTime",
-          "values": [3000],
+          "values": [
+            3000
+          ],
           "units": "NoUnits"
         }
       },
       {
         "IntKey": {
           "keyName": "ifsNumRamps",
-          "values": [1],
+          "values": [
+            1
+          ],
           "units": "NoUnits"
         }
       },
@@ -227,10 +304,13 @@
           ],
           "units": "NoUnits"
         }
-      },{
+      },
+      {
         "StringKey": {
           "keyName": "imagerExposureType",
-          "values": ["SCI"],
+          "values": [
+            "SCI"
+          ],
           "units": "NoUnits"
         }
       },
@@ -254,28 +334,54 @@
       {
         "ChoiceKey": {
           "keyName": "filter",
-          "values": ["H2"],
+          "values": [
+            "H2"
+          ],
           "units": "NoUnits"
         }
       },
       {
         "ChoiceKey": {
           "keyName": "scale",
-          "values": ["9"],
+          "values": [
+            "9"
+          ],
           "units": "marcsec"
         }
       },
       {
         "ChoiceKey": {
           "keyName": "spectralResolution",
-          "values": ["4000-K"],
+          "values": [
+            "4000-K"
+          ],
           "units": "NoUnits"
         }
       },
       {
         "BooleanKey": {
           "keyName": "scienceAdcFollow",
-          "values": [true],
+          "values": [
+            true
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "DoubleKey": {
+          "keyName": "p",
+          "values": [
+            200.0
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "DoubleKey": {
+          "keyName": "q",
+          "values": [
+            100.0
+          ],
           "units": "NoUnits"
         }
       }
@@ -290,28 +396,36 @@
       {
         "StringKey": {
           "keyName": "directory",
-          "values": ["/tmp/fits"],
+          "values": [
+            "/tmp/fits"
+          ],
           "units": "NoUnits"
         }
       },
       {
         "StringKey": {
           "keyName": "ifsExposureType",
-          "values": ["SCI"],
+          "values": [
+            "SCI"
+          ],
           "units": "NoUnits"
         }
       },
       {
         "IntKey": {
           "keyName": "ifsIntegrationTime",
-          "values": [5000],
+          "values": [
+            5000
+          ],
           "units": "NoUnits"
         }
       },
       {
         "IntKey": {
           "keyName": "ifsNumRamps",
-          "values": [1],
+          "values": [
+            1
+          ],
           "units": "NoUnits"
         }
       },
@@ -323,10 +437,13 @@
           ],
           "units": "NoUnits"
         }
-      },{
+      },
+      {
         "StringKey": {
           "keyName": "imagerExposureType",
-          "values": ["SCI"],
+          "values": [
+            "SCI"
+          ],
           "units": "NoUnits"
         }
       },
@@ -350,28 +467,36 @@
       {
         "StringKey": {
           "keyName": "directory",
-          "values": ["/tmp/fits"],
+          "values": [
+            "/tmp/fits"
+          ],
           "units": "NoUnits"
         }
       },
       {
         "StringKey": {
           "keyName": "ifsExposureType",
-          "values": ["SCI"],
+          "values": [
+            "SCI"
+          ],
           "units": "NoUnits"
         }
       },
       {
         "IntKey": {
           "keyName": "ifsIntegrationTime",
-          "values": [3000],
+          "values": [
+            3000
+          ],
           "units": "NoUnits"
         }
       },
       {
         "IntKey": {
           "keyName": "ifsNumRamps",
-          "values": [1],
+          "values": [
+            1
+          ],
           "units": "NoUnits"
         }
       },
@@ -383,10 +508,13 @@
           ],
           "units": "NoUnits"
         }
-      },{
+      },
+      {
         "StringKey": {
           "keyName": "imagerExposureType",
-          "values": ["SCI"],
+          "values": [
+            "SCI"
+          ],
           "units": "NoUnits"
         }
       },

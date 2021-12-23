@@ -57,9 +57,10 @@ object TestData {
 
   //TCS Sequencer data
 
-  val obsId: Option[ObsId]          = Some(ObsId("2020A-001-123"))
-  val baseCoords: Key[Coords.Coord] = CoordKey.make("baseCoords")
-  val tcsSequencerPrefix: Prefix    = Prefix("TCS.IRIS_ImagerAndIFS")
+  val obsId: Option[ObsId]            = Some(ObsId("2020A-001-123"))
+  val baseCoords: Key[Coords.Coord]   = CoordKey.make("baseCoords")
+  val targetCoords: Key[Coords.Coord] = CoordKey.make("targetCoords")
+  val tcsSequencerPrefix: Prefix      = Prefix("TCS.IRIS_ImagerAndIFS")
   val tcsPreset: Setup = Setup(tcsSequencerPrefix, CommandName("preset"), obsId).madd(
     baseCoords.set(EqCoord(240.0, 120.0))
   )
@@ -85,7 +86,9 @@ object TestData {
     filterKey.set("CO"),
     IfsScaleP,
     spectralResolutionP,
-    scienceAdcFollowP
+    scienceAdcFollowP,
+    pKey.set(200.0),
+    qKey.set(100.0)
   )
 
   val acquisitionExposure: Observe = Observe(Prefix("IRIS.Imager"), CommandName("acquisitionExposure"), obsId).madd(
@@ -136,7 +139,8 @@ object TestData {
 
   val preset: Setup = Setup(eswSequencerPrefix, CommandName("preset"), obsId).madd(
     filterKey.set("Ks"),
-    scienceAdcFollowP
+    scienceAdcFollowP,
+    targetCoords.set(EqCoord(240.0, 120.0))
   )
 
   private val imagerExposureTypeKey = StringKey.make("imagerExposureType")

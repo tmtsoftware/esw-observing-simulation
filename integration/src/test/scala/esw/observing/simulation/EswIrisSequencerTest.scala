@@ -4,12 +4,15 @@ import akka.actor.testkit.typed.scaladsl.TestProbe
 import csw.framework.deploy.containercmd.ContainerCmd
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
+import csw.logging.api.scaladsl.Logger
+import csw.logging.client.scaladsl.LoggerFactory
 import csw.params.commands.CommandResponse
 import csw.params.events.ObserveEventNames.{ExposureEnd, ExposureStart}
 import csw.params.events._
-import csw.prefix.models.Subsystem.IRIS
+import csw.prefix.models.Subsystem.{Container, IRIS}
 import csw.prefix.models.{Prefix, Subsystem}
 import csw.testkit.scaladsl.CSWService.EventServer
+import esw.agent.akka.app.process.{ProcessExecutor, ProcessOutput}
 import esw.agent.akka.client.AgentClient
 import esw.commons.utils.location.LocationServiceUtil
 import esw.ocs.api.models.ObsMode
@@ -25,31 +28,42 @@ import scala.concurrent.duration.DurationInt
 class EswIrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
 
   override implicit def patienceConfig: PatienceConfig = PatienceConfig(1.minute, 100.millis)
-
-  private val obsMode                         = ObsMode("IRIS_ImagerAndIFS")
-  private val seqComponentName1               = "testComponent1"
-  private val seqComponentName2               = "testComponent2"
-  private val agentConnection: AkkaConnection = AkkaConnection(ComponentId(agentSettings.prefix, ComponentType.Machine))
+  lazy val processOutput                               = new ProcessOutput()
+  implicit lazy val log: Logger                        = new LoggerFactory(agentSettings.prefix).getLogger
+  lazy val processExecutor                             = new ProcessExecutor(processOutput)
+  private val obsMode                                  = ObsMode("IRIS_ImagerAndIFS")
+  private val seqComponentName1                        = "testComponent1"
+  private val seqComponentName2                        = "testComponent2"
+  private val seqComponentName3                        = "testComponent3"
+  private val agentConnection: AkkaConnection          = AkkaConnection(ComponentId(agentSettings.prefix, ComponentType.Machine))
   private val testSeqCompConnection1 = AkkaConnection(
     ComponentId(Prefix(agentSettings.prefix.subsystem, seqComponentName1), ComponentType.SequenceComponent)
   )
   private val testSeqCompConnection2 = AkkaConnection(
     ComponentId(Prefix(agentSettings.prefix.subsystem, seqComponentName2), ComponentType.SequenceComponent)
   )
+  private val testSeqCompConnection3 = AkkaConnection(
+    ComponentId(Prefix(agentSettings.prefix.subsystem, seqComponentName3), ComponentType.SequenceComponent)
+  )
 
   private lazy val agentLoc    = locationService.find(agentConnection).futureValue
   private lazy val agentClient = new AgentClient(agentLoc.get)
 
-  private val locationServiceUtil               = new LocationServiceUtil(locationService)
-  private val sequenceComponentUtil             = new SequenceComponentUtil(locationServiceUtil, new SequenceComponentAllocator())
-  private var seqComp1Loc: Option[AkkaLocation] = None
-  private var seqComp2Loc: Option[AkkaLocation] = None
-  private var containerCmd: Option[Closeable]   = None
+  private val locationServiceUtil                = new LocationServiceUtil(locationService)
+  private val sequenceComponentUtil              = new SequenceComponentUtil(locationServiceUtil, new SequenceComponentAllocator())
+  private var seqComp1Loc: Option[AkkaLocation]  = None
+  private var seqComp2Loc: Option[AkkaLocation]  = None
+  private var seqComp3Loc: Option[AkkaLocation]  = None
+  private var containerCmd: Option[Closeable]    = None
+  private var containerLoc: Option[AkkaLocation] = None
 
   override def afterAll(): Unit = {
     containerCmd.foreach(_.close())
     seqComp1Loc.map(seqCompLocation => agentClient.killComponent(seqCompLocation).futureValue)
     seqComp2Loc.map(seqCompLocation => agentClient.killComponent(seqCompLocation).futureValue)
+    seqComp3Loc.map(seqCompLocation => agentClient.killComponent(seqCompLocation).futureValue)
+    containerLoc.map(compLocation => agentClient.killComponent(compLocation).futureValue)
+
     super.afterAll()
   }
 
@@ -59,12 +73,14 @@ class EswIrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
    We subscribe and validate all observe events are published by ESW sequencer and in correct order.
    */
   "Iris top level esw sequencer" must {
-    "handle the submitted sequence | ESW-554, ESW-82" in {
+    "handle the submitted sequence | ESW-554, ESW-82, ESW-570" in {
 
-      val containerConfPath = Paths.get(getClass.getResource("/IrisContainer.conf").toURI)
+      val irisContainerConfPath = Paths.get(getClass.getResource("/IrisContainer.conf").toURI)
+      val tcsContainerConfPath  = Paths.get(getClass.getResource("/TcsContainer.conf").toURI)
 
       //spawn the iris container
-      containerCmd = Some(ContainerCmd.start("iris_container_cmd_app", IRIS, List("--local", containerConfPath.toString).toArray))
+      containerCmd =
+        Some(ContainerCmd.start("iris_container_cmd_app", IRIS, List("--local", irisContainerConfPath.toString).toArray))
 
       val containerLocation: Option[AkkaLocation] =
         locationService.resolve(TestData.irisContainerConnection, 15.seconds).futureValue
@@ -90,17 +106,44 @@ class EswIrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
         .futureValue
         .value
 
+      val script = Paths.get(getClass.getResource("/test-setup.sh").toURI)
+
+      processExecutor
+        .runCommand(List(script.toString, tcsContainerConfPath.toString), Prefix(Container, "TcsContainer"))
+        .rightValue
+
+      containerLoc = locationService.resolve(TestData.tcsContainerConnection, 20.seconds).futureValue
+      containerLoc.isDefined shouldBe true
+
+      locationService
+        .resolve(TestData.tcsPkAssemblyConnection, 5.seconds)
+        .futureValue
+        .isDefined shouldBe true
+
+      locationService
+        .resolve(TestData.tcsMcsAssemblyConnection, 5.seconds)
+        .futureValue
+        .isDefined shouldBe true
+
+      locationService
+        .resolve(TestData.tcsEncAssemblyConnection, 5.seconds)
+        .futureValue
+        .isDefined shouldBe true
+
       //********************************************************************
 
       //spawn esw and iris sequencer
       agentClient.spawnSequenceComponent(seqComponentName1, Some(ScriptVersion.value)).futureValue
       agentClient.spawnSequenceComponent(seqComponentName2, Some(ScriptVersion.value)).futureValue
+      agentClient.spawnSequenceComponent(seqComponentName3, Some(ScriptVersion.value)).futureValue
 
       seqComp1Loc = locationService.find(testSeqCompConnection1).futureValue
       seqComp2Loc = locationService.find(testSeqCompConnection2).futureValue
+      seqComp3Loc = locationService.find(testSeqCompConnection3).futureValue
 
       seqComp1Loc.isDefined shouldBe true
       seqComp2Loc.isDefined shouldBe true
+      seqComp3Loc.isDefined shouldBe true
 
       val eswSequencerResponse = sequenceComponentUtil.loadScript(Subsystem.ESW, obsMode, None, seqComp1Loc.get).futureValue
       eswSequencerResponse.rightValue shouldBe a[Started]
@@ -108,9 +151,16 @@ class EswIrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       val irisSequencerResponse = sequenceComponentUtil.loadScript(Subsystem.IRIS, obsMode, None, seqComp2Loc.get).futureValue
       irisSequencerResponse.rightValue shouldBe a[Started]
 
+      val tcsSequencerResponse = sequenceComponentUtil.loadScript(Subsystem.TCS, obsMode, None, seqComp3Loc.get).futureValue
+      tcsSequencerResponse.rightValue shouldBe a[Started]
+
       //********************************************************************
 
-      val dmsConsumerProbe = createTestProbe(TestData.observeEventKeys ++ TestData.detectorObsEvents(Prefix("IRIS.ifs.detector")))
+      val dmsConsumerProbe = createTestProbe(
+        TestData.observeEventKeys
+          ++ TestData.detectorObsEvents(Prefix("IRIS.ifs.detector"))
+          ++ Set(TestData.encCurrentPositionEventKey)
+      )
 
       val sequencerApi = sequencerClient(Subsystem.ESW, obsMode)
 
@@ -133,6 +183,11 @@ class EswIrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
     eventually {
       val event = testProbe.expectMessageType[ObserveEvent]
       event.eventName.name shouldBe ObserveEventNames.PresetStart.name
+    }
+
+    eventually {
+      val event = testProbe.expectMessageType[SystemEvent]
+      event.eventName.name shouldBe "CurrentPosition"
     }
 
     eventually {
