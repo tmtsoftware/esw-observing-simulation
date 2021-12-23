@@ -36,7 +36,7 @@ jobs:
           sbtn clean
           sbtn scalafmtCheck
 
-      -name: Check port
+      - name: Check port
         run: |
           echo "CHECKING IF FREE PORT:6379"
           ps aux | grep 6379
