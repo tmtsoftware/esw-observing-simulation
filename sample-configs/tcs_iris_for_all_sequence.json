@@ -1,0 +1,56 @@
+[
+  {
+    "_type": "Setup",
+    "source": "TCS.IRIS_ImagerAndIFS",
+    "commandName": "preset",
+    "maybeObsId": "2020A-001-123",
+    "paramSet": [
+      {
+        "CoordKey": {
+          "keyName": "baseCoords",
+          "values": [
+            {
+              "_type": "EqCoord",
+              "tag": "BASE",
+              "ra": 864000000000,
+              "dec": 432000000000,
+              "frame": "ICRS",
+              "catalogName": "none",
+              "pm": {
+                "pmx": 0.0,
+                "pmy": 0.0
+              }
+            }
+          ],
+          "units": "NoUnits"
+        }
+      }
+    ]
+  },
+  {
+    "_type": "Setup",
+    "source": "TCS.IRIS_ImagerAndIFS",
+    "commandName": "setupObservation",
+    "maybeObsId": "2020A-001-123",
+    "paramSet": [
+      {
+        "DoubleKey": {
+          "keyName": "p",
+          "values": [
+            200.0
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "DoubleKey": {
+          "keyName": "q",
+          "values": [
+            100.0
+          ],
+          "units": "NoUnits"
+        }
+      }
+    ]
+  }
+]

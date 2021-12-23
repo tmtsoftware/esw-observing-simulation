@@ -6,7 +6,7 @@ import csw.params.commands.{CommandName, Observe, Sequence, Setup}
 import csw.params.core.generics.KeyType._
 import csw.params.core.generics.{GChoiceKey, Key, Parameter}
 import csw.params.core.models.Coords.EqCoord
-import csw.params.core.models.{Choice, Choices, Coords, ObsId, Units}
+import csw.params.core.models._
 import csw.params.events.{EventKey, EventName, ObserveEventNames}
 import csw.prefix.models.Subsystem.{Container, IRIS, TCS}
 import csw.prefix.models.{Prefix, Subsystem}
@@ -61,7 +61,7 @@ object TestData {
   val baseCoords: Key[Coords.Coord] = CoordKey.make("baseCoords")
   val tcsSequencerPrefix: Prefix    = Prefix("TCS.IRIS_ImagerAndIFS")
   val tcsPreset: Setup = Setup(tcsSequencerPrefix, CommandName("preset"), obsId).madd(
-    baseCoords.set(EqCoord("10:11:12", "15:21:22"))
+    baseCoords.set(EqCoord(240.0, 120.0))
   )
 
   private val pKey: Key[Double] = DoubleKey.make("p")
@@ -105,7 +105,8 @@ object TestData {
     ifsNumRampsP
   )
 
-  val mcsDemandPositionEventKey: EventKey = EventKey(Prefix("TCS.MCSAssembly"), EventName("MountPosition"))
+  val mcsDemandPositionEventKey: EventKey  = EventKey(Prefix("TCS.MCSAssembly"), EventName("MountPosition"))
+  val encCurrentPositionEventKey: EventKey = EventKey(Prefix("TCS.ENCAssembly"), EventName("CurrentPosition"))
 
   val imagerFilterPrefix: Prefix               = Prefix(Subsystem.IRIS, "imager.filter")
   val imagerFilterPositionEventName: EventName = EventName("Wheel1Position")

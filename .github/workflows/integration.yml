@@ -36,6 +36,12 @@ jobs:
           sbtn clean
           sbtn scalafmtCheck
 
+      - name: Check port
+        run: |
+          sudo service redis-server stop
+          echo "CHECKING IF FREE PORT:6379"
+          ps aux | grep 6379
+
       - name: Tests
         working-directory: integration
         run: sbt -DenableFatalWarnings=true test:test
