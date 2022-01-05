@@ -9,7 +9,11 @@ hostConfPath=$sampleConfDir/HostConfig.conf
 irisContainerPath=$sampleConfDir/IrisContainer.conf
 wfosContainerPath=$sampleConfDir/WfosContainer.conf
 ESW_VERSION=cd601b9
+mkdir -p "$ROOT"/../target/
+tempConfPath=$ROOT/../target/HostConfig.conf
 
-awk  -v searchStr="irisContainerPath" -v replaceStr="$irisContainerPath" '{sub(searchStr,replaceStr); print;}' $hostConfPath > tempfile && mv tempfile $hostConfPath
-awk  -v searchStr="wfosContainerPath" -v replaceStr="$wfosContainerPath" '{sub(searchStr,replaceStr); print;}' $hostConfPath > tempfile && mv tempfile $hostConfPath
-cs launch esw-agent-akka-app:$ESW_VERSION -- start -p "iris.machine99" -l --host-config-path $hostConfPath
+cp "$hostConfPath" "$tempConfPath"
+
+awk  -v searchStr="irisContainerPath" -v replaceStr="$irisContainerPath" '{sub(searchStr,replaceStr); print;}' "$tempConfPath" > tempfile && mv tempfile "$tempConfPath"
+awk  -v searchStr="wfosContainerPath" -v replaceStr="$wfosContainerPath" '{sub(searchStr,replaceStr); print;}' "$tempConfPath" > tempfile && mv tempfile "$tempConfPath"
+cs launch esw-agent-akka-app:$ESW_VERSION -- start -p "iris.machine99" -l --host-config-path "$tempConfPath"
