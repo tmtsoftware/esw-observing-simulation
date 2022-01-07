@@ -48,7 +48,7 @@ Once, everything is up and running, You can login to Eng UI app at this [Browser
 - Once provisioned, Configure an obsmode either from Manage Observation / Manage Infrastructure page. For e.g. IRIS_ImagerAndIFS obsMode.
 - Once configuration is successful, We need to submit sequence to Top level sequencer (ESW.IRIS_ImagerAndIFS).
 - Click on `ESW.IRIS_ImagerAndIFS` box on Manage Infrastructure page to go to Observation Detail page of `ESW.IRIS_ImagerAndIFS`.
-- On this page `sample-configs/esw_imager_and_ifs_sequence.json` sequence can be loaded using `Load Sequence` submit.
+- On this page `sample-sequences/esw_imager_and_ifs_sequence.json` sequence can be loaded using `Load Sequence` submit.
 - Once loaded, User can Start sequence from the left panel on Observation Detail page, and visualise how each steps getting executed.
 
 ### Integration project
