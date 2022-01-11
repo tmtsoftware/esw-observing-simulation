@@ -7,7 +7,7 @@ import iris.imageradc.Constants.ImagerADCAssemblyPrefix
 import iris.imageradc.models.{PrismPosition, PrismState}
 
 object PrismStateEvent {
-  val moveKey: GChoiceKey                = PrismState.makeChoiceKey("move")
+  val followingKey: GChoiceKey           = PrismState.makeChoiceKey("following")
   val onTargetKey: Key[Boolean]          = BooleanKey.make("onTarget")
   val ImagerADCStateEventName: EventName = EventName("prism_state")
   val ImagerADCStateEventKey: EventKey   = EventKey(ImagerADCAssemblyPrefix, ImagerADCStateEventName)
@@ -17,7 +17,7 @@ object PrismStateEvent {
       ImagerADCAssemblyPrefix,
       ImagerADCStateEventName,
       Set(
-        moveKey.set(current.entryName),
+        followingKey.set(current.entryName),
         onTargetKey.set(onTarget)
       )
     )

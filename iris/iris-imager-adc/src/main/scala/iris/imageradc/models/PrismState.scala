@@ -13,6 +13,6 @@ object PrismState extends Enum[PrismState] {
   private lazy val choices: Choices              = Choices.from(PrismState.values.map(_.entryName): _*)
   def makeChoiceKey(keyName: String): GChoiceKey = ChoiceKey.make(keyName, choices)
 
-  case object MOVING  extends PrismState("MOVING")
-  case object STOPPED extends PrismState("STOPPED")
+  case object FOLLOWING extends PrismState("FOLLOWING")
+  case object STOPPED   extends PrismState("STOPPED")
 }

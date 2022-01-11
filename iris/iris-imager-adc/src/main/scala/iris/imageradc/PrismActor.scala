@@ -13,7 +13,7 @@ import csw.time.scheduler.api.Cancellable
 import iris.imageradc.commands.PrismCommands.{GoingIn, GoingOut}
 import iris.imageradc.commands.{ADCCommand, PrismCommands}
 import iris.imageradc.events.{PrismCurrentEvent, PrismRetractEvent, PrismStateEvent}
-import iris.imageradc.models.PrismState.MOVING
+import iris.imageradc.models.PrismState.FOLLOWING
 import iris.imageradc.models.{AssemblyConfiguration, PrismAngle, PrismPosition, PrismState}
 
 class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfiguration, logger: Logger) {
@@ -95,7 +95,7 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
         targetModifier.cancel()
         inAndStopped(self)
       case PrismCommands.FollowTarget =>
-        publishPrismState(MOVING)
+        publishPrismState(FOLLOWING)
         prismAngle.nextCurrent()
         logger.info(s"Prism current angle ${prismAngle.currentAngle.toDouble}")
         publishEvent(PrismCurrentEvent.make(prismAngle.currentAngle.toDouble, prismAngle.target.toDouble, getCurrentDiff.toDouble))

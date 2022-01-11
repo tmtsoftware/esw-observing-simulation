@@ -23,9 +23,9 @@ import iris.imageradc.events.PrismCurrentEvent.{
   targetAngleKey
 }
 import iris.imageradc.events.PrismRetractEvent.{ImagerADCRetractEventKey, ImagerADCRetractEventName}
-import iris.imageradc.events.PrismStateEvent.{ImagerADCStateEventKey, ImagerADCStateEventName, moveKey, onTargetKey}
+import iris.imageradc.events.PrismStateEvent.{ImagerADCStateEventKey, ImagerADCStateEventName, followingKey, onTargetKey}
 import iris.imageradc.events.TCSEvents
-import iris.imageradc.models.PrismState.MOVING
+import iris.imageradc.models.PrismState.FOLLOWING
 import iris.imageradc.models.{PrismPosition, PrismState}
 import org.scalatest.funsuite.AnyFunSuiteLike
 
@@ -60,7 +60,7 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
     )
     // initially prism is stopped & on target
     val currentEvent      = testProbe.expectMessageType[SystemEvent]
-    val prismCurrentState = currentEvent(moveKey).head.name
+    val prismCurrentState = currentEvent(followingKey).head.name
     val isOnTarget        = currentEvent(onTargetKey).head
     prismCurrentState shouldBe PrismState.STOPPED.entryName
     isOnTarget shouldBe true
@@ -103,7 +103,7 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
     eventually {
       val movingEvent = testProbe.expectMessageType[SystemEvent]
       movingEvent.eventName shouldBe ImagerADCStateEventName
-      movingEvent(moveKey).head.name shouldBe MOVING.entryName
+      movingEvent(followingKey).head.name shouldBe FOLLOWING.entryName
       movingEvent(onTargetKey).head shouldBe false
     }
 
@@ -136,7 +136,7 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
     eventually {
       val stoppedEvent = testProbe.expectMessageType[SystemEvent]
       stoppedEvent.eventName shouldBe ImagerADCStateEventName
-      stoppedEvent(moveKey).head.name shouldBe PrismState.STOPPED.entryName
+      stoppedEvent(followingKey).head.name shouldBe PrismState.STOPPED.entryName
       stoppedEvent(onTargetKey).head shouldBe true
     }
 
@@ -174,7 +174,7 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
     )
     // initially prism is stopped & on target
     val currentEvent      = testProbe.expectMessageType[SystemEvent]
-    val prismCurrentState = currentEvent(moveKey).head.name
+    val prismCurrentState = currentEvent(followingKey).head.name
     val isOnTarget        = currentEvent(onTargetKey).head
     prismCurrentState shouldBe PrismState.STOPPED.entryName
     isOnTarget shouldBe true
