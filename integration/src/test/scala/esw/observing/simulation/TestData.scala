@@ -65,6 +65,13 @@ object TestData {
     baseCoords.set(EqCoord(240.0, 120.0))
   )
 
+  val currentAltAzCoordKey = AltAzCoordKey.make("current")
+  val demandAltAzCoordKey  = AltAzCoordKey.make("demand")
+  val baseCurrentKey       = DoubleKey.make("baseCurrent")
+  val capCurrentKey        = DoubleKey.make("capCurrent")
+  val baseDemandKey        = DoubleKey.make("baseDemand")
+  val capDemandKey         = DoubleKey.make("capDemand")
+
   private val pKey: Key[Double] = DoubleKey.make("p")
   private val qKey: Key[Double] = DoubleKey.make("q")
   val tcsSetupObservation: Setup = Setup(tcsSequencerPrefix, CommandName("setupObservation"), obsId).madd(

@@ -5,6 +5,7 @@ import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.LoggerFactory
 import csw.params.commands.CommandResponse
+import csw.params.core.models.Angle
 import csw.params.events.SystemEvent
 import csw.prefix.models.Subsystem.Container
 import csw.prefix.models.{Prefix, Subsystem}
@@ -12,6 +13,7 @@ import csw.testkit.scaladsl.CSWService.EventServer
 import esw.agent.akka.app.process.{ProcessExecutor, ProcessOutput}
 import esw.agent.akka.client.AgentClient
 import esw.commons.utils.location.LocationServiceUtil
+import esw.observing.simulation.TestData._
 import esw.ocs.api.models.ObsMode
 import esw.ocs.testkit.EswTestKit
 import esw.ocs.testkit.Service.MachineAgent
@@ -100,23 +102,44 @@ class TcsSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       eventually {
         val event = pkAssemblyTestProbe.expectMessageType[SystemEvent]
         event.eventName.name shouldBe "MountPosition"
+        assertMountPositionError(event, 0.5)
       }
 
       //Assert CurrentPosition for SlewToTarget command
       eventually {
         val event = pkAssemblyTestProbe.expectMessageType[SystemEvent]
         event.eventName.name shouldBe "CurrentPosition"
+        assertCapAndBaseError(event)
       }
 
       //Assert MountPosition for SetOffset command
       eventually {
         val event = pkAssemblyTestProbe.expectMessageType[SystemEvent]
         event.eventName.name shouldBe "MountPosition"
+        assertMountPositionError(event, 0.1)
       }
 
       val eventualResponse = sequencerApi.queryFinal(initialSubmitRes.runId)(20.seconds).futureValue
       eventualResponse shouldBe a[CommandResponse.Completed]
 
+    }
+
+    def assertMountPositionError(event: SystemEvent, tolerance: Double) = {
+      val current = event(currentAltAzCoordKey).head
+      val demand  = event(demandAltAzCoordKey).head
+      Angle.distance(current.alt.toRadian, current.az.toRadian, demand.alt.toRadian, demand.az.toRadian) should be < tolerance
+    }
+
+    def assertCapAndBaseError(event: SystemEvent) = {
+      val baseCurrentValue = event(baseCurrentKey).head
+      val capCurrentValue  = event(capCurrentKey).head
+      val baseDemandValue  = event(baseDemandKey).head
+      val capDemandValue   = event(capDemandKey).head
+
+      val capError  = Math.abs(capCurrentValue - capDemandValue)
+      val baseError = Math.abs(baseCurrentValue - baseDemandValue)
+      capError should be < 0.5
+      baseError should be < 0.5
     }
   }
 }
