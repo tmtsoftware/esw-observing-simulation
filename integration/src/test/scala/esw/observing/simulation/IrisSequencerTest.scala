@@ -214,7 +214,7 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
     eventually {
       val movingEvent = testProbe.expectMessageType[SystemEvent]
       movingEvent.eventName shouldBe TestData.ImagerADCStateEventName
-      movingEvent(TestData.adcPrismStateKey).head.name shouldBe "MOVING"
+      movingEvent(TestData.adcPrismStateKey).head.name shouldBe "FOLLOWING"
       movingEvent(TestData.adcPrismOnTargetKey).head shouldBe false
     }
 
@@ -230,7 +230,7 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
     eventually {
       val movingEvent = testProbe.expectMessageType[SystemEvent]
       movingEvent.eventName shouldBe TestData.ImagerADCStateEventName
-      movingEvent(TestData.adcPrismStateKey).head.name shouldBe "MOVING"
+      movingEvent(TestData.adcPrismStateKey).head.name shouldBe "FOLLOWING"
       movingEvent(TestData.adcPrismOnTargetKey).head shouldBe true
     }
 
@@ -243,7 +243,7 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
     eventually {
       val movingEvent = testProbe.expectMessageType[SystemEvent]
       movingEvent.eventName shouldBe TestData.ImagerADCStateEventName
-      movingEvent(TestData.adcPrismStateKey).head.name shouldBe "MOVING"
+      movingEvent(TestData.adcPrismStateKey).head.name shouldBe "FOLLOWING"
       movingEvent(TestData.adcPrismOnTargetKey).head shouldBe false
     }
 
@@ -259,7 +259,7 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
     eventually {
       val movingEvent = testProbe.expectMessageType[SystemEvent]
       movingEvent.eventName shouldBe TestData.ImagerADCStateEventName
-      movingEvent(TestData.adcPrismStateKey).head.name shouldBe "MOVING"
+      movingEvent(TestData.adcPrismStateKey).head.name shouldBe "FOLLOWING"
       movingEvent(TestData.adcPrismOnTargetKey).head shouldBe true
     }
 

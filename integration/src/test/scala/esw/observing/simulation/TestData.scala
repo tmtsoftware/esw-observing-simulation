@@ -38,7 +38,7 @@ object TestData {
 
   // adc
   val adcPrismRetractKey: GChoiceKey      = ChoiceKey.make("position", Choices.from("IN", "OUT"))
-  val adcPrismStateKey: GChoiceKey        = ChoiceKey.make("move", Choices.from("MOVING", "STOPPED"))
+  val adcPrismStateKey: GChoiceKey        = ChoiceKey.make("following", Choices.from("MOVING", "FOLLOWING"))
   val adcPrismAngleKey: Key[Double]       = DoubleKey.make("currentAngle")
   val adcPrismTargetAngleKey: Key[Double] = DoubleKey.make("targetAngle")
   val adcPrismAngleErrorKey: Key[Double]  = DoubleKey.make("errorAngle")
