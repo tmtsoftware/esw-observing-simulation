@@ -1,0 +1,6 @@
+{
+  "short_name": "monitor-ui",
+  "name": "monitor-ui",
+  "start_url": "./index.html",
+  "display": "standalone"
+}
