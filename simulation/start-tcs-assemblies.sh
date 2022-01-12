@@ -2,13 +2,10 @@
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
   export INTERFACE_NAME=en0
-  V_SLICE_ZIP=https://github.com/tmtsoftware/tcs-vslice-0.4/releases/download/v0.4/tcs-vslice-04.zip
-
 else
-  export INTERFACE_NAME=eth0
-  V_SLICE_ZIP=https://github.com/tmtsoftware/tcs-vslice-0.4/releases/download/v0.4/tcs-vslice-04-Ubuntu-20.04.zip
-
+  test "$INTERFACE_NAME" || export INTERFACE_NAME=eth0
 fi
+V_SLICE_ZIP=https://github.com/tmtsoftware/tcs-vslice-0.4/releases/download/v0.5/tcs-vslice-05-Ubuntu-20.04.zip
 
 echo "Setting INTERFACE_NAME tcs assemblies:"$INTERFACE_NAME
 
