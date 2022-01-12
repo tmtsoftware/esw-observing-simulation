@@ -108,6 +108,15 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
     }
 
     Thread.sleep(3000)
+
+    //assertion to check if onTarget becomes true while following
+    eventually {
+      val followingEvent = testProbe.expectMessageType[SystemEvent]
+      followingEvent.eventName shouldBe ImagerADCStateEventName
+      followingEvent(followingKey).head.name shouldBe PrismState.FOLLOWING.entryName
+      followingEvent(onTargetKey).head shouldBe true
+    }
+
     // After some time, current angle reaches near to targetAngle.
     eventually {
       val current = testProbe.expectMessageType[SystemEvent]
@@ -118,6 +127,14 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
 
     // update target to 10 degrees (90 - 80)
     eventService.defaultPublisher.publish(TCSEvents.make(AltAzCoord(BASE, 80.degree, 50.degree)))
+
+    //assertion to check if onTarget becomes true while following
+    eventually {
+      val followingEvent = testProbe.expectMessageType[SystemEvent]
+      followingEvent.eventName shouldBe ImagerADCStateEventName
+      followingEvent(followingKey).head.name shouldBe PrismState.FOLLOWING.entryName
+      followingEvent(onTargetKey).head shouldBe true
+    }
 
     //assertion to check if prism follows the new target
     eventually {
