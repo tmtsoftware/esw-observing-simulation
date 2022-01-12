@@ -12,6 +12,8 @@ fi
 
 echo "Setting INTERFACE_NAME tcs assemblies:"$INTERFACE_NAME
 
+export TPK_USE_FAKE_SYSTEM_CLOCK=1
+
 ROOT="$(
     cd "$(dirname "$0")" >/dev/null 2>&1 || exit
     pwd -P
