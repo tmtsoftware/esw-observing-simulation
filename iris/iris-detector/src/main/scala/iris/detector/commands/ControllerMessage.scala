@@ -16,11 +16,11 @@ object ControllerMessage {
   case class StartExposure(
       runId: Id,
       replyTo: ActorRef[FitsMessage]
-  )                                                          extends ControllerMessage
-  case class ExposureInProgress(runId: Id, currentRamp: Int) extends ControllerMessage
-  case class ExposureFinished(runId: Id)                     extends ControllerMessage
-  case class AbortExposure(runId: Id)                        extends ControllerMessage
-  case class Shutdown(runId: Id)                             extends ControllerMessage
+  )                                        extends ControllerMessage
+  case class ExposureInProgress(runId: Id) extends ControllerMessage
+  case class ExposureFinished(runId: Id)   extends ControllerMessage
+  case class AbortExposure(runId: Id)      extends ControllerMessage
+  case class Shutdown(runId: Id)           extends ControllerMessage
 }
 
 case class FitsData(data: Array[Array[Int]]) {

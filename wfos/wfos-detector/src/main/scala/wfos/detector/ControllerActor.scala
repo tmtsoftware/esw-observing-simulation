@@ -44,7 +44,7 @@ class ControllerActor(cswContext: CswContext, config: Config) {
   private lazy val idleHandler: PartialFunction[ControllerMessage, Behavior[ControllerMessage]] = {
     case ConfigureExposure(runId, exposureId, filename, ramps, rampIntegrationTime) =>
       crm.updateCommand(Completed(runId))
-      loaded(ControllerData(filename, exposureId, ramps, rampIntegrationTime))
+      loaded(ControllerData(filename, exposureId, ramps, rampIntegrationTime, 0))
     case Shutdown(runId) =>
       crm.updateCommand(Completed(runId))
       uninitialized
@@ -63,9 +63,9 @@ class ControllerActor(cswContext: CswContext, config: Config) {
     receiveWithDefaultBehavior("configured") {
       idleHandler.orElse {
         case StartExposure(runId, replyTo) =>
-          ctx.self ! ExposureInProgress(runId, 0)
+          ctx.self ! ExposureInProgress(runId)
           eventPublisher.publish(OpticalDetectorEvent.exposureStart(detectorPrefix, data.exposureId))
-          exposureInProgress(data, replyTo)
+          exposureInProgress(data.resetRamp(), replyTo)
         case IsValid(runId, commandName, replyTo) if commandName == Constants.StartExposure =>
           replyTo ! Accepted(runId)
           Behaviors.same
@@ -87,15 +87,20 @@ class ControllerActor(cswContext: CswContext, config: Config) {
       }
 
       receiveWithDefaultBehavior("exposing") {
-        case ExposureInProgress(runId, currentRamp) if isExposureRunning =>
-          if (currentRamp == data.ramps) ctx.self ! ExposureFinished(runId)
+        case ExposureInProgress(runId) if isExposureRunning =>
+          // publish ObserveEvent
+          eventPublisher.publish(OpticalDetectorEvent.exposureData(detectorPrefix,
+            data.exposureId,
+            data.ramps*data.rampIntegrationTime,
+            calculateTimeRemaining(data)))
+          if (data.currentRamp == data.ramps) ctx.self ! ExposureFinished(runId)
           else {
             timeServiceScheduler.scheduleOnce(UTCTime(Instant.ofEpochMilli(System.currentTimeMillis() + data.rampIntegrationTime))) {
-              ctx.self ! ExposureInProgress(runId, currentRamp + 1)
+              ctx.self ! ExposureInProgress(runId)
             }
           }
-          Behaviors.same
-        case ExposureInProgress(runId, _) if !isExposureRunning =>
+          exposureInProgress(data.incrementRamp(), replyTo)
+        case ExposureInProgress(runId) if !isExposureRunning =>
           crm.updateCommand(Completed(runId))
           loaded(data)
         case AbortExposure(runId) =>
@@ -120,4 +125,7 @@ class ControllerActor(cswContext: CswContext, config: Config) {
         Behaviors.same
       case _ => Behaviors.unhandled
     })
+
+  private def calculateTimeRemaining(data: ControllerData) = (data.ramps-data.currentRamp)*data.rampIntegrationTime
+
 }
