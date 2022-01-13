@@ -62,7 +62,7 @@ object TestData {
   val targetCoords: Key[Coords.Coord] = CoordKey.make("targetCoords")
   val tcsSequencerPrefix: Prefix      = Prefix("TCS.IRIS_ImagerAndIFS")
   val tcsPreset: Setup = Setup(tcsSequencerPrefix, CommandName("preset"), obsId).madd(
-    baseCoords.set(EqCoord(Angle(1080000000000L), Angle(756000000000L)))
+    baseCoords.set(EqCoord(Angle(1080000000000L), Angle(50400000000L)))
   )
 
   val currentAltAzCoordKey = AltAzCoordKey.make("current")
@@ -147,7 +147,7 @@ object TestData {
   val preset: Setup = Setup(eswSequencerPrefix, CommandName("preset"), obsId).madd(
     filterKey.set("Ks"),
     scienceAdcFollowP,
-    targetCoords.set(EqCoord(Angle(1080000000000L), Angle(756000000000L)))
+    targetCoords.set(EqCoord(Angle(1080000000000L), Angle(50400000000L)))
   )
 
   private val imagerExposureTypeKey = StringKey.make("imagerExposureType")
