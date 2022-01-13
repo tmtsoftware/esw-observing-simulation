@@ -113,6 +113,7 @@ class DetectorTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSui
             case event: ObserveEvent =>
               event.eventName shouldBe ObserveEventNames.OpticalDetectorExposureData
               ExposureId(event(ObserveEventKeys.exposureId).head) shouldBe exposureId
+              event(ObserveEventKeys.coaddsDone).head shouldBe ii
               event(ObserveEventKeys.remainingExposureTime).head shouldBe expectedRemainingIntegrationTimes(ii)
           }
         }

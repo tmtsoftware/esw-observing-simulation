@@ -91,6 +91,8 @@ class ControllerActor(cswContext: CswContext, config: Config) {
           // publish ObserveEvent
           eventPublisher.publish(OpticalDetectorEvent.exposureData(detectorPrefix,
             data.exposureId,
+            data.ramps,
+            data.currentRamp,
             data.ramps*data.rampIntegrationTime,
             calculateTimeRemaining(data)))
           if (data.currentRamp == data.ramps) ctx.self ! ExposureFinished(runId)
