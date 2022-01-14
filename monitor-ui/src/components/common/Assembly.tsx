@@ -3,7 +3,7 @@ import * as React from 'react'
 
 export type ValueType =
   | {
-      current: string | boolean | number | undefined
+      current?: string | boolean | number | undefined
       target?: string | boolean | number | undefined
       error?: string | boolean | number | undefined
       label: string

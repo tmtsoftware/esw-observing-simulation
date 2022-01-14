@@ -16,6 +16,11 @@ type PrismState = 'FOLLOWING' | 'STOPPED'
 const prismState: PrismState[] = ['FOLLOWING', 'STOPPED']
 type Retract = 'IN' | 'OUT'
 const retract: Retract[] = ['IN', 'OUT']
+type Prism = {
+  current: number | undefined
+  target: number | undefined
+  error: number | undefined
+}
 
 const followingKey = choiceKey<PrismState>('following', prismState)
 const retractPositionKey = choiceKey<Retract>('position', retract)
@@ -39,7 +44,7 @@ export const ADC = ({
   const [state, setState] = React.useState<PrismState>()
   const [onTarget, setOnTarget] = React.useState<boolean>()
   const [retractState, setRetractState] = React.useState<Retract>()
-  const [prism, setPrism] = React.useState<ValueType | undefined>(undefined)
+  const [prism, setPrism] = React.useState<Prism | undefined>(undefined)
 
   React.useEffect(() => {
     const subscriptions: Subscription[] = []
@@ -62,7 +67,7 @@ export const ADC = ({
       const current = event.get(currentAngleKey)?.values[0]
       const target = event.get(targetAngleKey)?.values[0]
       const error = event.get(angleErrorKey)?.values[0]
-      setPrism({ label: 'prism', target, error })
+      setPrism({ current, target, error })
     }
 
     subscriptions.push(
@@ -80,7 +85,12 @@ export const ADC = ({
     return () => subscriptions.forEach((s) => s.cancel())
   }, [eventService])
 
-  const values: ValueType[] = [prism]
+  const values: ValueType[] = [
+    { label: 'state', current: state },
+    { label: 'onTarget', current: onTarget },
+    { label: 'stage', current: retractState },
+    { label: 'prism', ...prism }
+  ]
 
   return (
     <Card
@@ -107,5 +117,3 @@ export const ADC = ({
     </Card>
   )
 }
-
-//
