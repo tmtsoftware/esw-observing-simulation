@@ -1,7 +1,10 @@
+import { Spin } from 'antd'
 import * as React from 'react'
-import styles from './Main.module.css'
+import { EventServiceContext } from '../contexts/EventServiceContext'
+import { ADC } from './iris/Adc'
 
 export const Main = (): JSX.Element => {
-  return <div className={styles.App}>Hello world</div>
+  const eventService = React.useContext(EventServiceContext)
+  console.log(eventService)
+  return eventService ? <ADC eventService={eventService} /> : <Spin />
 }
-
