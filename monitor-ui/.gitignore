@@ -21,3 +21,4 @@ project/.bloop
 project/target
 target
 project/metals.sbt
+monitor-ui/*
