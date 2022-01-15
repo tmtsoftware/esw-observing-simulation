@@ -1,12 +1,12 @@
 import { Col, Divider, Row } from 'antd'
 import * as React from 'react'
 
-export type ValueType =
+export type LabelValueMap =
   | {
-      current?: string | boolean | number | undefined
-      target?: string | boolean | number | undefined
-      error?: string | boolean | number | undefined
       label: string
+      current?: string | boolean | number
+      target?: string | boolean | number
+      error?: string | boolean | number
     }
   | undefined
 
@@ -15,7 +15,7 @@ export const Assembly = ({
   keyValue
 }: {
   name: string
-  keyValue: ValueType[]
+  keyValue: LabelValueMap[]
 }): JSX.Element => {
   return (
     <>

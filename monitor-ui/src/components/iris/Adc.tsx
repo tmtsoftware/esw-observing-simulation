@@ -1,54 +1,46 @@
-import {
-  booleanKey,
-  choiceKey,
-  doubleKey,
+import type {
+  Event,
   EventKey,
-  EventName,
-  Prefix
+  EventService,
+  Subscription
 } from '@tmtsoftware/esw-ts'
-import type { Event, Subscription, EventService } from '@tmtsoftware/esw-ts'
-import { Card, Col, Divider, Row } from 'antd'
+import { booleanKey } from '@tmtsoftware/esw-ts'
 import * as React from 'react'
+import { EventServiceContext } from '../../contexts/EventServiceContext'
+import type { LabelValueMap } from '../common/Assembly'
 import { Assembly } from '../common/Assembly'
-import type { ValueType } from '../common/Assembly'
+import type { Prism, PrismState, Retract } from './adcHelpers'
+import {
+  angleErrorKey,
+  currentAngleKey,
+  followingKey,
+  prismEvent,
+  prismRetractEvent,
+  prismStateEvent,
+  retractPositionKey,
+  targetAngleKey
+} from './adcHelpers'
 
-type PrismState = 'FOLLOWING' | 'STOPPED'
-const prismState: PrismState[] = ['FOLLOWING', 'STOPPED']
-type Retract = 'IN' | 'OUT'
-const retract: Retract[] = ['IN', 'OUT']
-type Prism = {
-  current: number | undefined
-  target: number | undefined
-  error: number | undefined
-}
+type EventHandler = (event: Event) => void
 
-const followingKey = choiceKey<PrismState>('following', prismState)
-const retractPositionKey = choiceKey<Retract>('position', retract)
-const currentAngleKey = doubleKey('currentAngle')
-const angleErrorKey = doubleKey('errorAngle')
-const targetAngleKey = doubleKey('targetAngle')
-
-const adcPrefix = new Prefix('IRIS', 'imager.adc')
-const prismStateEvent = new EventKey(adcPrefix, new EventName('prism_state'))
-const prismRetractEvent = new EventKey(
-  adcPrefix,
-  new EventName('prism_position')
-)
-const prismEvent = new EventKey(adcPrefix, new EventName('prism_current'))
-
-export const ADC = ({
+const getSubscriptions = (
+  eventService: EventService | undefined,
+  keys: [EventKey, EventHandler][]
+): Subscription[] =>
   eventService
-}: {
-  eventService: EventService
-}): JSX.Element => {
+    ? keys.map(([eventKey, onEvent]) =>
+        eventService.subscribe(new Set([eventKey]), 1)(onEvent)
+      )
+    : []
+
+export const ADC = (): JSX.Element => {
+  const eventService = React.useContext(EventServiceContext)
   const [state, setState] = React.useState<PrismState>()
   const [onTarget, setOnTarget] = React.useState<boolean>()
   const [retractState, setRetractState] = React.useState<Retract>()
   const [prism, setPrism] = React.useState<Prism | undefined>(undefined)
 
   React.useEffect(() => {
-    const subscriptions: Subscription[] = []
-
     const onPrismStateEvent = (event: Event) => {
       const values = event.get(followingKey)?.values as unknown as PrismState[]
       setState(values[0])
@@ -70,50 +62,21 @@ export const ADC = ({
       setPrism({ current, target, error })
     }
 
-    subscriptions.push(
-      eventService.subscribe(new Set([prismStateEvent]), 1)(onPrismStateEvent)
-    )
-    subscriptions.push(
-      eventService.subscribe(
-        new Set([prismRetractEvent]),
-        1
-      )(onPrismRetractEvent)
-    )
-    subscriptions.push(
-      eventService.subscribe(new Set([prismEvent]), 1)(onPrismEvent)
-    )
+    const subscriptions = getSubscriptions(eventService, [
+      [prismStateEvent, onPrismStateEvent],
+      [prismRetractEvent, onPrismRetractEvent],
+      [prismEvent, onPrismEvent]
+    ])
+
     return () => subscriptions.forEach((s) => s.cancel())
   }, [eventService])
 
-  const values: ValueType[] = [
+  const adcLabelValueMap: LabelValueMap[] = [
     { label: 'state', current: state },
     { label: 'onTarget', current: onTarget },
     { label: 'stage', current: retractState },
     { label: 'prism', ...prism }
   ]
 
-  return (
-    <Card
-      bodyStyle={{ paddingTop: '0', paddingBottom: '0' }}
-      title={
-        <Row gutter={16}>
-          <Col span={6}>IRIS</Col>
-          <Col style={{ fontWeight: 'normal', fontSize: '14px' }} span={6}>
-            CURRENT
-          </Col>
-          <Col style={{ fontWeight: 'normal', fontSize: '14px' }} span={6}>
-            TARGET
-          </Col>
-          <Col style={{ fontWeight: 'normal', fontSize: '14px' }} span={6}>
-            ERROR
-          </Col>
-        </Row>
-      }
-      bordered={true}
-      style={{ width: '30%' }}>
-      <Assembly name={'ADC'} keyValue={values} />
-      <Divider orientation='center'>Imager</Divider>
-      <p>Card content</p>
-    </Card>
-  )
+  return <Assembly name={'ADC'} keyValue={adcLabelValueMap} />
 }
