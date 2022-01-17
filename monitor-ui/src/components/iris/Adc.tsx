@@ -1,14 +1,10 @@
-import type {
-  Event,
-  EventKey,
-  EventService,
-  Subscription
-} from '@tmtsoftware/esw-ts'
+import type { Event } from '@tmtsoftware/esw-ts'
 import { booleanKey } from '@tmtsoftware/esw-ts'
 import * as React from 'react'
 import { EventServiceContext } from '../../contexts/EventServiceContext'
 import type { LabelValueMap } from '../common/Assembly'
 import { Assembly } from '../common/Assembly'
+import { getSubscriptions } from '../common/helpers'
 import type { Prism, PrismState, Retract } from './adcHelpers'
 import {
   angleErrorKey,
@@ -20,18 +16,6 @@ import {
   retractPositionKey,
   targetAngleKey
 } from './adcHelpers'
-
-type EventHandler = (event: Event) => void
-
-const getSubscriptions = (
-  eventService: EventService | undefined,
-  keys: [EventKey, EventHandler][]
-): Subscription[] =>
-  eventService
-    ? keys.map(([eventKey, onEvent]) =>
-        eventService.subscribe(new Set([eventKey]), 1)(onEvent)
-      )
-    : []
 
 export const ADC = (): JSX.Element => {
   const eventService = React.useContext(EventServiceContext)
