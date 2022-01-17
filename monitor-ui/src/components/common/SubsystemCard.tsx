@@ -2,13 +2,13 @@ import type { Subsystem } from '@tmtsoftware/esw-ts'
 import { Card, Col, Row } from 'antd'
 import React from 'react'
 
-export const SubsytemHeader = ({
+export const SubsytemCard = ({
   subsystem,
   children
 }: {
   subsystem: Subsystem
   children: React.ReactNode
-}) => {
+}): JSX.Element => {
   return (
     <Card
       style={{ marginBottom: '1.5rem' }}

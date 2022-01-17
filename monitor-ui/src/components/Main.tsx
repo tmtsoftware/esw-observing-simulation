@@ -1,7 +1,7 @@
 import { Col, Row } from 'antd'
 import * as React from 'react'
 import { Assembly } from './common/Assembly'
-import { SubsytemHeader } from './common/Subsystem'
+import { SubsytemCard } from './common/SubsystemCard'
 import { IRIS } from './iris/Iris'
 
 export const Main = (): JSX.Element => {
@@ -11,16 +11,16 @@ export const Main = (): JSX.Element => {
         <IRIS />
       </Col>
       <Col span={6}>
-        <SubsytemHeader subsystem={'WFOS'}>
+        <SubsytemCard subsystem={'WFOS'}>
           <Assembly name={'Red Filter Wheel'} keyValue={[]} />
           <Assembly name={'Blue Filter Wheel'} keyValue={[]} />
           <Assembly name={'Blue Detector'} keyValue={[]} />
           <Assembly name={'Red Detector'} keyValue={[]} />
-        </SubsytemHeader>
-        <SubsytemHeader subsystem={'TCS'}>
+        </SubsytemCard>
+        <SubsytemCard subsystem={'TCS'}>
           <Assembly name={'Mount Position'} keyValue={[]} />
           <Assembly name={'Enclosure'} keyValue={[]} />
-        </SubsytemHeader>
+        </SubsytemCard>
       </Col>
     </Row>
   )
