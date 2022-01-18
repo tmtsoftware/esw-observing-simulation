@@ -30,12 +30,12 @@ import scala.concurrent.duration.DurationInt
 class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
 
   override implicit def patienceConfig: PatienceConfig = PatienceConfig(1.minute, 100.millis)
-  lazy val processOutput   = new ProcessOutput()
-  implicit lazy val log: Logger      = new LoggerFactory(agentSettings.prefix).getLogger
-  lazy val processExecutor = new ProcessExecutor(processOutput)
-  private val obsMode                         = ObsMode("IRIS_ImagerAndIFS")
-  private val seqComponentName                = "testComponent"
-  private val agentConnection: AkkaConnection = AkkaConnection(ComponentId(agentSettings.prefix, ComponentType.Machine))
+  lazy val processOutput                               = new ProcessOutput()
+  implicit lazy val log: Logger                        = new LoggerFactory(agentSettings.prefix).getLogger
+  lazy val processExecutor                             = new ProcessExecutor(processOutput)
+  private val obsMode                                  = ObsMode("IRIS_ImagerAndIFS")
+  private val seqComponentName                         = "testComponent"
+  private val agentConnection: AkkaConnection          = AkkaConnection(ComponentId(agentSettings.prefix, ComponentType.Machine))
   private val testSeqCompConnection = AkkaConnection(
     ComponentId(Prefix(agentSettings.prefix.subsystem, seqComponentName), ComponentType.SequenceComponent)
   )
@@ -79,7 +79,7 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
 
       seqCompLoc.isDefined shouldBe true
 
-      val sequencerResponse = sequenceComponentUtil.loadScript(Subsystem.IRIS, obsMode,None, seqCompLoc.get).futureValue
+      val sequencerResponse = sequenceComponentUtil.loadScript(Subsystem.IRIS, obsMode, None, seqCompLoc.get).futureValue
       sequencerResponse.rightValue shouldBe a[Started]
 
       //********************************************************************
@@ -102,7 +102,7 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       import Angle._
       eventService.defaultPublisher.publish(TCSEvents.make(AltAzCoord(BASE, 50.degree, 20.degree))) // 90 - 50(alt) = target (40)
 
-      val sequencerApi = sequencerClient(Subsystem.IRIS, obsMode)
+      val sequencerApi     = sequencerClient(Subsystem.IRIS, obsMode)
       val initialSubmitRes = sequencerApi.submit(TestData.irisSequence).futureValue
       initialSubmitRes shouldBe a[CommandResponse.Started]
       //sequence : setupAcquisition, acquisitionExposure, setupObservation, singleExposure
@@ -110,13 +110,13 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       //assert events for setupAcquisition
       assertImagerFilterPosition(imagerFilterTestProbe, "Ks", "H")
 
-      assertAdcPrismInSetupAcquisition(imagerAdcTestProbe,10.0, 40.0)
+      assertAdcPrismInSetupAcquisition(imagerAdcTestProbe, 10.0, 40.0)
 
       //assert events for acquisitionExposure
       assertDetectorEvents(imagerDetectorTestProbe, "/tmp", ExposureId("2020A-001-123-IRIS-IMG-DRK1-0023"))
       eventService.defaultPublisher.publish(TCSEvents.make(AltAzCoord(BASE, 40.degree, 20.degree))) // 90-40 = target (50)
       //assert events for setupObservation
-      assertAdcPrismInSetupObservation(imagerAdcTestProbe,45.0, 50.0)
+      assertAdcPrismInSetupObservation(imagerAdcTestProbe, 45.0, 50.0)
       assertImagerFilterPosition(imagerFilterTestProbe, "CO", "H+K notch")
       assertIfsResPosition(ifsResTestProbe)
       assertIfsScalePosition(ifsScaleTestProbe)
@@ -201,7 +201,7 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
     }
   }
 
-  private def assertAdcPrismInSetupAcquisition(testProbe: TestProbe[Event], currentAngle: Double,  targetAngle: Double): Unit = {
+  private def assertAdcPrismInSetupAcquisition(testProbe: TestProbe[Event], currentAngle: Double, targetAngle: Double): Unit = {
 
     // initially prism is stopped & on target
     eventually {
@@ -236,8 +236,7 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
 
   }
 
-
-  private def assertAdcPrismInSetupObservation(testProbe: TestProbe[Event], currentAngle: Double,  targetAngle: Double): Unit = {
+  private def assertAdcPrismInSetupObservation(testProbe: TestProbe[Event], currentAngle: Double, targetAngle: Double): Unit = {
 
     //verify whether prism has started moving
     eventually {
