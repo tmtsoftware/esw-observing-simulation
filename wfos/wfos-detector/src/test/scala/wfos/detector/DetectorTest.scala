@@ -109,6 +109,7 @@ class DetectorTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSui
         (0 to 5).foreach { ii =>
           // skip first message, which is an InvalidEvent published on subscription
           dataMessages(ii + 1) match {
+            case _: SystemEvent => fail("Should not receive SystemEvent")
             case event: ObserveEvent =>
               event.eventName shouldBe ObserveEventNames.OpticalDetectorExposureData
               ExposureId(event(ObserveEventKeys.exposureId).head) shouldBe exposureId
