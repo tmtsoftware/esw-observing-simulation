@@ -13,7 +13,7 @@ import {
 
 export const IfsScale = (): JSX.Element => {
   const eventService = React.useContext(EventServiceContext)
-  const [scale, setScale] = React.useState<Scale | undefined>(undefined)
+  const [scale, setScale] = React.useState<Scale>()
 
   React.useEffect(() => {
     const onscaleLevelEvent = (event: Event) => {

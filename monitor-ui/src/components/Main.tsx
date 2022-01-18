@@ -7,10 +7,10 @@ import { IRIS } from './iris/Iris'
 export const Main = (): JSX.Element => {
   return (
     <Row gutter={16}>
-      <Col span={6}>
+      <Col span={9}>
         <IRIS />
       </Col>
-      <Col span={6}>
+      <Col span={9}>
         <SubsytemCard subsystem={'WFOS'}>
           <Assembly name={'Red Filter Wheel'} keyValue={[]} />
           <Assembly name={'Blue Filter Wheel'} keyValue={[]} />

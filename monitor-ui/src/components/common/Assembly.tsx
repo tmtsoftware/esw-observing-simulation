@@ -1,4 +1,4 @@
-import { Col, Divider, Row } from 'antd'
+import { Col, Row, Typography } from 'antd'
 import * as React from 'react'
 
 export type LabelValueMap =
@@ -18,20 +18,22 @@ export const Assembly = ({
   keyValue: LabelValueMap[]
 }): JSX.Element => {
   return (
-    <>
-      <Divider orientation='center' style={{ paddingTop: '0px' }}>
-        {name}
-      </Divider>
+    <div style={{ paddingBottom: '0.5rem' }}>
+      <Typography.Title level={5}>{name}</Typography.Title>
       {keyValue.map((e, i) => {
         return (
-          <Row key={i} style={{ border: '0.5px solid lightgrey' }} gutter={16}>
-            <Col span={6}>{e?.label}:</Col>
+          <Row key={i} gutter={16}>
+            <Col style={{ textAlign: 'left' }} span={6}>
+              <Typography.Text strong type='secondary'>
+                {e?.label}:
+              </Typography.Text>
+            </Col>
             <Col span={6}>{e?.current?.toString()}</Col>
             <Col span={6}>{e?.target?.toString()}</Col>
             <Col span={6}>{e?.error?.toString()}</Col>
           </Row>
         )
       })}
-    </>
+    </div>
   )
 }

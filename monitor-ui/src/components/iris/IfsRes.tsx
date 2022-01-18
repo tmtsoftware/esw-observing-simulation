@@ -13,7 +13,7 @@ import {
 
 export const IfsRes = (): JSX.Element => {
   const eventService = React.useContext(EventServiceContext)
-  const [res, setRes] = React.useState<Res | undefined>(undefined)
+  const [res, setRes] = React.useState<Res>()
 
   React.useEffect(() => {
     const onResPositionEvent = (event: Event) => {

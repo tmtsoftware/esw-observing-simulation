@@ -16,7 +16,7 @@ import {
 
 export const FilterWheel = (): JSX.Element => {
   const eventService = React.useContext(EventServiceContext)
-  const [filter, setFilter] = React.useState<Filter | undefined>(undefined)
+  const [filter, setFilter] = React.useState<Filter>()
   const [darkSlide, setDarkSlide] = React.useState<string>()
 
   React.useEffect(() => {

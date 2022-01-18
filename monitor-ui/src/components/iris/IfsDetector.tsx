@@ -10,7 +10,7 @@ import {
 
 export const IfsDetector = (): JSX.Element => {
   const eventService = React.useContext(EventServiceContext)
-  const [obsEvent, setObsEvent] = React.useState<string | undefined>(undefined)
+  const [obsEvent, setObsEvent] = React.useState<string>()
 
   React.useEffect(() => {
     const onObserveEvent = (event: Event) => {

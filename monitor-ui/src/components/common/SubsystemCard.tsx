@@ -1,5 +1,5 @@
 import type { Subsystem } from '@tmtsoftware/esw-ts'
-import { Card, Col, Row } from 'antd'
+import { Card, Col, Row, Typography } from 'antd'
 import React from 'react'
 
 export const SubsytemCard = ({
@@ -12,10 +12,12 @@ export const SubsytemCard = ({
   return (
     <Card
       style={{ marginBottom: '1.5rem' }}
-      bodyStyle={{ paddingTop: '0', paddingBottom: '0' }}
+      headStyle={{ background: 'rgb(240,240,240)' }}
       title={
         <Row gutter={16}>
-          <Col span={6}>{subsystem}</Col>
+          <Col span={6}>
+            <Typography.Title level={4}>{subsystem}</Typography.Title>
+          </Col>
           {['CURRENT', 'TARGET', 'ERROR'].map((c, i) => (
             <Col
               key={i}

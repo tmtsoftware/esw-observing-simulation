@@ -22,7 +22,7 @@ export const ADC = (): JSX.Element => {
   const [state, setState] = React.useState<PrismState>()
   const [onTarget, setOnTarget] = React.useState<boolean>()
   const [retractState, setRetractState] = React.useState<Retract>()
-  const [prism, setPrism] = React.useState<Prism | undefined>(undefined)
+  const [prism, setPrism] = React.useState<Prism>()
 
   React.useEffect(() => {
     const onPrismStateEvent = (event: Event) => {

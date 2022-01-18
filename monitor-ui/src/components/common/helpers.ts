@@ -14,7 +14,7 @@ export const getSubscriptions = (
 ): Subscription[] =>
   eventService
     ? keys.map(([eventKey, onEvent]) =>
-        eventService.subscribe(new Set([eventKey]), 1)(onEvent)
+        eventService.subscribe(new Set([eventKey]), 10)(onEvent)
       )
     : []
 
@@ -27,4 +27,4 @@ export const getObserveEventSubscriptionForPattern = (
   subsystem: Subsystem,
   pattern: string
 ): Subscription | undefined =>
-  eventService?.pSubscribe(subsystem, 1, pattern)(eventHandler)
+  eventService?.pSubscribe(subsystem, 10, pattern)(eventHandler)
