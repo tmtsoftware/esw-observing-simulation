@@ -26,17 +26,14 @@ export const ADC = (): JSX.Element => {
 
   React.useEffect(() => {
     const onPrismStateEvent = (event: Event) => {
-      const values = event.get(followingKey)?.values as unknown as PrismState[]
-      setState(values[0])
+      setState(event.get(followingKey)?.values[0])
 
       const onTargetKey = booleanKey('onTarget')
       setOnTarget(event.get(onTargetKey)?.values[0])
     }
 
     const onPrismRetractEvent = (event: Event) => {
-      const values = event.get(retractPositionKey)
-        ?.values as unknown as Retract[]
-      setRetractState(values[0])
+      setRetractState(event.get(retractPositionKey)?.values[0])
     }
 
     const onPrismEvent = (event: Event) => {

@@ -6,7 +6,7 @@ import type { LabelValueMap } from '../common/Assembly'
 import { Assembly } from '../common/Assembly'
 import { getSubscriptions } from '../common/helpers'
 
-import type { Filter, FilterPosition } from './filterWheelHelpers'
+import type { Filter } from './filterWheelHelpers'
 
 import {
   filterCurrentPositionKey,
@@ -21,11 +21,9 @@ export const FilterWheel = (): JSX.Element => {
 
   React.useEffect(() => {
     const onWheelPositionEvent = (event: Event) => {
-      const current = event.get(filterCurrentPositionKey)
-        ?.values as unknown as FilterPosition[]
-      const target = event.get(filterDemandPositionKey)
-        ?.values as unknown as FilterPosition[]
-      setFilter({ current: current[0], target: target[0] })
+      const current = event.get(filterCurrentPositionKey)?.values[0]
+      const target = event.get(filterDemandPositionKey)?.values[0]
+      setFilter({ current: current, target: target })
 
       const darkKey = booleanKey('dark')
       if (event.get(darkKey)?.values[0] === true) setDarkSlide('In')

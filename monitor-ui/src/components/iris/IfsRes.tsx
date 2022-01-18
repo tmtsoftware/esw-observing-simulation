@@ -4,7 +4,7 @@ import { EventServiceContext } from '../../contexts/EventServiceContext'
 import type { LabelValueMap } from '../common/Assembly'
 import { Assembly } from '../common/Assembly'
 import { getSubscriptions } from '../common/helpers'
-import type { Res, ResPosition } from './IfsResHelpers'
+import type { Res } from './IfsResHelpers'
 import {
   resDemandPositionKey,
   resCurrentPositionKey,
@@ -17,11 +17,9 @@ export const IfsRes = (): JSX.Element => {
 
   React.useEffect(() => {
     const onResPositionEvent = (event: Event) => {
-      const current = event.get(resCurrentPositionKey)
-        ?.values as unknown as ResPosition[]
-      const target = event.get(resDemandPositionKey)
-        ?.values as unknown as ResPosition[]
-      setRes({ current: current[0], target: target[0] })
+      const current = event.get(resCurrentPositionKey)?.values[0]
+      const target = event.get(resDemandPositionKey)?.values[0]
+      setRes({ current: current, target: target })
     }
 
     const subscriptions = getSubscriptions(eventService, [

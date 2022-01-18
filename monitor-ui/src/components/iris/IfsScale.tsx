@@ -4,7 +4,7 @@ import { EventServiceContext } from '../../contexts/EventServiceContext'
 import type { LabelValueMap } from '../common/Assembly'
 import { Assembly } from '../common/Assembly'
 import { getSubscriptions } from '../common/helpers'
-import type { Scale, ScaleLevel } from './IfsScaleHelpers'
+import type { Scale } from './IfsScaleHelpers'
 import {
   scaleCurrentLevelKey,
   scaleDemandLevelKey,
@@ -17,11 +17,9 @@ export const IfsScale = (): JSX.Element => {
 
   React.useEffect(() => {
     const onscaleLevelEvent = (event: Event) => {
-      const current = event.get(scaleCurrentLevelKey)
-        ?.values as unknown as ScaleLevel[]
-      const target = event.get(scaleDemandLevelKey)
-        ?.values as unknown as ScaleLevel[]
-      setScale({ current: current[0], target: target[0] })
+      const current = event.get(scaleCurrentLevelKey)?.values[0]
+      const target = event.get(scaleDemandLevelKey)?.values[0]
+      setScale({ current: current, target: target })
     }
 
     const subscriptions = getSubscriptions(eventService, [
