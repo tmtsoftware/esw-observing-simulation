@@ -71,7 +71,6 @@ class DetectorTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSui
         )
         dataSubscription.ready().futureValue shouldBe Done
 
-
         val commandService: CommandService = assertAssemblyIsConfigured(obsId, exposureId, testPrefix, akkaLocation)
 
         val exposureStarted = commandService.submit(Observe(testPrefix, Constants.StartExposure, Some(obsId))).futureValue
@@ -104,12 +103,12 @@ class DetectorTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSui
         val exposureFinished = commandService.queryFinal(exposureStarted.runId).futureValue
         exposureFinished shouldBe a[Completed]
 
-        val dataMessages = detectorDataTestProbe.receiveMessages(7)
+        val dataMessages                      = detectorDataTestProbe.receiveMessages(7)
         val expectedRemainingIntegrationTimes = List(8800, 7040, 5280, 3520, 1760, 0)
 
         (0 to 5).foreach { ii =>
           // skip first message, which is an InvalidEvent published on subscription
-          dataMessages(ii+1) match {
+          dataMessages(ii + 1) match {
             case event: ObserveEvent =>
               event.eventName shouldBe ObserveEventNames.OpticalDetectorExposureData
               ExposureId(event(ObserveEventKeys.exposureId).head) shouldBe exposureId

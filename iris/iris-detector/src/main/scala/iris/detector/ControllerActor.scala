@@ -89,13 +89,18 @@ class ControllerActor(cswContext: CswContext, config: Config) {
       receiveWithDefaultBehavior("exposing") {
         case ExposureInProgress(runId) if isExposureRunning =>
           // publish ObserveEvent
-          eventPublisher.publish(IRDetectorEvent.exposureData(detectorPrefix,
-            data.exposureId,
-            1, 1,
-            data.ramps,
-            data.currentRamp,
-            data.ramps*data.rampIntegrationTime,
-            calculateTimeRemaining(data)))
+          eventPublisher.publish(
+            IRDetectorEvent.exposureData(
+              detectorPrefix,
+              data.exposureId,
+              1,
+              1,
+              data.ramps,
+              data.currentRamp,
+              data.ramps * data.rampIntegrationTime,
+              calculateTimeRemaining(data)
+            )
+          )
           if (data.currentRamp == data.ramps) ctx.self ! ExposureFinished(runId)
           else {
             timeServiceScheduler.scheduleOnce(UTCTime(Instant.ofEpochMilli(System.currentTimeMillis() + data.rampIntegrationTime))) {
@@ -129,5 +134,5 @@ class ControllerActor(cswContext: CswContext, config: Config) {
       case _ => Behaviors.unhandled
     })
 
-  private def calculateTimeRemaining(data: ControllerData) = (data.ramps-data.currentRamp)*data.rampIntegrationTime
+  private def calculateTimeRemaining(data: ControllerData) = (data.ramps - data.currentRamp) * data.rampIntegrationTime
 }
