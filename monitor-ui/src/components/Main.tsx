@@ -15,11 +15,11 @@ export const Main = (): JSX.Element => {
           <Assembly name={'Red Filter Wheel'} keyValue={[]} />
           <Assembly name={'Blue Filter Wheel'} keyValue={[]} />
           <Assembly name={'Blue Detector'} keyValue={[]} />
-          <Assembly name={'Red Detector'} keyValue={[]} />
+          <Assembly name={'Red Detector'} keyValue={[]} showDivider={false} />
         </SubsytemCard>
         <SubsytemCard subsystem={'TCS'}>
           <Assembly name={'Mount Position'} keyValue={[]} />
-          <Assembly name={'Enclosure'} keyValue={[]} />
+          <Assembly name={'Enclosure'} keyValue={[]} showDivider={false} />
         </SubsytemCard>
       </Col>
     </Row>

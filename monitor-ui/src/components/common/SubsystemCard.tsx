@@ -14,21 +14,19 @@ export const SubsytemCard = ({
       style={{ marginBottom: '1.5rem' }}
       headStyle={{ background: 'rgb(240,240,240)' }}
       title={
-        <Row gutter={16}>
+        <Row gutter={16} style={{ display: 'flex', alignItems: 'center' }}>
           <Col span={6}>
-            <Typography.Title level={4}>{subsystem}</Typography.Title>
+            <Typography.Title level={4} style={{ marginBottom: '0' }}>
+              {subsystem}
+            </Typography.Title>
           </Col>
-          {['CURRENT', 'TARGET', 'ERROR'].map((c, i) => (
-            <Col
-              key={i}
-              style={{ fontWeight: 'normal', fontSize: '14px' }}
-              span={6}>
-              {c}
+          {['CURRENT', 'TARGET', 'ERROR'].map((columnName, i) => (
+            <Col key={i} span={6}>
+              {columnName}
             </Col>
           ))}
         </Row>
-      }
-      bordered={true}>
+      }>
       {children}
     </Card>
   )

@@ -34,6 +34,10 @@ export const ImagerDetector = (): JSX.Element => {
   ]
 
   return (
-    <Assembly name={'Imager Detector'} keyValue={imagerDetectorLabelValueMap} />
+    <Assembly
+      name={'Imager Detector'}
+      keyValue={imagerDetectorLabelValueMap}
+      showDivider={false}
+    />
   )
 }

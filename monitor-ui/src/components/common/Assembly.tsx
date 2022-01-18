@@ -1,4 +1,4 @@
-import { Col, Row, Typography } from 'antd'
+import { Col, Divider, Row, Typography } from 'antd'
 import * as React from 'react'
 
 export type LabelValueMap =
@@ -10,30 +10,46 @@ export type LabelValueMap =
     }
   | undefined
 
+export const Line = () => (
+  <Divider
+    style={{
+      borderTopColor: 'lightgrey',
+      margin: '1rem'
+    }}
+  />
+)
+
 export const Assembly = ({
   name,
-  keyValue
+  keyValue,
+  showDivider = true
 }: {
   name: string
   keyValue: LabelValueMap[]
+  showDivider?: boolean
 }): JSX.Element => {
   return (
-    <div style={{ paddingBottom: '0.5rem' }}>
-      <Typography.Title level={5}>{name}</Typography.Title>
-      {keyValue.map((e, i) => {
+    <div>
+      <Row>
+        <Col style={{ textAlign: 'right', paddingRight: '1rem' }} span={6}>
+          <Typography.Title level={5}>{name}</Typography.Title>
+        </Col>
+      </Row>
+      {keyValue.map((data, i) => {
         return (
           <Row key={i} gutter={16}>
-            <Col style={{ textAlign: 'left' }} span={6}>
+            <Col style={{ textAlign: 'right' }} span={6}>
               <Typography.Text strong type='secondary'>
-                {e?.label}:
+                {data?.label}:
               </Typography.Text>
             </Col>
-            <Col span={6}>{e?.current?.toString()}</Col>
-            <Col span={6}>{e?.target?.toString()}</Col>
-            <Col span={6}>{e?.error?.toString()}</Col>
+            <Col span={6}>{data?.current?.toString()}</Col>
+            <Col span={6}>{data?.target?.toString()}</Col>
+            <Col span={6}>{data?.error?.toString()}</Col>
           </Row>
         )
       })}
+      {showDivider && <Line />}
     </div>
   )
 }
