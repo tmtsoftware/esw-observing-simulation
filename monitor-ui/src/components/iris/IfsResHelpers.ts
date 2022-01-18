@@ -1,27 +1,6 @@
 import { choiceKey, EventKey, EventName, Prefix } from '@tmtsoftware/esw-ts'
 
-export type ResPosition =
-  | '4000-Z'
-  | '4000-Y'
-  | '4000-J'
-  | '4000-H'
-  | '4000-K'
-  | '4000-H+K'
-  | '8000-Z'
-  | '8000-Y'
-  | '8000-J'
-  | '8000-H'
-  | '8000-Kn1-3'
-  | '8000-Kn4-5'
-  | '8000-Kbb'
-  | '10000-Z'
-  | '10000-Y'
-  | '10000-J'
-  | '10000-H'
-  | '1000-K'
-  | 'Mirror'
-
-export const resPosition: ResPosition[] = [
+export const resPosition = [
   '4000-Z',
   '4000-Y',
   '4000-J',
@@ -41,7 +20,9 @@ export const resPosition: ResPosition[] = [
   '10000-H',
   '1000-K',
   'Mirror'
-]
+] as const
+
+export type ResPosition = typeof resPosition[number]
 
 export type Res = {
   current: ResPosition | undefined

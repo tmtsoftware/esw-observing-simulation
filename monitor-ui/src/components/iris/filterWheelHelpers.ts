@@ -1,25 +1,6 @@
 import { choiceKey, EventKey, EventName, Prefix } from '@tmtsoftware/esw-ts'
 
-export type FilterPosition =
-  | 'Z'
-  | 'Y'
-  | 'J'
-  | 'H'
-  | 'K'
-  | 'Ks'
-  | 'H+K notch'
-  | 'CO'
-  | 'BrGamma'
-  | 'PaBeta'
-  | 'H2'
-  | 'FeII'
-  | 'HeI'
-  | 'CaII Trip'
-  | 'J Cont'
-  | 'H Cont'
-  | 'K Cont'
-
-export const filterPosition: FilterPosition[] = [
+export const filterPosition = [
   'Z',
   'Y',
   'J',
@@ -37,7 +18,9 @@ export const filterPosition: FilterPosition[] = [
   'J Cont',
   'H Cont',
   'K Cont'
-]
+] as const
+
+export type FilterPosition = typeof filterPosition[number]
 
 export type Filter = {
   current: FilterPosition | undefined

@@ -6,11 +6,11 @@ import {
   Prefix
 } from '@tmtsoftware/esw-ts'
 
-export type PrismState = 'FOLLOWING' | 'STOPPED'
-export const prismState: PrismState[] = ['FOLLOWING', 'STOPPED']
+export const prismState = ['FOLLOWING', 'STOPPED'] as const
+export type PrismState = typeof prismState[number]
 
-export type Retract = 'IN' | 'OUT'
-export const retract: Retract[] = ['IN', 'OUT']
+export const retract = ['IN', 'OUT'] as const
+export type Retract = typeof retract[number]
 
 export type Prism = {
   current: number | undefined

@@ -14,10 +14,11 @@ import {
   wheelPositionEvent
 } from './filterWheelHelpers'
 
+type DarkSlide = 'In' | 'Out'
 export const FilterWheel = (): JSX.Element => {
   const eventService = React.useContext(EventServiceContext)
   const [filter, setFilter] = React.useState<Filter>()
-  const [darkSlide, setDarkSlide] = React.useState<string>()
+  const [darkSlide, setDarkSlide] = React.useState<DarkSlide>()
 
   React.useEffect(() => {
     const onWheelPositionEvent = (event: Event) => {
