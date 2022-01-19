@@ -12,9 +12,17 @@ export const SubsytemCard = ({
   return (
     <Card
       style={{ marginBottom: '1.5rem' }}
-      headStyle={{ background: 'rgb(240,240,240)' }}
-      title={
-        <Row gutter={16} style={{ display: 'flex', alignItems: 'center' }}>
+      headStyle={{ display: 'none' }}
+      bodyStyle={{ padding: '12px' }}>
+      <>
+        <Row
+          gutter={16}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            backgroundColor: 'rgb(240,240,240)',
+            marginBottom: '8px'
+          }}>
           <Col span={6}>
             <Typography.Title level={4} style={{ marginBottom: '0' }}>
               {subsystem}
@@ -26,8 +34,8 @@ export const SubsytemCard = ({
             </Col>
           ))}
         </Row>
-      }>
-      {children}
+        {children}
+      </>
     </Card>
   )
 }

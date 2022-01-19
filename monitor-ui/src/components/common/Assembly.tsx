@@ -10,11 +10,11 @@ export type LabelValueMap =
     }
   | undefined
 
-export const Line = (): JSX.Element => (
+const Line = () => (
   <Divider
     style={{
       borderTopColor: 'lightgrey',
-      margin: '1rem'
+      margin: '0.25rem 0rem'
     }}
   />
 )
