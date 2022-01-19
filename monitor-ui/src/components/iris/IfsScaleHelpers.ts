@@ -1,6 +1,6 @@
 import { choiceKey, EventKey, EventName, Prefix } from '@tmtsoftware/esw-ts'
 
-export const scaleLevel = ['4', '9', '25', '50'] as const
+const scaleLevel = ['4', '9', '25', '50'] as const
 export type ScaleLevel = typeof scaleLevel[number]
 
 export type Scale = {

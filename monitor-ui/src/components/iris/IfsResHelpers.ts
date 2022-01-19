@@ -1,6 +1,6 @@
 import { choiceKey, EventKey, EventName, Prefix } from '@tmtsoftware/esw-ts'
 
-export const resPosition = [
+const resPosition = [
   '4000-Z',
   '4000-Y',
   '4000-J',

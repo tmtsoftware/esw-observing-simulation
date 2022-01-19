@@ -2,8 +2,7 @@ import type {
   Event,
   EventKey,
   EventService,
-  Subscription,
-  Subsystem
+  Subscription
 } from '@tmtsoftware/esw-ts'
 
 type EventHandler = (event: Event) => void
@@ -20,11 +19,3 @@ export const getSubscriptions = (
 
 export const getObserveEventName = (event: Event): string =>
   event.eventName.name.split('.')[1]
-
-export const getObserveEventSubscriptionForPattern = (
-  eventService: EventService | undefined,
-  eventHandler: EventHandler,
-  subsystem: Subsystem,
-  pattern: string
-): Subscription | undefined =>
-  eventService?.pSubscribe(subsystem, 10, pattern)(eventHandler)

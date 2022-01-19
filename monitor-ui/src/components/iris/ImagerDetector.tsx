@@ -3,10 +3,8 @@ import * as React from 'react'
 import { EventServiceContext } from '../../contexts/EventServiceContext'
 import type { LabelValueMap } from '../common/Assembly'
 import { Assembly } from '../common/Assembly'
-import {
-  getObserveEventName,
-  getObserveEventSubscriptionForPattern
-} from '../common/helpers'
+import { getObserveEventName } from '../common/helpers'
+import { imagerObserveEvents } from './ImagerDetectorHelpers'
 
 export const ImagerDetector = (): JSX.Element => {
   const eventService = React.useContext(EventServiceContext)
@@ -17,16 +15,12 @@ export const ImagerDetector = (): JSX.Element => {
       setObsEvent(getObserveEventName(event))
     }
 
-    const subscriptions = [
-      getObserveEventSubscriptionForPattern(
-        eventService,
-        onObserveEvent,
-        'IRIS',
-        'imager.detector.ObserveEvent.*'
-      )
-    ]
+    const subscription = eventService?.subscribe(
+      new Set(imagerObserveEvents),
+      10
+    )(onObserveEvent)
 
-    return () => subscriptions.forEach((s) => s?.cancel())
+    return () => subscription?.cancel()
   }, [eventService])
 
   const imagerDetectorLabelValueMap: LabelValueMap[] = [

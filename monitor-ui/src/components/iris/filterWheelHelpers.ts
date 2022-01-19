@@ -1,6 +1,6 @@
 import { choiceKey, EventKey, EventName, Prefix } from '@tmtsoftware/esw-ts'
 
-export const filterPosition = [
+const filterPosition = [
   'Z',
   'Y',
   'J',
