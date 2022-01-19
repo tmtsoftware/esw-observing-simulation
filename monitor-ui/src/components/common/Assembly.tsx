@@ -22,11 +22,13 @@ const Line = () => (
 export const Assembly = ({
   name,
   keyValue,
-  showDivider = true
+  showDivider = true,
+  singleColumn = false
 }: {
   name: string
   keyValue: LabelValueMap[]
   showDivider?: boolean
+  singleColumn?: boolean
 }): JSX.Element => {
   return (
     <div>
@@ -43,9 +45,19 @@ export const Assembly = ({
                 {data?.label}:
               </Typography.Text>
             </Col>
-            <Col span={6}>{data?.current?.toString()}</Col>
-            <Col span={6}>{data?.target?.toString()}</Col>
-            <Col span={6}>{data?.error?.toString()}</Col>
+            {singleColumn ? (
+              <Col style={{ width: '25rem' }}>
+                <Typography.Text style={{ wordWrap: 'break-word' }}>
+                  {data?.current?.toString()}
+                </Typography.Text>
+              </Col>
+            ) : (
+              <>
+                <Col span={6}>{data?.current?.toString()}</Col>
+                <Col span={6}>{data?.target?.toString()}</Col>
+                <Col span={6}>{data?.error?.toString()}</Col>
+              </>
+            )}
           </Row>
         )
       })}

@@ -4,6 +4,7 @@ import type {
   EventService,
   Subscription
 } from '@tmtsoftware/esw-ts'
+import { stringKey } from '@tmtsoftware/esw-ts'
 
 type EventHandler = (event: Event) => void
 
@@ -19,3 +20,6 @@ export const getSubscriptions = (
 
 export const getObserveEventName = (event: Event): string =>
   event.eventName.name.split('.')[1]
+
+export const filenameKey = stringKey('filename')
+export const exposureIdKey = stringKey('exposureId')

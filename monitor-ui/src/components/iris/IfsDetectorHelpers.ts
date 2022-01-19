@@ -13,11 +13,11 @@ const exposureAbortedEvent = new EventKey(
   ifsDetectorPrefix,
   new EventName('ObserveEvent.ExposureAborted')
 )
-const dataWriteStartEvent = new EventKey(
+export const dataWriteStartEvent = new EventKey(
   ifsDetectorPrefix,
   new EventName('ObserveEvent.DataWriteStart')
 )
-const dataWriteEndEvent = new EventKey(
+export const dataWriteEndEvent = new EventKey(
   ifsDetectorPrefix,
   new EventName('ObserveEvent.DataWriteEnd')
 )
