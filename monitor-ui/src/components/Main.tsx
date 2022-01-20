@@ -6,10 +6,10 @@ import { IRIS } from './iris/Iris'
 
 export const Main = (): JSX.Element => (
   <Row gutter={16}>
-    <Col xs={24} sm={24} md={12} xl={8}>
+    <Col xs={24} md={24} lg={12} xl={8}>
       <IRIS />
     </Col>
-    <Col xs={24} sm={24} md={12} xl={8}>
+    <Col xs={24} md={24} lg={12} xl={8}>
       <SubsytemCard subsystem={'WFOS'}>
         <Assembly name={'Red Filter Wheel'} keyValue={[]} />
         <Assembly name={'Blue Filter Wheel'} keyValue={[]} />

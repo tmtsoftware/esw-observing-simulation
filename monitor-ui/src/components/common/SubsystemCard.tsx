@@ -24,11 +24,11 @@ export const SubsytemCard = ({
             marginBottom: '8px'
           }}>
           <Col span={6}>
-            <Typography.Title level={4} style={{ marginBottom: '0' }}>
+            <Typography.Title level={5} style={{ marginBottom: '0' }}>
               {subsystem}
             </Typography.Title>
           </Col>
-          {['CURRENT', 'TARGET', 'ERROR'].map((columnName, i) => (
+          {['Current', 'Target', 'Error'].map((columnName, i) => (
             <Col key={i} span={6}>
               {columnName}
             </Col>

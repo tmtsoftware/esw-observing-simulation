@@ -34,7 +34,7 @@ export const Assembly = ({
     <div>
       <Row>
         <Col style={{ textAlign: 'right', paddingRight: '1rem' }} span={6}>
-          <Typography.Title level={5}>{name}</Typography.Title>
+          <Typography.Text strong>{name}</Typography.Text>
         </Col>
       </Row>
       {keyValue.map((data, i) => {
@@ -46,7 +46,7 @@ export const Assembly = ({
               </Typography.Text>
             </Col>
             {singleColumn ? (
-              <Col style={{ width: '25rem' }}>
+              <Col style={{ width: '25rem' }} span={18}>
                 <Typography.Text style={{ wordWrap: 'break-word' }}>
                   {data?.current?.toString()}
                 </Typography.Text>
