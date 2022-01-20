@@ -1,25 +1,35 @@
-import { EventKey, EventName, Prefix } from '@tmtsoftware/esw-ts'
+import { EventKey, Prefix } from '@tmtsoftware/esw-ts'
+import {
+  dataWriteEndEventKey,
+  dataWriteStartEventKey,
+  exposureAbortedEventKey,
+  exposureEndEventKey,
+  exposureStartEventKey,
+  irDetectorExposureDataEventKey
+} from '../common/helpers'
 
 const imagerDetectorPrefix = new Prefix('IRIS', 'imager.detector')
 const exposureStartEvent = new EventKey(
   imagerDetectorPrefix,
-  new EventName('ObserveEvent.ExposureStart')
+  exposureStartEventKey
 )
-const exposureEndEvent = new EventKey(
-  imagerDetectorPrefix,
-  new EventName('ObserveEvent.ExposureEnd')
-)
+const exposureEndEvent = new EventKey(imagerDetectorPrefix, exposureEndEventKey)
 const exposureAbortedEvent = new EventKey(
   imagerDetectorPrefix,
-  new EventName('ObserveEvent.ExposureAborted')
+  exposureAbortedEventKey
 )
 const dataWriteStartEvent = new EventKey(
   imagerDetectorPrefix,
-  new EventName('ObserveEvent.DataWriteStart')
+  dataWriteStartEventKey
 )
 const dataWriteEndEvent = new EventKey(
   imagerDetectorPrefix,
-  new EventName('ObserveEvent.DataWriteEnd')
+  dataWriteEndEventKey
+)
+
+export const imagerDetectorExposureData = new EventKey(
+  imagerDetectorPrefix,
+  irDetectorExposureDataEventKey
 )
 
 export const imagerObserveEvents = [
@@ -27,5 +37,6 @@ export const imagerObserveEvents = [
   exposureEndEvent,
   exposureAbortedEvent,
   dataWriteStartEvent,
-  dataWriteEndEvent
+  dataWriteEndEvent,
+  imagerDetectorExposureData
 ]
