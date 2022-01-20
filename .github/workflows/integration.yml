@@ -6,6 +6,8 @@ on:
     branches: [ main ]
   push:
     branches: [ main, 'branch-*' ]
+    paths-ignore:
+      - monitor-ui/**
 
 jobs:
   build:

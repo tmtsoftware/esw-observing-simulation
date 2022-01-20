@@ -14,7 +14,7 @@
   },
   "scripts": {
     "start": "vite",
-    "build": "vite build",
+    "build": "npm run fix && vite build",
     "clean": "rm -rf dist && mkdir dist",
     "prebuild": "npm-run-all --parallel clean fix",
     "test": "web-test-runner 'test/**/*.test.{ts,tsx}'",
