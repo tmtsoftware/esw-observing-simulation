@@ -20,27 +20,29 @@ Repository has the following contents:
    - wfos.blue.filter 
    - wfos.red.detector 
    - wfos.red.detector 
-- `sample-configs` folder has sample configuration files which will be used while providing neccessary configs to start simulation
+- `sample-configs` folder has sample configuration files which will be used while providing necessary configs to start simulation
   also these files are for future reference. All these files in production would be present in svn of config service.
-- `apps` & `simulation` folder's has pre-configured setup for starting a simulation. These folders need not require any modification for an observation.
+- `apps` & `simulation-scripts` folder's has pre-configured setup and scripts for starting a simulation. These folders need not require any modification for an observation.
 
 ## Run complete simulation
 
 Run the shell scripts in this order in different terminals.
 
-1. sh simulation/start-csw-services.sh 
+1. sh simulation-scripts/start-csw-services.sh 
     - this maintains which esw & sequencer-script sha to be used in the simulation observation.
     - it starts required csw services : location service, config-service & aas server. 
-2. sh simulation/start-esw-services.sh
+2. sh simulation-scripts/start-esw-services.sh
     - this maintains which esw & sequencer-script sha to be used in the simulation observation. 
     - it starts required esw services for observation : sequence manager, agent service along with that 6 agents(Machines) are also started.
-3. sh simulation/start-components.sh
+3. sh simulation-scripts/start-components.sh
     - this scripts starts the container containing all the `WFOS` & `IRIS` assemblies using `esw-agent-akka-app`.
     - this script uses `HostConfig.conf` which has entries of the `IRIS` & `WFOS` container.
-4. sh simulation/start-tcs-assemblies.sh
+4. sh simulation-scripts/start-tcs-assemblies.sh
     - this download tcs assemblies release zip and start them. For mac users, refer the following for pre-requisites [document](https://github.com/tmtsoftware/tcs-vslice-0.4#macos-12-monterey-intel-homebrew-installation-of-shared-library-dependencies).
-5. sh simulation/start-eng-ui.sh
+5. sh simulation-scripts/start-eng-ui.sh
     - It builds `esw-ocs-eng-ui` app using the latest code from esw-ocs-eng-ui repo & starts serving it on `http:localhost:8000/esw-ocs-eng-ui/` to manage observation from browser.
+6. sh simulation-scripts/start-monitor-ui.sh
+    - It runs `monitor-ui` app using the source code from monitor-ui folder & starts serving it on `http:localhost:9000/` to show events from observing-simulation.
 
 Once, everything is up and running, You can login to Eng UI app at this [Browser Link](http://localhost:8000/esw-ocs-eng-ui) with user `osw-user1`.
 

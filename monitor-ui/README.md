@@ -1,6 +1,6 @@
 # monitor-ui
 
-This project is a sample React web application.
+This project tracks events published by various subsystems during an observation and display on UI.
 
 ## Prerequisites Required for Running App
 
@@ -24,12 +24,6 @@ Run following commands in the terminal.
 ```bash
 npm install
 npm run build
-```
-
-## Running Tests
-
-```bash
-npm test
 ```
 
 ## How to Use the Project
