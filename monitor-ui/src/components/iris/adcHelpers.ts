@@ -1,4 +1,5 @@
 import {
+  booleanKey,
   choiceKey,
   doubleKey,
   EventKey,
@@ -19,6 +20,7 @@ export type Prism = {
 }
 
 export const followingKey = choiceKey<PrismState>('following', prismState)
+export const onTargetKey = booleanKey('onTarget')
 export const retractPositionKey = choiceKey<Retract>('position', retract)
 export const currentAngleKey = doubleKey('currentAngle')
 export const angleErrorKey = doubleKey('errorAngle')

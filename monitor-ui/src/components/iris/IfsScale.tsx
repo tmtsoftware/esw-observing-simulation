@@ -1,9 +1,8 @@
 import type { Event } from '@tmtsoftware/esw-ts'
 import * as React from 'react'
-import { EventServiceContext } from '../../contexts/EventServiceContext'
+import { useEventService } from '../../contexts/EventServiceContext'
 import type { LabelValueMap } from '../common/Assembly'
 import { Assembly } from '../common/Assembly'
-import { getSubscriptions } from '../common/helpers'
 import type { Scale } from './IfsScaleHelpers'
 import {
   scaleCurrentLevelKey,
@@ -12,7 +11,7 @@ import {
 } from './IfsScaleHelpers'
 
 export const IfsScale = (): JSX.Element => {
-  const eventService = React.useContext(EventServiceContext)
+  const eventService = useEventService()
   const [scale, setScale] = React.useState<Scale>()
 
   React.useEffect(() => {
@@ -22,11 +21,12 @@ export const IfsScale = (): JSX.Element => {
       setScale({ current: current, target: target })
     }
 
-    const subscriptions = getSubscriptions(eventService, [
-      [scaleLevelEvent, onscaleLevelEvent]
-    ])
+    const subscription = eventService?.subscribe(
+      new Set([scaleLevelEvent]),
+      10
+    )(onscaleLevelEvent)
 
-    return () => subscriptions.forEach((s) => s.cancel())
+    return () => subscription?.cancel()
   }, [eventService])
 
   const scaleLabelValueMap: LabelValueMap[] = [{ label: 'scale', ...scale }]

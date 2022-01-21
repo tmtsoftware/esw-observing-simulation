@@ -1,6 +1,6 @@
 import type { Event, EventKey } from '@tmtsoftware/esw-ts'
 import * as React from 'react'
-import { EventServiceContext } from '../../contexts/EventServiceContext'
+import { useEventService } from '../../contexts/EventServiceContext'
 import type { LabelValueMap } from '../common/Assembly'
 import { Assembly } from '../common/Assembly'
 import {
@@ -29,7 +29,7 @@ const Detector = ({
   eventKeys: EventKey[]
   showDivider: boolean
 }): JSX.Element => {
-  const eventService = React.useContext(EventServiceContext)
+  const eventService = useEventService()
   const [obsEvent, setObsEvent] = React.useState<string>()
   const [exposureId, setExposureId] = React.useState<string>()
   const [filename, setFilename] = React.useState<string>()
@@ -41,7 +41,6 @@ const Detector = ({
 
   React.useEffect(() => {
     const onObserveEvent = (event: Event) => {
-      console.log(JSON.stringify(event))
       setObsEvent(getObserveEventName(event))
       setExposureId(event.get(exposureIdKey)?.values[0])
       switch (event.eventName.name) {

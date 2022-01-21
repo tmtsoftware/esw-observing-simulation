@@ -1,22 +1,5 @@
-import type {
-  Event,
-  Subscription,
-  EventKey,
-  EventService
-} from '@tmtsoftware/esw-ts'
+import type { Event } from '@tmtsoftware/esw-ts'
 import { EventName, intKey, longKey, stringKey } from '@tmtsoftware/esw-ts'
-
-type EventHandler = (event: Event) => void
-
-export const getSubscriptions = (
-  eventService: EventService | undefined,
-  keys: [EventKey, EventHandler][]
-): Subscription[] =>
-  eventService
-    ? keys.map(([eventKey, onEvent]) =>
-        eventService.subscribe(new Set([eventKey]), 10)(onEvent)
-      )
-    : []
 
 export const getObserveEventName = (event: Event): string =>
   event.eventName.name.split('.')[1]

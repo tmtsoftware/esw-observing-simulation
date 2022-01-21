@@ -1,51 +1,47 @@
-import { EventService, setAppName } from '@tmtsoftware/esw-ts'
-import React, { createContext, useEffect, useState } from 'react'
-import { AppConfig } from '../config/AppConfig'
+import { EventService, Prefix, TcpConnection } from '@tmtsoftware/esw-ts'
+import React, { createContext, useContext, useEffect, useState } from 'react'
+import { useLocationService } from './LocationServiceContext'
 
 export interface EventServiceProps {
   children: React.ReactNode
 }
 
-setAppName(AppConfig.applicationName)
+const EventServiceContext = createContext<EventService | undefined>(undefined)
 
-// eslint-disable-next-line import/no-mutable-exports
-export let defaultEventServiceState: EventService
-// eslint-disable-next-line import/no-mutable-exports
-export let EventServiceContext = createContext<EventService | undefined>(
-  undefined
-)
-
-const setDefault = async () => {
-  defaultEventServiceState = await EventService()
-  EventServiceContext = createContext<EventService | undefined>(
-    defaultEventServiceState
-  )
-}
-
-setDefault()
+const EVENT_SERVER = TcpConnection(new Prefix('CSW', 'EventServer'), 'Service')
 
 const EventServiceProvider = (props: EventServiceProps) => {
   const { children } = props
-  const [eventService, setEventService] = useState<EventService>(
-    defaultEventServiceState
-  )
+  const locationService = useLocationService()
+  const [eventService, setEventService] = useState<EventService>()
 
   const resetEventService = async () => {
-    //Authenticating config service
-    const service = await EventService()
-    setEventService(service)
+    setEventService(await EventService())
   }
 
   useEffect(() => {
-    resetEventService().catch(() => ({}))
-    // window.alert('event server is not available')
-  }, [])
+    const sub = locationService.track(EVENT_SERVER)((e) => {
+      switch (e._type) {
+        case 'LocationRemoved':
+          setEventService(undefined)
+          break
+        case 'LocationUpdated':
+          resetEventService()
+          break
+      }
+    })
+    return () => sub.cancel()
+  }, [locationService])
 
   return (
     <EventServiceContext.Provider value={eventService}>
       {children}
     </EventServiceContext.Provider>
   )
+}
+
+export const useEventService = () => {
+  return useContext(EventServiceContext)
 }
 
 export default EventServiceProvider

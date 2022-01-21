@@ -1,13 +1,10 @@
 import type { Event } from '@tmtsoftware/esw-ts'
 import { booleanKey } from '@tmtsoftware/esw-ts'
 import * as React from 'react'
-import { EventServiceContext } from '../../contexts/EventServiceContext'
+import { useEventService } from '../../contexts/EventServiceContext'
 import type { LabelValueMap } from '../common/Assembly'
 import { Assembly } from '../common/Assembly'
-import { getSubscriptions } from '../common/helpers'
-
 import type { Filter } from './filterWheelHelpers'
-
 import {
   filterCurrentPositionKey,
   filterDemandPositionKey,
@@ -16,7 +13,7 @@ import {
 
 type DarkSlide = 'In' | 'Out'
 export const FilterWheel = (): JSX.Element => {
-  const eventService = React.useContext(EventServiceContext)
+  const eventService = useEventService()
   const [filter, setFilter] = React.useState<Filter>()
   const [darkSlide, setDarkSlide] = React.useState<DarkSlide>()
 
@@ -31,11 +28,12 @@ export const FilterWheel = (): JSX.Element => {
       else if (event.get(darkKey)?.values[0] === false) setDarkSlide('Out')
     }
 
-    const subscriptions = getSubscriptions(eventService, [
-      [wheelPositionEvent, onWheelPositionEvent]
-    ])
+    const subscription = eventService?.subscribe(
+      new Set([wheelPositionEvent]),
+      10
+    )(onWheelPositionEvent)
 
-    return () => subscriptions.forEach((s) => s.cancel())
+    return () => subscription?.cancel()
   }, [eventService])
 
   const filterLabelValueMap: LabelValueMap[] = [

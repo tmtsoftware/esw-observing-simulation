@@ -1,18 +1,17 @@
 import type { Event } from '@tmtsoftware/esw-ts'
 import * as React from 'react'
-import { EventServiceContext } from '../../contexts/EventServiceContext'
+import { useEventService } from '../../contexts/EventServiceContext'
 import type { LabelValueMap } from '../common/Assembly'
 import { Assembly } from '../common/Assembly'
-import { getSubscriptions } from '../common/helpers'
 import type { Res } from './IfsResHelpers'
 import {
-  resDemandPositionKey,
   resCurrentPositionKey,
+  resDemandPositionKey,
   resPositionEvent
 } from './IfsResHelpers'
 
 export const IfsRes = (): JSX.Element => {
-  const eventService = React.useContext(EventServiceContext)
+  const eventService = useEventService()
   const [res, setRes] = React.useState<Res>()
 
   React.useEffect(() => {
@@ -22,11 +21,12 @@ export const IfsRes = (): JSX.Element => {
       setRes({ current: current, target: target })
     }
 
-    const subscriptions = getSubscriptions(eventService, [
-      [resPositionEvent, onResPositionEvent]
-    ])
+    const subscription = eventService?.subscribe(
+      new Set([resPositionEvent]),
+      10
+    )(onResPositionEvent)
 
-    return () => subscriptions.forEach((s) => s.cancel())
+    return () => subscription?.cancel()
   }, [eventService])
 
   const resLabelValueMap: LabelValueMap[] = [{ label: 'grating', ...res }]
