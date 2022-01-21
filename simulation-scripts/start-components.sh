@@ -4,11 +4,12 @@ ROOT="$(
     pwd -P
 )"
 
+ESW_VERSION=180274e
+
 sampleConfDir=$ROOT/../sample-configs
 hostConfPath=$sampleConfDir/HostConfig.conf
 irisContainerPath=$sampleConfDir/IrisContainer.conf
 wfosContainerPath=$sampleConfDir/WfosContainer.conf
-ESW_VERSION=cd601b9
 mkdir -p "$ROOT"/../target/
 tempConfPath=$ROOT/../target/HostConfig.conf
 
