@@ -1,3 +1,5 @@
+ThisBuild / scalafmtConfig := file("../.scalafmt.conf")
+
 lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `iris-imager-filter`,
   `iris-irisdeploy`,

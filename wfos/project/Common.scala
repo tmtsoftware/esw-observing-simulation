@@ -42,8 +42,7 @@ object Common extends AutoPlugin {
     fork := true,
     Test / parallelExecution := false,
     autoCompilerPlugins := true,
-    if (formatOnCompile) scalafmtOnCompile := true else scalafmtOnCompile := false,
-    scalafmtConfig := file("../../.scalafmt.conf")
+    if (formatOnCompile) scalafmtOnCompile := true else scalafmtOnCompile := false
   )
 
   private def formatOnCompile = sys.props.get("format.on.compile") match {
