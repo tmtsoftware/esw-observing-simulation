@@ -3,6 +3,7 @@ import * as React from 'react'
 import { Assembly } from './common/Assembly'
 import { SubsytemCard } from './common/SubsystemCard'
 import { IRIS } from './iris/Iris'
+import { WFOS } from './wfos/Wfos'
 
 export const Main = (): JSX.Element => (
   <Row gutter={16}>
@@ -10,13 +11,8 @@ export const Main = (): JSX.Element => (
       <IRIS />
     </Col>
     <Col xs={24} md={24} lg={12} xl={8}>
-      <SubsytemCard subsystem={'WFOS'}>
-        <Assembly name={'Red Filter Wheel'} keyValue={[]} />
-        <Assembly name={'Blue Filter Wheel'} keyValue={[]} />
-        <Assembly name={'Blue Detector'} keyValue={[]} />
-        <Assembly name={'Red Detector'} keyValue={[]} showDivider={false} />
-      </SubsytemCard>
-      <SubsytemCard subsystem={'TCS'}>
+        <WFOS />
+       <SubsytemCard subsystem={'TCS'}>
         <Assembly name={'Mount Position'} keyValue={[]} />
         <Assembly name={'Enclosure'} keyValue={[]} showDivider={false} />
       </SubsytemCard>
