@@ -11,8 +11,8 @@ export const Main = (): JSX.Element => (
       <IRIS />
     </Col>
     <Col xs={24} md={24} lg={12} xl={8}>
-        <WFOS />
-       <SubsytemCard subsystem={'TCS'}>
+      <WFOS />
+      <SubsytemCard subsystem={'TCS'}>
         <Assembly name={'Mount Position'} keyValue={[]} />
         <Assembly name={'Enclosure'} keyValue={[]} showDivider={false} />
       </SubsytemCard>
