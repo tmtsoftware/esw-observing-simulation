@@ -23,3 +23,7 @@ export const dataWriteEndEventKey = new EventName('ObserveEvent.DataWriteEnd')
 export const irDetectorExposureDataEventKey = new EventName(
   'ObserveEvent.IRDetectorExposureData'
 )
+
+export const OpticalDetectorExposureDataEventKey = new EventName(
+  'ObserveEvent.OpticalDetectorExposureData'
+)

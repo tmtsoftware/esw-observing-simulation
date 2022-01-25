@@ -5,7 +5,7 @@ import {
   exposureAbortedEventKey,
   exposureEndEventKey,
   exposureStartEventKey,
-  irDetectorExposureDataEventKey
+  OpticalDetectorExposureDataEventKey
 } from '../common/helpers'
 
 const redDetectorPrefix = new Prefix('WFOS', 'red.detector')
@@ -26,7 +26,7 @@ const dataWriteEndEvent = new EventKey(redDetectorPrefix, dataWriteEndEventKey)
 
 export const redDetectorExposureData = new EventKey(
   redDetectorPrefix,
-  irDetectorExposureDataEventKey
+  OpticalDetectorExposureDataEventKey
 )
 
 export const redDetectorObserveEvents = [
