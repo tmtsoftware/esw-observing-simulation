@@ -1,7 +1,7 @@
 package esw.observing.simulation
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import csw.framework.deploy.containercmd.ContainerCmd
+import com.typesafe.config.ConfigFactory
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.logging.api.scaladsl.Logger
@@ -9,7 +9,7 @@ import csw.logging.client.scaladsl.LoggerFactory
 import csw.params.commands.CommandResponse
 import csw.params.events.ObserveEventNames.{ExposureEnd, ExposureStart}
 import csw.params.events._
-import csw.prefix.models.Subsystem.{Container, IRIS}
+import csw.prefix.models.Subsystem.Container
 import csw.prefix.models.{Prefix, Subsystem}
 import csw.testkit.scaladsl.CSWService.EventServer
 import esw.agent.akka.app.process.{ProcessExecutor, ProcessOutput}
@@ -21,7 +21,6 @@ import esw.ocs.testkit.Service.MachineAgent
 import esw.sm.api.protocol.StartSequencerResponse.Started
 import esw.sm.impl.utils.{SequenceComponentAllocator, SequenceComponentUtil}
 
-import java.io.Closeable
 import java.nio.file.Paths
 import scala.concurrent.duration.DurationInt
 
@@ -54,11 +53,9 @@ class EswIrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
   private var seqComp1Loc: Option[AkkaLocation]  = None
   private var seqComp2Loc: Option[AkkaLocation]  = None
   private var seqComp3Loc: Option[AkkaLocation]  = None
-  private var containerCmd: Option[Closeable]    = None
   private var containerLoc: Option[AkkaLocation] = None
 
   override def afterAll(): Unit = {
-    containerCmd.foreach(_.close())
     seqComp1Loc.map(seqCompLocation => agentClient.killComponent(seqCompLocation).futureValue)
     seqComp2Loc.map(seqCompLocation => agentClient.killComponent(seqCompLocation).futureValue)
     seqComp3Loc.map(seqCompLocation => agentClient.killComponent(seqCompLocation).futureValue)
@@ -75,12 +72,10 @@ class EswIrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
   "Iris top level esw sequencer" must {
     "handle the submitted sequence | ESW-554, ESW-82, ESW-570" in {
 
-      val irisContainerConfPath = Paths.get(getClass.getResource("/IrisContainer.conf").toURI)
       val tcsContainerConfPath  = Paths.get(getClass.getResource("/TcsContainer.conf").toURI)
 
       //spawn the iris container
-      containerCmd =
-        Some(ContainerCmd.start("iris_container_cmd_app", IRIS, List("--local", irisContainerConfPath.toString).toArray))
+      frameworkTestKit.spawnContainer(ConfigFactory.load("IrisContainer.conf"))
 
       val containerLocation: Option[AkkaLocation] =
         locationService.resolve(TestData.irisContainerConnection, 15.seconds).futureValue

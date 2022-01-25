@@ -1,13 +1,12 @@
 package esw.observing.simulation
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import csw.framework.deploy.containercmd.ContainerCmd
+import com.typesafe.config.ConfigFactory
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.params.commands.CommandResponse
 import csw.params.core.models.ExposureId
 import csw.params.events._
-import csw.prefix.models.Subsystem.WFOS
 import csw.prefix.models.{Prefix, Subsystem}
 import csw.testkit.scaladsl.CSWService.EventServer
 import esw.agent.akka.client.AgentClient
@@ -18,8 +17,6 @@ import esw.ocs.testkit.Service.MachineAgent
 import esw.sm.api.protocol.StartSequencerResponse.Started
 import esw.sm.impl.utils.{SequenceComponentAllocator, SequenceComponentUtil}
 
-import java.io.Closeable
-import java.nio.file.Paths
 import scala.concurrent.duration.DurationInt
 
 class WfosSequencerTest extends EswTestKit(EventServer, MachineAgent) {
@@ -39,10 +36,8 @@ class WfosSequencerTest extends EswTestKit(EventServer, MachineAgent) {
   private val locationServiceUtil              = new LocationServiceUtil(locationService)
   private val sequenceComponentUtil            = new SequenceComponentUtil(locationServiceUtil, new SequenceComponentAllocator())
   private var seqCompLoc: Option[AkkaLocation] = None
-  private var containerCmd: Option[Closeable]  = None
 
   override def afterAll(): Unit = {
-    containerCmd.foreach(_.close())
     seqCompLoc.map(seqCompLocation => agentClient.killComponent(seqCompLocation).futureValue)
     super.afterAll()
   }
@@ -55,11 +50,8 @@ class WfosSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       val wfosBlueDetectorTestProbe = createTestProbe(WFOSTestData.detectorObsEvents(WFOSTestData.wfosBlueDetectorPrefix))
       val wfosRedDetectorTestProbe  = createTestProbe(WFOSTestData.detectorObsEvents(WFOSTestData.wfosRedDetectorPrefix))
 
-      val containerConfPath = Paths.get(getClass.getResource("/WfosContainer.conf").toURI)
-
       //spawn the wfos container
-      containerCmd = Some(ContainerCmd.start("wfos_container_cmd_app", WFOS, List("--local", containerConfPath.toString).toArray))
-
+      frameworkTestKit.spawnContainer(ConfigFactory.load("WfosContainer.conf"))
       val containerLocation: Option[AkkaLocation] =
         locationService.resolve(WFOSTestData.wfosContainerConnection, 15.seconds).futureValue
       containerLocation.isDefined shouldBe true
