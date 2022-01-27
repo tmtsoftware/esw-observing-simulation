@@ -9,3 +9,4 @@ libraryDependencies += ("com.github.tmtsoftware.esw"                      %% "es
 libraryDependencies += ("com.github.tmtsoftware.esw-observing-simulation" %% "iris-irisdeploy" % "390fa6d")
 libraryDependencies += ("com.github.tmtsoftware.esw-observing-simulation" %% "wfos-wfosdeploy" % "390fa6d")
 Test / parallelExecution := false
+scalafmtConfig := file("../.scalafmt.conf")

@@ -1,11 +1,11 @@
-import org.scalafmt.sbt.ScalafmtPlugin.autoImport.scalafmtOnCompile
+import org.scalafmt.sbt.ScalafmtPlugin.autoImport.{scalafmtConfig, scalafmtOnCompile}
 import sbt.Keys._
 import sbt.plugins.JvmPlugin
-import sbt.{url, _}
+import sbt.{file, url, _}
 
 object Common extends AutoPlugin {
   private val enableFatalWarnings: Boolean = sys.props.get("enableFatalWarnings").contains("true")
-  override def trigger: PluginTrigger = allRequirements
+  override def trigger: PluginTrigger      = allRequirements
 
   override def requires: Plugins = JvmPlugin
 
