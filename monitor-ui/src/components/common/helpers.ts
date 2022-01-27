@@ -10,6 +10,8 @@ export const rampsKey = intKey('rampsInExposure')
 export const rampsCompleteKey = intKey('rampsComplete')
 export const exposureTimeKey = longKey('exposureTime')
 export const remainingExposureTimeKey = longKey('remainingExposureTime')
+export const coaddsKey = intKey('coaddsInExposure')
+export const coaddsDoneKey = intKey('coaddsDone')
 
 export const exposureEndEventKey = new EventName('ObserveEvent.ExposureEnd')
 export const exposureStartEventKey = new EventName('ObserveEvent.ExposureStart')

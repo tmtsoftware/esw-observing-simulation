@@ -3,7 +3,15 @@ import * as React from 'react'
 import { useEventService } from '../../contexts/EventServiceContext'
 import type { LabelValueMap } from '../common/Assembly'
 import { Assembly } from '../common/Assembly'
-import { exposureTimeKey, getObserveEventName } from '../common/helpers'
+import {
+  exposureIdKey,
+  filenameKey,
+  exposureTimeKey,
+  remainingExposureTimeKey,
+  coaddsDoneKey,
+  coaddsKey,
+  getObserveEventName
+} from '../common/helpers'
 import {
   blueDetectorObserveEvents,
   dataWriteEndEvent,
@@ -23,18 +31,28 @@ const Detector = ({
 }): JSX.Element => {
   const eventService = useEventService()
   const [obsEvent, setObsEvent] = React.useState<string>()
+  const [exposureId, setExposureId] = React.useState<string>()
+  const [filename, setFilename] = React.useState<string>()
   const [exposureTime, setExposureTime] = React.useState<number>()
+  const [remainingExposureTime, setRemExposureTime] = React.useState<number>()
+  const [coadds, setCoadds] = React.useState<number>()
+  const [coaddsDone, setCoaddsDone] = React.useState<number>()
 
   React.useEffect(() => {
     const onObserveEvent = (event: Event) => {
       setObsEvent(getObserveEventName(event))
+      setExposureId(event.get(exposureIdKey)?.values[0])
       switch (event.eventName.name) {
         case dataWriteStartEvent.eventName.name:
           break
         case dataWriteEndEvent.eventName.name:
+          setFilename(event.get(filenameKey)?.values[0])
           break
         case blueDetectorExposureData.eventName.name:
+          setCoadds(event.get(coaddsKey)?.values[0])
+          setCoaddsDone(event.get(coaddsDoneKey)?.values[0])
           setExposureTime(event.get(exposureTimeKey)?.values[0])
+          setRemExposureTime(event.get(remainingExposureTimeKey)?.values[0])
           break
       }
     }
@@ -48,8 +66,13 @@ const Detector = ({
   }, [eventKeys, eventService])
 
   const blueDetectorLabelValueMap: LabelValueMap[] = [
+    { label: 'coadds', current: coadds },
+    { label: 'coadds done', current: coaddsDone },
     { label: 'exposure time', current: exposureTime },
-    { label: 'observe event', current: obsEvent }
+    { label: 'remaining time', current: remainingExposureTime },
+    { label: 'observe event', current: obsEvent },
+    { label: 'exposure id', current: exposureId },
+    { label: 'filename', current: filename }
   ]
 
   return (
