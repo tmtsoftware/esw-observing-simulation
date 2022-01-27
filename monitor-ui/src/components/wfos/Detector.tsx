@@ -44,7 +44,6 @@ const Detector = ({
       setExposureId(event.get(exposureIdKey)?.values[0])
       switch (event.eventName.name) {
         case dataWriteStartEvent.eventName.name:
-          break
         case dataWriteEndEvent.eventName.name:
           setFilename(event.get(filenameKey)?.values[0])
           break
