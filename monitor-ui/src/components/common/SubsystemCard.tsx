@@ -2,7 +2,7 @@ import type { Subsystem } from '@tmtsoftware/esw-ts'
 import { Card, Col, Row, Typography } from 'antd'
 import React from 'react'
 
-export const SubsytemCard = ({
+export const SubsystemCard = ({
   subsystem,
   children
 }: {

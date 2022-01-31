@@ -1,8 +1,9 @@
 import { Col, Row } from 'antd'
 import * as React from 'react'
-import { Assembly } from './common/Assembly'
-import { SubsytemCard } from './common/SubsystemCard'
+import { SubsystemCard } from './common/SubsystemCard'
 import { IRIS } from './iris/Iris'
+import { ENCAssembly } from './tcs/ENCAssembly'
+import { MCSAssembly } from './tcs/MCSAssembly'
 import { WFOS } from './wfos/Wfos'
 
 export const Main = (): JSX.Element => (
@@ -12,10 +13,10 @@ export const Main = (): JSX.Element => (
     </Col>
     <Col xs={24} md={24} lg={12} xl={8}>
       <WFOS />
-      <SubsytemCard subsystem={'TCS'}>
-        <Assembly name={'Mount Position'} keyValue={[]} />
-        <Assembly name={'Enclosure'} keyValue={[]} showDivider={false} />
-      </SubsytemCard>
+      <SubsystemCard subsystem={'TCS'}>
+        <MCSAssembly />
+        <ENCAssembly />
+      </SubsystemCard>
     </Col>
   </Row>
 )
