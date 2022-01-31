@@ -8,18 +8,19 @@ The simulation also depends on `TCS` assemblies which are part of separate [repo
 Apart from the scripts & tcs assemblies, All the other components required for the simulation are part of this repository.
 
 Repository has the following contents:
+
 - Inside `iris` folder, code related to following assemblies are present.
-   - iris.imager.filter
-   - iris.imager.adc (dependency on tcs-assemblies)
-   - iris.imager.detector
-   - iris.ifs.detector
-   - iris.ifs.scale
-   - iris.ifs.res
+  - iris.imager.filter
+  - iris.imager.adc (dependency on tcs-assemblies)
+  - iris.imager.detector
+  - iris.ifs.detector
+  - iris.ifs.scale
+  - iris.ifs.res
 - Inside `wfos` folder, code related to following assemblies are present.
-   - wfos.red.filter 
-   - wfos.blue.filter 
-   - wfos.red.detector 
-   - wfos.red.detector 
+  - wfos.red.filter
+  - wfos.blue.filter
+  - wfos.red.detector
+  - wfos.red.detector
 - `sample-configs` folder has sample configuration files which will be used while providing necessary configs to start simulation
   also these files are for future reference. All these files in production would be present in svn of config service.
 - `apps` & `simulation-scripts` folder's has pre-configured setup and scripts for starting a simulation. These folders need not require any modification for an observation.
@@ -28,11 +29,11 @@ Repository has the following contents:
 
 Run the shell scripts in this order in different terminals.
 
-1. sh simulation-scripts/start-csw-services.sh 
+1. sh simulation-scripts/start-csw-services.sh
     - this maintains which esw & sequencer-script sha to be used in the simulation observation.
-    - it starts required csw services : location service, config-service & aas server. 
+    - it starts required csw services : location service, config-service & aas server.
 2. sh simulation-scripts/start-esw-services.sh
-    - this maintains which esw & sequencer-script sha to be used in the simulation observation. 
+    - this maintains which esw & sequencer-script sha to be used in the simulation observation.
     - it starts required esw services for observation : sequence manager, agent service along with that 6 agents(Machines) are also started.
 3. sh simulation-scripts/start-components.sh
     - this scripts starts the container containing all the `WFOS` & `IRIS` assemblies using `esw-agent-akka-app`.
@@ -57,6 +58,7 @@ Once, everything is up and running, You can login to Eng UI app at this [Browser
 
 `integration` project has automated integration tests which demonstrates, commands(Setup/Observe) flowing from top level component(esw-sequencer) to the lowest component(assembly).
 Following tests inside integration project verifies that the communication is properly happening between the following components.
+
 - IrisSequencerTest : iris-assemblies <-> iris-sequencer.
 - WfosSequencerTest : wfos-assemblies <-> wfof-sequencer.
 - TcsSequencerTest : tcs-assemblies <-> tcs-sequencer
