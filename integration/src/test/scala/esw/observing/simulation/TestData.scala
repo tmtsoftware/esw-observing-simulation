@@ -62,7 +62,7 @@ object TestData {
   val targetCoords: Key[Coords.Coord] = CoordKey.make("targetCoords")
   val tcsSequencerPrefix: Prefix      = Prefix("TCS.IRIS_ImagerAndIFS")
   val tcsPreset: Setup = Setup(tcsSequencerPrefix, CommandName("preset"), obsId).madd(
-    baseCoords.set(EqCoord(Angle(1080000000000L), Angle(50400000000L)))
+    baseCoords.set(EqCoord(Angle(0L), Angle(72000000000L)))
   )
 
   val currentAltAzCoordKey = AltAzCoordKey.make("current")

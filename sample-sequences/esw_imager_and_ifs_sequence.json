@@ -55,8 +55,8 @@
             {
               "_type": "EqCoord",
               "tag": "BASE",
-              "ra": 1080000000000,
-              "dec": 756000000000,
+              "ra": 0,
+              "dec": 72000000000,
               "frame": "ICRS",
               "catalogName": "none",
               "pm": {

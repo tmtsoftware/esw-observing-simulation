@@ -72,7 +72,7 @@ class EswIrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
   "Iris top level esw sequencer" must {
     "handle the submitted sequence | ESW-554, ESW-82, ESW-570" in {
 
-      val tcsContainerConfPath  = Paths.get(getClass.getResource("/TcsContainer.conf").toURI)
+      val tcsContainerConfPath = Paths.get(getClass.getResource("/TcsContainer.conf").toURI)
 
       //spawn the iris container
       frameworkTestKit.spawnContainer(ConfigFactory.load("IrisContainer.conf"))
