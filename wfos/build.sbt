@@ -1,3 +1,4 @@
+import Common._
 ThisBuild / scalafmtConfig := file("../.scalafmt.conf")
 
 lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
@@ -12,6 +13,7 @@ lazy val `wfos-root` = project
 
 // assembly module
 lazy val `wfos-filter` = project
+  .enablePlugins(MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.WfosAssemblies
   )
@@ -29,6 +31,7 @@ lazy val `wfos-wfosdeploy` = project
 
 lazy val `wfos-detector` = project
   .in(file("wfos-detector"))
+  .enablePlugins(MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.WfosDetector
   )

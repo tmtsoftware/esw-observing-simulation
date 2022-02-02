@@ -46,7 +46,15 @@ jobs:
 
       - name: Tests
         working-directory: integration
-        run: sbt -DenableFatalWarnings=true test:test
+        run: sbt -DenableFatalWarnings=true -DgenerateStoryReport=true test:test
+
+      - name: Upload RTM
+        working-directory: integration
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: Integration RTM
+          path: target/RTM
 
       - name: Notify slack
         if: always()

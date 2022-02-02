@@ -7,7 +7,8 @@ object Dependencies {
     CSW.`csw-testkit`               % Test,
     Libs.`scalatest`                % Test,
     Libs.`junit-4-13`               % Test,
-    Libs.`akka-actor-testkit-typed` % Test
+    Libs.`akka-actor-testkit-typed` % Test,
+    Libs.`tmt-test-reporter`        % Test
   )
 
   val WfosDeploy = Seq(

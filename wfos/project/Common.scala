@@ -7,6 +7,18 @@ object Common extends AutoPlugin {
   private val enableFatalWarnings: Boolean = sys.props.get("enableFatalWarnings").contains("true")
   override def trigger: PluginTrigger      = allRequirements
 
+  private val enableCoverage: Boolean      = sys.props.get("enableCoverage").contains("true")
+  val MaybeCoverage: Plugins = if (enableCoverage) Coverage else Plugins.empty
+  val storyReport: Boolean                 = sys.props.get("generateStoryReport").contains("true")
+
+  private val reporterOptions: Seq[Tests.Argument] =
+    if (storyReport)
+      Seq(
+        Tests.Argument(TestFrameworks.ScalaTest, "-oDF", "-C", "tmt.test.reporter.TestReporter"),
+        Tests.Argument(TestFrameworks.JUnit, "-v", "-a")
+      )
+    else Seq(Tests.Argument("-oDF"), Tests.Argument(TestFrameworks.JUnit, "-v", "-a"))
+
   override def requires: Plugins = JvmPlugin
 
   override lazy val projectSettings: Seq[Setting[_]] = Seq(
@@ -30,13 +42,7 @@ object Common extends AutoPlugin {
       "-Xasync"
     ),
     Compile / doc / javacOptions ++= Seq("-Xdoclint:none"),
-    Test / testOptions ++= Seq(
-      // show full stack traces and test case durations
-      Tests.Argument("-oDF"),
-      // -v Log "test run started" / "test started" / "test run finished" events on log level "info" instead of "debug".
-      // -a Show stack traces and exception class name for AssertionErrors.
-      Tests.Argument(TestFrameworks.JUnit, "-v", "-a")
-    ),
+    Test / testOptions ++= reporterOptions,
     resolvers += "jitpack" at "https://jitpack.io",
     version := "0.1.0-SNAPSHOT",
     fork := true,

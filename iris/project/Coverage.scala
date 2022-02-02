@@ -8,7 +8,7 @@ object Coverage extends AutoPlugin {
 
   override def projectSettings: Seq[Setting[_]] = Seq(
     coverageEnabled := true,
-    coverageMinimumStmtTotal := 80,
+    coverageMinimumStmtTotal := 75,
     coverageFailOnMinimum := true,
     coverageHighlighting := true,
     coverageOutputCobertura := true,

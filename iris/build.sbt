@@ -1,3 +1,4 @@
+import Common._
 ThisBuild / scalafmtConfig := file("../.scalafmt.conf")
 
 lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
@@ -17,6 +18,7 @@ lazy val `iris-root` = project
 // assembly module
 lazy val `iris-imager-filter` = project
   .dependsOn(`iris-commons`)
+  .enablePlugins(MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.IrisAssemblies
   )
@@ -24,6 +26,7 @@ lazy val `iris-imager-filter` = project
 // assembly2 module
 lazy val `iris-ifs-res` = project
   .dependsOn(`iris-commons`)
+  .enablePlugins(MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.IrisAssemblies
   )
@@ -32,6 +35,7 @@ lazy val `iris-ifs-res` = project
 lazy val `iris-ifs-scale` = project
   .in(file("iris-ifs-scale"))
   .dependsOn(`iris-commons`)
+  .enablePlugins(MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.IrisAssemblies
   )
@@ -39,6 +43,7 @@ lazy val `iris-ifs-scale` = project
 lazy val `iris-imager-adc` = project
   .in(file("iris-imager-adc"))
   .dependsOn(`iris-commons`)
+  .enablePlugins(MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.IrisAssemblies
   )
