@@ -30,7 +30,7 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
     logger.info("Prism is now in Retracted IN position")
     publishPrismState(PrismState.STOPPED)
     publishRetractPosition(PrismPosition.IN)
-    //start subscription
+    // start subscription
     receiveWithDefaultBehavior("IN") {
       case PrismCommands.RetractSelect(runId, position) =>
         position match {
@@ -38,7 +38,7 @@ class PrismActor(cswContext: CswContext, adcImagerConfiguration: AssemblyConfigu
             crm.updateCommand(Completed(runId))
             Behaviors.same
           case PrismPosition.OUT =>
-            //stop subscription
+            // stop subscription
             startRetracting(runId)(self ! GoingOut)
             goingOut(self)
         }

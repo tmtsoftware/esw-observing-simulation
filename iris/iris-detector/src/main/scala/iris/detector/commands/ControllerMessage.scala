@@ -16,7 +16,7 @@ object ControllerMessage {
   case class StartExposure(
       runId: Id,
       replyTo: ActorRef[FitsMessage]
-  )                                        extends ControllerMessage
+  ) extends ControllerMessage
   case class ExposureInProgress(runId: Id) extends ControllerMessage
   case class ExposureFinished(runId: Id)   extends ControllerMessage
   case class AbortExposure(runId: Id)      extends ControllerMessage
