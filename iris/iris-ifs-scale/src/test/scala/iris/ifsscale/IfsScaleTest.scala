@@ -39,7 +39,7 @@ class IfsScaleTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSui
     akkaLocation.connection shouldBe connection
 
     val testProbe = TestProbe[Event]()
-    //Subscribe to event's which will be published by scale assembly in it's lifecycle
+    // Subscribe to event's which will be published by scale assembly in it's lifecycle
     eventService.defaultSubscriber.subscribeActorRef(
       Set(
         IfsScaleEventKey
@@ -81,7 +81,7 @@ class IfsScaleTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSui
     akkaLocation.connection shouldBe connection
 
     val testProbe = TestProbe[Event]()
-    //Subscribe to event's which will be published by scale assembly in it's lifecycle
+    // Subscribe to event's which will be published by scale assembly in it's lifecycle
     eventService.defaultSubscriber.subscribeActorRef(
       Set(
         IfsScaleEventKey
@@ -95,7 +95,7 @@ class IfsScaleTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSui
       Setup(sequencerPrefix, SelectCommand.Name, None).add(ScaleKey.set(S9.entryName))
     val initialResponse = commandService.submit(selectCommand).futureValue
 
-    //concurrent change scale
+    // concurrent change scale
     val command2Response = commandService.submit(selectCommand).futureValue
 
     initialResponse shouldBe a[Started]

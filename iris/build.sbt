@@ -51,6 +51,7 @@ lazy val `iris-imager-adc` = project
 lazy val `iris-detector` = project
   .in(file("iris-detector"))
   .dependsOn(`iris-commons`)
+  .enablePlugins(MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.IrisDetector
   )

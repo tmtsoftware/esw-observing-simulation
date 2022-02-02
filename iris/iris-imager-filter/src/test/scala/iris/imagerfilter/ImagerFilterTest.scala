@@ -41,7 +41,7 @@ class ImagerFilterTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFu
     akkaLocation.connection shouldBe connection
 
     val testProbe = TestProbe[Event]()
-    //Subscribe to event's which will be published by imager in it's lifecycle
+    // Subscribe to event's which will be published by imager in it's lifecycle
     eventService.defaultSubscriber.subscribeActorRef(
       Set(
         ImagerPositionEvent.ImagerPositionEventKey
@@ -91,7 +91,7 @@ class ImagerFilterTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFu
     val finalResponse = commandService.queryFinal(initialResponse.runId)(Timeout(2.seconds))
     finalResponse.futureValue shouldBe a[Completed]
 
-    //Move position backwards
+    // Move position backwards
 
     val selectCommand2 =
       Setup(sequencerPrefix, SelectCommand.Name, None).add(Wheel1Key.set(Z.entryName))
@@ -133,7 +133,7 @@ class ImagerFilterTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFu
     akkaLocation.connection shouldBe connection
 
     val testProbe = TestProbe[Event]()
-    //Subscribe to event's which will be published by imager in it's lifecycle
+    // Subscribe to event's which will be published by imager in it's lifecycle
     eventService.defaultSubscriber.subscribeActorRef(
       Set(
         ImagerPositionEvent.ImagerPositionEventKey
@@ -157,7 +157,7 @@ class ImagerFilterTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFu
       Setup(sequencerPrefix, SelectCommand.Name, None).add(Wheel1Key.set(H.entryName))
     val initialResponse = commandService.submit(selectCommand).futureValue
 
-    //concurrent move
+    // concurrent move
     val command2Response = commandService.submit(selectCommand).futureValue
 
     initialResponse shouldBe a[Started]

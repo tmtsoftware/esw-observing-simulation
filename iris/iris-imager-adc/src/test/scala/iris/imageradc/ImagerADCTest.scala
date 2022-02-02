@@ -49,7 +49,7 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
     akkaLocation.connection shouldBe connection
 
     val testProbe = TestProbe[Event]()
-    //Subscribe to event's which will be published by prism in it's lifecycle
+    // Subscribe to event's which will be published by prism in it's lifecycle
     eventService.defaultSubscriber.subscribeActorRef(
       Set(
         ImagerADCStateEventKey,
@@ -81,7 +81,7 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
       val goingInEvent = testProbe.expectMessageType[SystemEvent]
       goingInEvent(PrismPosition.RetractKey).head.name shouldBe PrismPosition.IN.entryName
     }
-    //Send Follow command to prism with target angle. This command is immediately completed.
+    // Send Follow command to prism with target angle. This command is immediately completed.
     val followCommand =
       Setup(sequencerPrefix, ADCCommand.PrismFollow, None)
 //        .add(ADCCommand.targetAngleKey.set(50.0))
@@ -92,14 +92,14 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
     import Angle._
     eventService.defaultPublisher.publish(TCSEvents.make(AltAzCoord(BASE, 40.degree, 20.degree)))
 
-    //verify targetAngle is set to 50.0
+    // verify targetAngle is set to 50.0
     eventually {
       val currentEvent = testProbe.expectMessageType[SystemEvent]
       currentEvent.eventName shouldBe ImagerADCCurrentEventName
       currentEvent(targetAngleKey).head shouldBe 50.0 // we set target to  90 - alt.degree so here in test, it comes out 50, 90 - 40
     }
 
-    //verify whether prism has started moving
+    // verify whether prism has started moving
     eventually {
       val movingEvent = testProbe.expectMessageType[SystemEvent]
       movingEvent.eventName shouldBe ImagerADCStateEventName
@@ -109,7 +109,7 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
 
     Thread.sleep(3000)
 
-    //assertion to check if onTarget becomes true while following
+    // assertion to check if onTarget becomes true while following
     eventually {
       val followingEvent = testProbe.expectMessageType[SystemEvent]
       followingEvent.eventName shouldBe ImagerADCStateEventName
@@ -128,7 +128,7 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
     // update target to 10 degrees (90 - 80)
     eventService.defaultPublisher.publish(TCSEvents.make(AltAzCoord(BASE, 80.degree, 50.degree)))
 
-    //assertion to check if onTarget becomes true while following
+    // assertion to check if onTarget becomes true while following
     eventually {
       val followingEvent = testProbe.expectMessageType[SystemEvent]
       followingEvent.eventName shouldBe ImagerADCStateEventName
@@ -136,7 +136,7 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
       followingEvent(onTargetKey).head shouldBe true
     }
 
-    //assertion to check if prism follows the new target
+    // assertion to check if prism follows the new target
     eventually {
       val current = testProbe.expectMessageType[SystemEvent]
       current.eventName shouldBe ImagerADCCurrentEventName
@@ -180,7 +180,7 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
     akkaLocation.connection shouldBe connection
 
     val testProbe = TestProbe[Event]()
-    //Subscribe to event's which will be published by prism in it's lifecycle
+    // Subscribe to event's which will be published by prism in it's lifecycle
     eventService.defaultSubscriber.subscribeActorRef(
       Set(
         ImagerADCStateEventKey,

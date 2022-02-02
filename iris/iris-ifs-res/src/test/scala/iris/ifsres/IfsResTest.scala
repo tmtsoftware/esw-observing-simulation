@@ -39,7 +39,7 @@ class IfsResTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSuite
     akkaLocation.connection shouldBe connection
 
     val testProbe = TestProbe[Event]()
-    //Subscribe to event's which will be published by imager in it's lifecycle
+    // Subscribe to event's which will be published by imager in it's lifecycle
     eventService.defaultSubscriber.subscribeActorRef(
       Set(
         IfsResPositionEventKey
@@ -84,7 +84,7 @@ class IfsResTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSuite
     val finalResponse = commandService.queryFinal(initialResponse.runId)(Timeout(2.seconds))
     finalResponse.futureValue shouldBe a[Completed]
 
-    //Move position backwards
+    // Move position backwards
 
     val selectCommand2 =
       Setup(sequencerPrefix, SelectCommand.Name, None).add(SpectralResolutionKey.set(R4000_Z.entryName))
@@ -123,7 +123,7 @@ class IfsResTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSuite
     akkaLocation.connection shouldBe connection
 
     val testProbe = TestProbe[Event]()
-    //Subscribe to event's which will be published by imager in it's lifecycle
+    // Subscribe to event's which will be published by imager in it's lifecycle
     eventService.defaultSubscriber.subscribeActorRef(
       Set(
         IfsResPositionEventKey
@@ -145,7 +145,7 @@ class IfsResTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSuite
       Setup(sequencerPrefix, SelectCommand.Name, None).add(SpectralResolutionKey.set(R4000_H.entryName))
     val initialResponse = commandService.submit(selectCommand).futureValue
 
-    //concurrent move
+    // concurrent move
     val command2Response = commandService.submit(selectCommand).futureValue
 
     initialResponse shouldBe a[Started]
