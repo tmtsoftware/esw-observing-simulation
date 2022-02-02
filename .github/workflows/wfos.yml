@@ -45,6 +45,12 @@ jobs:
         working-directory: wfos
         run: cs launch --channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/master/apps.json rtm:0.3.0 -- target/RTM/testStoryMapping.txt tools/RTM/storyRequirementMapping.csv target/RTM/testRequirementsMapping.txt
 
+      - name: Generate Coverage
+        working-directory: wfos
+        run: |
+          sbt -DenableCoverage=true coverageReport
+          sbtn coverageAggregate
+
       - name: Upload RTM
         if: always()
         uses: actions/upload-artifact@v2
