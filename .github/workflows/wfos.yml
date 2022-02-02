@@ -42,18 +42,16 @@ jobs:
         run: sbt -DenableFatalWarnings=true -DenableCoverage=true -DgenerateStoryReport=true test:test
 
       - name: Upload RTM
-        working-directory: wfos
         if: always()
         uses: actions/upload-artifact@v2
         with:
           name: WFOS RTM
-          path: target/RTM
+          path: wfos/target/RTM
 
       - uses: actions/upload-artifact@v2
-        working-directory: wfos
         with:
           name: WFOS Coverage Report
-          path: target/scala-2.13/scoverage-report
+          path: wfos/target/scala-2.13/scoverage-report
 
       - name: Notify slack
         if: always()

@@ -42,18 +42,16 @@ jobs:
         run: sbt -DenableFatalWarnings=true -DenableCoverage=true -DgenerateStoryReport=true test:test
 
       - name: Upload RTM
-        working-directory: iris
         if: always()
         uses: actions/upload-artifact@v2
         with:
           name: IRIS RTM
-          path: target/RTM
+          path: iris/target/RTM
 
       - uses: actions/upload-artifact@v2
-        working-directory: iris
         with:
           name: IRIS Coverage Report
-          path: target/scala-2.13/scoverage-report
+          path: iris/target/scala-2.13/scoverage-report
 
       - name: Notify slack
         if: always()

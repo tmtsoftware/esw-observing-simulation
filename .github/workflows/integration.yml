@@ -49,12 +49,11 @@ jobs:
         run: sbt -DenableFatalWarnings=true -DgenerateStoryReport=true test:test
 
       - name: Upload RTM
-        working-directory: integration
-        if: always()
         uses: actions/upload-artifact@v2
+        if: always()
         with:
           name: Integration RTM
-          path: target/RTM
+          path: integration/target/RTM
 
       - name: Notify slack
         if: always()
