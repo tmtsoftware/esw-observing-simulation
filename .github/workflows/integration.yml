@@ -47,6 +47,10 @@ jobs:
       - name: Tests
         working-directory: integration
         run: sbt -DenableFatalWarnings=true -DgenerateStoryReport=true test:test
+      
+      - name: Generate RTM
+        working-directory: wfos
+        run: cs launch --channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/master/apps.json rtm:0.3.0 -- target/RTM/testStoryMapping.txt tools/RTM/storyRequirementMapping.csv target/RTM/testRequirementsMapping.txt
 
       - name: Upload RTM
         uses: actions/upload-artifact@v2
