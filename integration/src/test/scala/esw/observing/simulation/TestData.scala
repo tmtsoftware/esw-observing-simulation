@@ -13,7 +13,7 @@ import csw.prefix.models.{Prefix, Subsystem}
 
 object TestData {
 
-  //imager filter
+  // imager filter
   private val filterChoices: Choices             = Choices.from("Ks", "CO")
   val ImagerFilterCurrentPositionKey: GChoiceKey = ChoiceKey.make("current", filterChoices)
   val ImagerFilterDemandPositionKey: GChoiceKey  = ChoiceKey.make("demand", filterChoices)
@@ -21,7 +21,7 @@ object TestData {
 
   val filterKey: GChoiceKey = ChoiceKey.make("filter", Units.NoUnits, filterChoices)
 
-  //ifs res
+  // ifs res
   private val ifsResChoices: Choices       = Choices.from("4000-H")
   val IfsResCurrentPositionKey: GChoiceKey = ChoiceKey.make("current", ifsResChoices)
   val IfsResTargetPositionKey: GChoiceKey  = ChoiceKey.make("target", ifsResChoices)
@@ -29,7 +29,7 @@ object TestData {
   val spectralResolutionP: Parameter[Choice] =
     ChoiceKey.make("spectralResolution", Units.NoUnits, ifsResChoices).set("4000-H")
 
-  //ifs scale
+  // ifs scale
   private val ifsScaleChoices: Choices       = Choices.from("9")
   val IfsScaleCurrentPositionKey: GChoiceKey = ChoiceKey.make("current", ifsScaleChoices)
   val IfsScaleTargetPositionKey: GChoiceKey  = ChoiceKey.make("target", ifsScaleChoices)
@@ -46,7 +46,7 @@ object TestData {
 
   val scienceAdcFollowP: Parameter[Boolean] = BooleanKey.make("scienceAdcFollow").set(true)
 
-  //***********
+  // ***********
   val directoryP: Parameter[String]          = StringKey.make("directory").set("/tmp")
   val imagerExposureIdP: Parameter[String]   = StringKey.make("imagerExposureId").set("2020A-001-123-IRIS-IMG-DRK1-0023")
   val ifsExposureIdP: Parameter[String]      = StringKey.make("ifsExposureId").set("2020A-001-123-IRIS-IMG-DRK1-0023")
@@ -55,7 +55,7 @@ object TestData {
   val imagerNumRampsP: Parameter[Int]        = IntKey.make("imagerNumRamps").set(2)
   val ifsNumRampsP: Parameter[Int]           = IntKey.make("ifsNumRamps").set(2)
 
-  //TCS Sequencer data
+  // TCS Sequencer data
 
   val obsId: Option[ObsId]            = Some(ObsId("2020A-001-123"))
   val baseCoords: Key[Coords.Coord]   = CoordKey.make("baseCoords")
@@ -79,7 +79,7 @@ object TestData {
     qKey.set(100.0)
   )
 
-  //IRIS Sequencer data
+  // IRIS Sequencer data
 
   val observationStart: Setup = Setup(Prefix("IRIS.Imager"), CommandName("observationStart"), obsId)
   val observationEnd: Setup   = Setup(Prefix("IRIS.Imager"), CommandName("observationEnd"), obsId)
@@ -138,7 +138,7 @@ object TestData {
   val ImagerADCCurrentEventName: EventName = EventName("prism_current")
   val ImagerADCCurrentEventKey: EventKey   = EventKey(ImagerADCAssemblyPrefix, ImagerADCCurrentEventName)
 
-  //ESW sequencer data
+  // ESW sequencer data
   private val eswSequencerPrefix: Prefix = Prefix("ESW.IRIS_ImagerAndIFS")
 
   val eswObservationStart: Setup = Setup(eswSequencerPrefix, CommandName("observationStart"), obsId)

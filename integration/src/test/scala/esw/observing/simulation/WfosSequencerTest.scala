@@ -50,7 +50,7 @@ class WfosSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       val wfosBlueDetectorTestProbe = createTestProbe(WFOSTestData.detectorObsEvents(WFOSTestData.wfosBlueDetectorPrefix))
       val wfosRedDetectorTestProbe  = createTestProbe(WFOSTestData.detectorObsEvents(WFOSTestData.wfosRedDetectorPrefix))
 
-      //spawn the wfos container
+      // spawn the wfos container
       frameworkTestKit.spawnContainer(ConfigFactory.load("WfosContainer.conf"))
       val containerLocation: Option[AkkaLocation] =
         locationService.resolve(WFOSTestData.wfosContainerConnection, 15.seconds).futureValue
@@ -60,9 +60,9 @@ class WfosSequencerTest extends EswTestKit(EventServer, MachineAgent) {
         .resolve(AkkaConnection(ComponentId(WFOSTestData.wfosBlueFilterPrefix, ComponentType.Assembly)), 5.seconds)
         .futureValue
         .value
-      //********************************************************************
+      // ********************************************************************
 
-      //spawn wfos sequencer
+      // spawn wfos sequencer
       agentClient.spawnSequenceComponent(seqComponentName, Some(ScriptVersion.value)).futureValue
 
       seqCompLoc = locationService.find(testSeqCompConnection).futureValue
@@ -72,24 +72,24 @@ class WfosSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       val sequencerResponse = sequenceComponentUtil.loadScript(Subsystem.WFOS, obsMode, None, seqCompLoc.get).futureValue
       sequencerResponse.rightValue shouldBe a[Started]
 
-      //********************************************************************
+      // ********************************************************************
 
       val sequencerApi = sequencerClient(Subsystem.WFOS, obsMode)
 
       val initialSubmitRes = sequencerApi.submit(WFOSTestData.sequence).futureValue
       initialSubmitRes shouldBe a[CommandResponse.Started]
 
-      //assert events for setupAcquisition
+      // assert events for setupAcquisition
       assertBlueFilterPosition(wfosBlueFilterTestProbe, "g'")
 
-      //assert events for acquisitionExposure
+      // assert events for acquisitionExposure
       assertDetectorEvents(wfosBlueDetectorTestProbe, "/tmp", ExposureId(WFOSTestData.exposureIdStr))
 
-      //assert events for setupObservation
+      // assert events for setupObservation
       assertBlueFilterPosition(wfosBlueFilterTestProbe, "fused-silica")
       assertRedFilterPosition(wfosRedFilterTestProbe, "z'")
 
-      //assert events for singleExposure
+      // assert events for singleExposure
       assertDetectorEvents(wfosBlueDetectorTestProbe, "/tmp", ExposureId(WFOSTestData.exposureIdStr))
       assertDetectorEvents(wfosRedDetectorTestProbe, "/tmp", ExposureId(WFOSTestData.exposureIdStr))
     }

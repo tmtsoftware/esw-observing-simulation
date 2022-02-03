@@ -42,7 +42,7 @@ class RedFilterTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
     akkaLocation.connection shouldBe connection
 
     val testProbe = TestProbe[Event]()
-    //Subscribe to event's which will be published by red filter in it's lifecycle
+    // Subscribe to event's which will be published by red filter in it's lifecycle
     eventService.defaultSubscriber.subscribeActorRef(
       Set(
         filterPositionEvent.FilterPositionEventKey
@@ -94,7 +94,7 @@ class RedFilterTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
     val finalResponse = commandService.queryFinal(initialResponse.runId)(Timeout(2.seconds))
     finalResponse.futureValue shouldBe a[Completed]
 
-    //Move position backwards
+    // Move position backwards
 
     val selectCommand2 =
       Setup(sequencerPrefix, RedSelectCommand.Name, None).add(Wheel1Key.set(RPrime.entryName))
@@ -135,7 +135,7 @@ class RedFilterTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
     akkaLocation.connection shouldBe connection
 
     val testProbe = TestProbe[Event]()
-    //Subscribe to event's which will be published by red filter in it's lifecycle
+    // Subscribe to event's which will be published by red filter in it's lifecycle
     eventService.defaultSubscriber.subscribeActorRef(
       Set(
         filterPositionEvent.FilterPositionEventKey
@@ -159,7 +159,7 @@ class RedFilterTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
       Setup(sequencerPrefix, RedSelectCommand.Name, None).add(Wheel1Key.set(FusedSilica.entryName))
     val initialResponse = commandService.submit(selectCommand).futureValue
 
-    //concurrent move
+    // concurrent move
     val command2Response = commandService.submit(selectCommand).futureValue
 
     initialResponse shouldBe a[Started]

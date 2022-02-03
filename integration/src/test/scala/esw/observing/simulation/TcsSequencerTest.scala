@@ -77,9 +77,9 @@ class TcsSequencerTest extends EswTestKit(EventServer, MachineAgent) {
         .futureValue
         .isDefined shouldBe true
 
-      //********************************************************************
+      // ********************************************************************
 
-      //spawn iris sequencer
+      // spawn iris sequencer
       agentClient.spawnSequenceComponent(seqComponentName, Some(ScriptVersion.value)).futureValue
 
       seqCompLoc = locationService.find(testSeqCompConnection).futureValue
@@ -89,30 +89,30 @@ class TcsSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       val sequencerResponse = sequenceComponentUtil.loadScript(Subsystem.TCS, obsMode, None, seqCompLoc.get).futureValue
       sequencerResponse.rightValue shouldBe a[Started]
 
-      //********************************************************************
+      // ********************************************************************
 
       val pkAssemblyTestProbe = createTestProbe(Set(TestData.mcsDemandPositionEventKey, TestData.encCurrentPositionEventKey))
 
       val sequencerApi     = sequencerClient(Subsystem.TCS, obsMode)
       val initialSubmitRes = sequencerApi.submit(TestData.tcsSequence).futureValue
       initialSubmitRes shouldBe a[CommandResponse.Started]
-      //sequence : preset, setupObservation
+      // sequence : preset, setupObservation
 
-      //Assert MountPosition for SlewToTarget command
+      // Assert MountPosition for SlewToTarget command
       eventually {
         val event = pkAssemblyTestProbe.expectMessageType[SystemEvent]
         event.eventName.name shouldBe "MountPosition"
         assertMountPositionError(event, 0.5)
       }
 
-      //Assert CurrentPosition for SlewToTarget command
+      // Assert CurrentPosition for SlewToTarget command
       eventually {
         val event = pkAssemblyTestProbe.expectMessageType[SystemEvent]
         event.eventName.name shouldBe "CurrentPosition"
         assertCapAndBaseError(event)
       }
 
-      //Assert MountPosition for SetOffset command
+      // Assert MountPosition for SetOffset command
       eventually {
         val event = pkAssemblyTestProbe.expectMessageType[SystemEvent]
         event.eventName.name shouldBe "MountPosition"

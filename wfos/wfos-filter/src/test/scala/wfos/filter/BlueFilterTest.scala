@@ -42,7 +42,7 @@ class BlueFilterTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunS
     akkaLocation.connection shouldBe connection
 
     val testProbe = TestProbe[Event]()
-    //Subscribe to event's which will be published by blue filter in it's lifecycle
+    // Subscribe to event's which will be published by blue filter in it's lifecycle
     eventService.defaultSubscriber.subscribeActorRef(
       Set(
         filterPositionEvent.FilterPositionEventKey
@@ -87,7 +87,7 @@ class BlueFilterTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunS
     val finalResponse = commandService.queryFinal(initialResponse.runId)(Timeout(2.seconds))
     finalResponse.futureValue shouldBe a[Completed]
 
-    //Move position backwards
+    // Move position backwards
 
     val selectCommand2 =
       Setup(sequencerPrefix, BlueSelectCommand.Name, None).add(Wheel1Key.set(UPrime.entryName))
@@ -121,7 +121,7 @@ class BlueFilterTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunS
     akkaLocation.connection shouldBe connection
 
     val testProbe = TestProbe[Event]()
-    //Subscribe to event's which will be published by blue filter in it's lifecycle
+    // Subscribe to event's which will be published by blue filter in it's lifecycle
     eventService.defaultSubscriber.subscribeActorRef(
       Set(
         filterPositionEvent.FilterPositionEventKey
@@ -145,7 +145,7 @@ class BlueFilterTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunS
       Setup(sequencerPrefix, BlueSelectCommand.Name, None).add(Wheel1Key.set(FusedSilica.entryName))
     val initialResponse = commandService.submit(selectCommand).futureValue
 
-    //concurrent move
+    // concurrent move
     val command2Response = commandService.submit(selectCommand).futureValue
 
     initialResponse shouldBe a[Started]

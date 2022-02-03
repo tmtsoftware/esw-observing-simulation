@@ -52,8 +52,7 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
   "IrisSequencer" must {
     "handle the submitted sequence | ESW-551, ESW-566" in {
 
-
-      //spawn the iris container
+      // spawn the iris container
       frameworkTestKit.spawnContainer(ConfigFactory.load("IrisContainer.conf"))
 
       val containerLocation: Option[AkkaLocation] =
@@ -64,9 +63,9 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
         .resolve(AkkaConnection(ComponentId(TestData.imagerFilterPrefix, ComponentType.Assembly)), 5.seconds)
         .futureValue
         .value
-      //********************************************************************
+      // ********************************************************************
 
-      //spawn iris sequencer
+      // spawn iris sequencer
       agentClient.spawnSequenceComponent(seqComponentName, Some(ScriptVersion.value)).futureValue
 
       seqCompLoc = locationService.find(testSeqCompConnection).futureValue
@@ -76,7 +75,7 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       val sequencerResponse = sequenceComponentUtil.loadScript(Subsystem.IRIS, obsMode, None, seqCompLoc.get).futureValue
       sequencerResponse.rightValue shouldBe a[Started]
 
-      //********************************************************************
+      // ********************************************************************
 
       val imagerFilterTestProbe = createTestProbe(Set(TestData.imagerFilterPositionEventKey))
       val ifsResTestProbe       = createTestProbe(Set(TestData.IfsResPositionEventKey))
@@ -99,23 +98,23 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       val sequencerApi     = sequencerClient(Subsystem.IRIS, obsMode)
       val initialSubmitRes = sequencerApi.submit(TestData.irisSequence).futureValue
       initialSubmitRes shouldBe a[CommandResponse.Started]
-      //sequence : setupAcquisition, acquisitionExposure, setupObservation, singleExposure
+      // sequence : setupAcquisition, acquisitionExposure, setupObservation, singleExposure
       assertAdcInitialized(imagerAdcTestProbe)
-      //assert events for setupAcquisition
+      // assert events for setupAcquisition
       assertImagerFilterPosition(imagerFilterTestProbe, "Ks", "H")
 
       assertAdcPrismInSetupAcquisition(imagerAdcTestProbe, 10.0, 40.0)
 
-      //assert events for acquisitionExposure
+      // assert events for acquisitionExposure
       assertDetectorEvents(imagerDetectorTestProbe, "/tmp", ExposureId("2020A-001-123-IRIS-IMG-DRK1-0023"))
       eventService.defaultPublisher.publish(TCSEvents.make(AltAzCoord(BASE, 40.degree, 20.degree))) // 90-40 = target (50)
-      //assert events for setupObservation
+      // assert events for setupObservation
       assertAdcPrismInSetupObservation(imagerAdcTestProbe, 45.0, 50.0)
       assertImagerFilterPosition(imagerFilterTestProbe, "CO", "H+K notch")
       assertIfsResPosition(ifsResTestProbe)
       assertIfsScalePosition(ifsScaleTestProbe)
 
-      //assert events for singleExposure
+      // assert events for singleExposure
       assertDetectorEvents(imagerDetectorTestProbe, "/tmp", ExposureId("2020A-001-123-IRIS-IMG-DRK1-0023"))
       assertDetectorEvents(ifsDetectorTestProbe, "/tmp", ExposureId("2020A-001-123-IRIS-IMG-DRK1-0023"))
 
@@ -204,7 +203,7 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       goingInEvent(TestData.adcPrismRetractKey).head.name shouldBe "IN"
     }
 
-    //verify whether prism has started moving
+    // verify whether prism has started moving
     eventually {
       val movingEvent = testProbe.expectMessageType[SystemEvent]
       movingEvent.eventName shouldBe TestData.ImagerADCStateEventName
@@ -212,7 +211,7 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       movingEvent(TestData.adcPrismOnTargetKey).head shouldBe false
     }
 
-    //verify prism angle's
+    // verify prism angle's
     eventually {
       val currentEvent = testProbe.expectMessageType[SystemEvent]
       currentEvent.eventName shouldBe TestData.ImagerADCCurrentEventName
@@ -232,7 +231,7 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
 
   private def assertAdcPrismInSetupObservation(testProbe: TestProbe[Event], currentAngle: Double, targetAngle: Double): Unit = {
 
-    //verify whether prism has started moving
+    // verify whether prism has started moving
     eventually {
       val movingEvent = testProbe.expectMessageType[SystemEvent]
       movingEvent.eventName shouldBe TestData.ImagerADCStateEventName
@@ -240,7 +239,7 @@ class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       movingEvent(TestData.adcPrismOnTargetKey).head shouldBe false
     }
 
-    //verify prism angle's
+    // verify prism angle's
     eventually {
       val currentEvent = testProbe.expectMessageType[SystemEvent]
       currentEvent.eventName shouldBe TestData.ImagerADCCurrentEventName

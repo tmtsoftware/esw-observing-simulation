@@ -74,7 +74,7 @@ class EswIrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
 
       val tcsContainerConfPath = Paths.get(getClass.getResource("/TcsContainer.conf").toURI)
 
-      //spawn the iris container
+      // spawn the iris container
       frameworkTestKit.spawnContainer(ConfigFactory.load("IrisContainer.conf"))
 
       val containerLocation: Option[AkkaLocation] =
@@ -125,9 +125,9 @@ class EswIrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
         .futureValue
         .isDefined shouldBe true
 
-      //********************************************************************
+      // ********************************************************************
 
-      //spawn esw and iris sequencer
+      // spawn esw and iris sequencer
       agentClient.spawnSequenceComponent(seqComponentName1, Some(ScriptVersion.value)).futureValue
       agentClient.spawnSequenceComponent(seqComponentName2, Some(ScriptVersion.value)).futureValue
       agentClient.spawnSequenceComponent(seqComponentName3, Some(ScriptVersion.value)).futureValue
@@ -149,7 +149,7 @@ class EswIrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       val tcsSequencerResponse = sequenceComponentUtil.loadScript(Subsystem.TCS, obsMode, None, seqComp3Loc.get).futureValue
       tcsSequencerResponse.rightValue shouldBe a[Started]
 
-      //********************************************************************
+      // ********************************************************************
 
       val dmsConsumerProbe = createTestProbe(
         TestData.observeEventKeys
@@ -166,9 +166,9 @@ class EswIrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
     }
   }
 
-  //ESW-82
+  // ESW-82
   private def assertObserveEvents(testProbe: TestProbe[Event]) = {
-    //sequence : eswObservationStart,preset,coarseAcquisition,fineAcquisition,setupObservation,observe,observationEnd
+    // sequence : eswObservationStart,preset,coarseAcquisition,fineAcquisition,setupObservation,observe,observationEnd
 
     eventually {
       val event = testProbe.expectMessageType[ObserveEvent]

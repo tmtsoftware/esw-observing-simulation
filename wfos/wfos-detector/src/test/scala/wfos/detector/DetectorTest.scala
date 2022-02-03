@@ -50,7 +50,7 @@ class DetectorTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSui
 
         val testProbe = TestProbe[Event]()
 
-        //Subscribe to event's which will be published by detector in it's lifecycle
+        // Subscribe to event's which will be published by detector in it's lifecycle
         val subscription = eventService.defaultSubscriber.subscribeActorRef(
           Set(
             EventKey(detectorPrefix, ObserveEventNames.ExposureStart),
@@ -134,7 +134,7 @@ class DetectorTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSui
 
         val testProbe = TestProbe[Event]()
 
-        //Subscribe to event's which will be published by detector in it's lifecycle
+        // Subscribe to event's which will be published by detector in it's lifecycle
         val subscription = eventService.defaultSubscriber.subscribeActorRef(
           Set(
             EventKey(detectorPrefix, ObserveEventNames.ExposureStart),
@@ -203,7 +203,7 @@ class DetectorTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSui
         akkaLocation.connection shouldBe connection
 
         val testProbe = TestProbe[Event]()
-        //Subscribe to event's which will be published by prism in it's lifecycle
+        // Subscribe to event's which will be published by prism in it's lifecycle
         val subscription = eventService.defaultSubscriber.subscribeActorRef(
           Set(
             EventKey(detectorPrefix, ObserveEventNames.ExposureStart),

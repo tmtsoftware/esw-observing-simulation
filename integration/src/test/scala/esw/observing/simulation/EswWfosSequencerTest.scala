@@ -56,7 +56,7 @@ class EswWfosSequencerTest extends EswTestKit(EventServer, MachineAgent) {
   "Wfos top level esw sequencer" must {
     "handle the submitted sequence | ESW-564, ESW-82" in {
 
-      //spawn the wfos container
+      // spawn the wfos container
       frameworkTestKit.spawnContainer(ConfigFactory.load("WfosContainer.conf"))
 
       Thread.sleep(10000)
@@ -84,9 +84,9 @@ class EswWfosSequencerTest extends EswTestKit(EventServer, MachineAgent) {
         .futureValue
         .value
 
-      //********************************************************************
+      // ********************************************************************
 
-      //spawn esw and wfos sequencer
+      // spawn esw and wfos sequencer
       agentClient.spawnSequenceComponent(seqComponentName1, Some(ScriptVersion.value)).futureValue
       agentClient.spawnSequenceComponent(seqComponentName2, Some(ScriptVersion.value)).futureValue
 
@@ -102,7 +102,7 @@ class EswWfosSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       val wfosSequencerResponse = sequenceComponentUtil.loadScript(Subsystem.WFOS, obsMode, None, seqComp2Loc.get).futureValue
       wfosSequencerResponse.rightValue shouldBe a[Started]
 
-      //********************************************************************
+      // ********************************************************************
 
       val dmsConsumerProbe          = createTestProbe(WFOSTestData.observeEventKeys)
       val wfosBlueDetectorTestProbe = createTestProbe(WFOSTestData.detectorObsEvents(WFOSTestData.wfosBlueDetectorPrefix))
@@ -117,13 +117,13 @@ class EswWfosSequencerTest extends EswTestKit(EventServer, MachineAgent) {
     }
   }
 
-  //ESW-82
+  // ESW-82
   private def assertObserveEvents(
       seqTestProbe: TestProbe[Event],
       blueTestProbe: TestProbe[Event],
       redTesProbe: TestProbe[Event]
   ) = {
-    //sequence : eswObservationStart,preset,coarseAcquisition,fineAcquisition,setupObservation,observe,observationEnd
+    // sequence : eswObservationStart,preset,coarseAcquisition,fineAcquisition,setupObservation,observe,observationEnd
 
     eventually {
       val event = seqTestProbe.expectMessageType[ObserveEvent]
