@@ -43,7 +43,7 @@ jobs:
       
       - name: Generate RTM
         working-directory: iris
-        run: cs launch --channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/master/apps.json rtm:0.3.0 -- target/RTM/testStoryMapping.txt tools/RTM/storyRequirementMapping.csv target/RTM/testRequirementsMapping.txt
+        run: cs launch --channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/master/apps.json rtm:0.3.0 -- target/RTM/testStoryMapping.txt ../tools/RTM/storyRequirementMapping.csv target/RTM/testRequirementsMapping.txt
 
       - name: Generate Coverage
         working-directory: iris

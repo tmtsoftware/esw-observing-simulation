@@ -26,7 +26,7 @@ import scala.concurrent.duration.DurationInt
 
 class IrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
 
-  override implicit def patienceConfig: PatienceConfig = PatienceConfig(1.minute, 100.millis)
+  override implicit def patienceConfig: PatienceConfig = PatienceConfig(2.minute, 100.millis)
   lazy val processOutput                               = new ProcessOutput()
   implicit lazy val log: Logger                        = new LoggerFactory(agentSettings.prefix).getLogger
   lazy val processExecutor                             = new ProcessExecutor(processOutput)
