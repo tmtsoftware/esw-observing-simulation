@@ -61,22 +61,23 @@ object TestData {
   val baseCoords: Key[Coords.Coord]   = CoordKey.make("baseCoords")
   val targetCoords: Key[Coords.Coord] = CoordKey.make("targetCoords")
   val tcsSequencerPrefix: Prefix      = Prefix("TCS.IRIS_ImagerAndIFS")
+  import Angle._
   val tcsPreset: Setup = Setup(tcsSequencerPrefix, CommandName("preset"), obsId).madd(
-    baseCoords.set(EqCoord(Angle(0L), Angle(72000000000L)))
+    baseCoords.set(EqCoord(10.arcHour, 30.degree))
   )
 
-  val currentAltAzCoordKey = AltAzCoordKey.make("current")
-  val demandAltAzCoordKey  = AltAzCoordKey.make("demand")
-  val baseCurrentKey       = DoubleKey.make("baseCurrent")
-  val capCurrentKey        = DoubleKey.make("capCurrent")
-  val baseDemandKey        = DoubleKey.make("baseDemand")
-  val capDemandKey         = DoubleKey.make("capDemand")
+  val currentEqCoordKey = EqCoordKey.make("currentPos")
+  val demandEqCoordKey  = EqCoordKey.make("demandPos")
+  val baseCurrentKey    = DoubleKey.make("baseCurrent")
+  val capCurrentKey     = DoubleKey.make("capCurrent")
+  val baseDemandKey     = DoubleKey.make("baseDemand")
+  val capDemandKey      = DoubleKey.make("capDemand")
 
   private val pKey: Key[Double] = DoubleKey.make("p")
   private val qKey: Key[Double] = DoubleKey.make("q")
   val tcsSetupObservation: Setup = Setup(tcsSequencerPrefix, CommandName("setupObservation"), obsId).madd(
-    pKey.set(200.0),
-    qKey.set(100.0)
+    pKey.set(20.0),
+    qKey.set(10.0)
   )
 
   // IRIS Sequencer data
@@ -94,8 +95,8 @@ object TestData {
     IfsScaleP,
     spectralResolutionP,
     scienceAdcFollowP,
-    pKey.set(200.0),
-    qKey.set(100.0)
+    pKey.set(20.0),
+    qKey.set(10.0)
   )
 
   val acquisitionExposure: Observe = Observe(Prefix("IRIS.Imager"), CommandName("acquisitionExposure"), obsId).madd(
@@ -147,7 +148,7 @@ object TestData {
   val preset: Setup = Setup(eswSequencerPrefix, CommandName("preset"), obsId).madd(
     filterKey.set("Ks"),
     scienceAdcFollowP,
-    targetCoords.set(EqCoord(Angle(972000000000L), Angle(36734000000L)))
+    targetCoords.set(EqCoord(10.arcHour, 30.degree))
   )
 
   private val imagerExposureTypeKey = StringKey.make("imagerExposureType")
@@ -255,4 +256,29 @@ object TestData {
     observe,
     observationEnd
   )
+}
+
+object temp extends App {
+  import Angle._
+  //  SlewToTarget --ra 20:00:00 --dec 14:00:00
+  //  SlewToTarget --ra 00:00:00 --dec 20:00:00
+  //  SlewToTarget --ra 18:00:00 --dec 10:12:14
+//  println(10.arcHour.uas, 30.degree.uas)
+//  println(11.arcHour.uas, 27.degree.uas)
+  println(Angle.parseRa("20:00:00").uas, Angle.parseDe("14:00:00").uas)
+  println(Angle.parseRa("20:00:00").toRadian, Angle.parseDe("14:00:00").toRadian)
+  println(Angle.parseRa("20:00:00").toDegree, Angle.parseDe("14:00:00").toDegree)
+  println(Angle.parseRa("20:00:00").toMas, Angle.parseDe("14:00:00").toMas)
+  println(Angle.parseRa("20:00:00").toArcSec, Angle.parseDe("14:00:00").toArcSec)
+  println(Angle.parseRa("20:00:00").toString, Angle.parseDe("14:00:00").toString)
+  //  println(Angle.parseRa("00:00:00").uas, Angle.parseDe("20:00:00").uas)
+  //  println(Angle.parseRa("18:00:00").uas, Angle.parseDe("10:12:14").uas)
+
+  //  import Angle._
+  //
+  //  private val ra: String  = Angle.raToString(240.degree.toRadian)
+  //  private val dec: String = Angle.deToString(120.degree.toRadian)
+  //  println(Angle.parseRa(ra).uas, Angle.parseDe(dec).uas)
+  //  EqCoord(240, 120)
+
 }

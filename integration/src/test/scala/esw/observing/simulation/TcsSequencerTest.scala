@@ -125,9 +125,9 @@ class TcsSequencerTest extends EswTestKit(EventServer, MachineAgent) {
     }
 
     def assertMountPositionError(event: SystemEvent, tolerance: Double) = {
-      val current = event(currentAltAzCoordKey).head
-      val demand  = event(demandAltAzCoordKey).head
-      Angle.distance(current.alt.toRadian, current.az.toRadian, demand.alt.toRadian, demand.az.toRadian) should be < tolerance
+      val current = event(currentEqCoordKey).head
+      val demand  = event(demandEqCoordKey).head
+      Angle.distance(current.ra.toRadian, current.dec.toRadian, demand.ra.toRadian, demand.dec.toRadian) should be < tolerance
     }
 
     def assertCapAndBaseError(event: SystemEvent) = {

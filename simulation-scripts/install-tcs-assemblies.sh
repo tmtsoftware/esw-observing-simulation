@@ -2,10 +2,10 @@
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
   #Please do not remove below , as this zip is used when we run tcs assembly on Mac
-  V_SLICE_ZIP=https://github.com/tmtsoftware/tcs-vslice-0.4/releases/download/v0.6/tcs-vslice-0.6.zip
+  V_SLICE_ZIP=https://github.com/tmtsoftware/tcs-vslice-0.4/releases/download/v0.7/tcs-vslice-0.7.zip
 else
   # this zip is used when we run tcs assembly on ubuntu
-  V_SLICE_ZIP=https://github.com/tmtsoftware/tcs-vslice-0.4/releases/download/v0.6/tcs-vslice-06-Ubuntu-20.04.zip
+  V_SLICE_ZIP=https://github.com/tmtsoftware/tcs-vslice-0.4/releases/download/v0.7/tcs-vslice-07-Ubuntu-20.04.zip
 fi
 
 ROOT="$(
