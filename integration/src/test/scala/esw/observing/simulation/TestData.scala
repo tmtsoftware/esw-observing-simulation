@@ -257,28 +257,3 @@ object TestData {
     observationEnd
   )
 }
-
-object temp extends App {
-  import Angle._
-  //  SlewToTarget --ra 20:00:00 --dec 14:00:00
-  //  SlewToTarget --ra 00:00:00 --dec 20:00:00
-  //  SlewToTarget --ra 18:00:00 --dec 10:12:14
-//  println(10.arcHour.uas, 30.degree.uas)
-//  println(11.arcHour.uas, 27.degree.uas)
-  println(Angle.parseRa("20:00:00").uas, Angle.parseDe("14:00:00").uas)
-  println(Angle.parseRa("20:00:00").toRadian, Angle.parseDe("14:00:00").toRadian)
-  println(Angle.parseRa("20:00:00").toDegree, Angle.parseDe("14:00:00").toDegree)
-  println(Angle.parseRa("20:00:00").toMas, Angle.parseDe("14:00:00").toMas)
-  println(Angle.parseRa("20:00:00").toArcSec, Angle.parseDe("14:00:00").toArcSec)
-  println(Angle.parseRa("20:00:00").toString, Angle.parseDe("14:00:00").toString)
-  //  println(Angle.parseRa("00:00:00").uas, Angle.parseDe("20:00:00").uas)
-  //  println(Angle.parseRa("18:00:00").uas, Angle.parseDe("10:12:14").uas)
-
-  //  import Angle._
-  //
-  //  private val ra: String  = Angle.raToString(240.degree.toRadian)
-  //  private val dec: String = Angle.deToString(120.degree.toRadian)
-  //  println(Angle.parseRa(ra).uas, Angle.parseDe(dec).uas)
-  //  EqCoord(240, 120)
-
-}
