@@ -1,0 +1,3 @@
+## ESW Observing Simulation - TMT Executive Software v0.1.0-RC1
+
+This is a release v0.1.0-RC1 of the ESW Observing simulation.

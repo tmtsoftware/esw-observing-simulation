@@ -1,0 +1,140 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: coursier/setup-action@v1.2.0-M2
+        with:
+          jvm: 11
+          apps: sbt sbtn
+      - uses: coursier/cache-action@v6.3
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "16.x"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: install junit utils for test-reports
+        run: npm install -g junit-merge junit-viewer
+
+      - name: Install Redis
+        run: sudo apt-get install redis-server
+
+      - name: Install Kotlin
+        run: |
+          curl -s https://get.sdkman.io | bash
+          source "/home/runner/.sdkman/bin/sdkman-init.sh"
+          sdk install kotlin
+          sudo ln -s $(which kotlinc) /usr/local/bin/kotlinc
+
+      - name: Integration - Build 
+        working-directory: integration
+        run: |
+          sbtn clean
+          sbtn scalafmtCheck
+
+      - name: Check port
+        run: |
+          sudo service redis-server stop
+          echo "CHECKING IF FREE PORT:6379"
+          ps aux | grep 6379
+
+      - name: Integration - Tests 
+        working-directory: integration
+        run: sbt -DenableFatalWarnings=true "test:test; packagedArtifacts"
+
+      - name: Integration- Generate RTM 
+        working-directory: integration
+        run: cs launch --channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/master/apps.json rtm:0.3.0 -- target/RTM/testStoryMapping.txt ../tools/RTM/storyRequirementMapping.csv target/RTM/testRequirementsMapping.txt
+
+      - name: Integration - Upload RTM 
+        uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: Integration RTM
+          path: integration/target/RTM
+    
+      - name: IRIS- Build
+        working-directory: iris
+        run: |
+          sbtn clean
+          sbtn scalafmtCheck
+    
+      - name: IRIS - Tests 
+        working-directory: iris
+        run: sbt -DenableFatalWarnings=true -DenableCoverage=true -DgenerateStoryReport=true "test:test; packagedArtifacts"
+
+      - name: IRIS - Generate RTM 
+        working-directory: iris
+        run: cs launch --channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/master/apps.json rtm:0.3.0 -- target/RTM/testStoryMapping.txt ../tools/RTM/storyRequirementMapping.csv target/RTM/testRequirementsMapping.txt
+
+      - name: IRIS - Generate Coverage 
+        working-directory: iris
+        run: |
+          sbt -DenableCoverage=true "coverageReport;coverageAggregate"
+
+      - name: IRIS - Upload RTM 
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: IRIS RTM
+          path: iris/target/RTM
+
+      - name: IRIS - Uplaod scoverage
+        uses: actions/upload-artifact@v2
+        with:
+          name: IRIS Coverage Report
+          path: iris/target/scala-2.13/scoverage-report
+
+      - name: WFOS - Tests 
+        working-directory: wfos
+        run: sbt -DenableFatalWarnings=true -DenableCoverage=true -DgenerateStoryReport=true "test:test; packagedArtifacts"
+
+      - name: WFOS - Generate RTM 
+        working-directory: wfos
+        run: cs launch --channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/master/apps.json rtm:0.3.0 -- target/RTM/testStoryMapping.txt ../tools/RTM/storyRequirementMapping.csv target/RTM/testRequirementsMapping.txt
+
+      - name: WFOS - Generate Coverage 
+        working-directory: wfos
+        run: |
+          sbt -DenableCoverage=true "coverageReport;coverageAggregate"
+
+      - name: WFOS - Upload RTM 
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: WFOS RTM
+          path: wfos/target/RTM
+
+      - name: WFOS - Upload scoverage
+        uses: actions/upload-artifact@v2
+        with:
+          name: WFOS Coverage Report
+          path: wfos/target/scala-2.13/scoverage-report
+
+      - name: Generate release artifacts
+        run: ./generate-release-artifacts.sh
+
+      - name: Create release & Upload artifacts
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "tmp/release-artifacts/*"
+          bodyFile: "notes/v0.1.0-RC1.markdown"
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Notify slack
+        if: always()
+        continue-on-error: true
+        uses: kpritam/slack-job-status-action@v1
+        with:
+          job-status: ${{ job.status }}
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
+          channel: ci-release
