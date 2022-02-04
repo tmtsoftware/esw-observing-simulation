@@ -37,8 +37,8 @@
             {
               "_type": "EqCoord",
               "tag": "BASE",
-              "ra": 1080000000000,
-              "dec": 756000000000,
+              "ra": 540000000000,
+              "dec": 108000000000,
               "frame": "ICRS",
               "catalogName": "none",
               "pm": {
@@ -149,7 +149,7 @@
         "DoubleKey": {
           "keyName": "p",
           "values": [
-            200.0
+            20.0
           ],
           "units": "NoUnits"
         }
@@ -158,7 +158,7 @@
         "DoubleKey": {
           "keyName": "q",
           "values": [
-            100.0
+            10.0
           ],
           "units": "NoUnits"
         }
@@ -255,7 +255,7 @@
         "DoubleKey": {
           "keyName": "p",
           "values": [
-            200.0
+            20.0
           ],
           "units": "NoUnits"
         }
@@ -264,7 +264,7 @@
         "DoubleKey": {
           "keyName": "q",
           "values": [
-            100.0
+            10.0
           ],
           "units": "NoUnits"
         }
