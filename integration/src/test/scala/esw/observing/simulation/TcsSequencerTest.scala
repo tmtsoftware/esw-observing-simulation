@@ -58,7 +58,8 @@ class TcsSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       val script = Paths.get(getClass.getResource("/test-setup.sh").toURI)
 
       processExecutor.runCommand(List(script.toString, containerConfPath.toString), Prefix(Container, "TcsContainer")).rightValue
-
+      // wait for tcs-zip to download
+      Thread.sleep(20000)
       containerLoc = locationService.resolve(TestData.tcsContainerConnection, 15.seconds).futureValue
       containerLoc.isDefined shouldBe true
 

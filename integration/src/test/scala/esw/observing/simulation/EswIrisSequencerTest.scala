@@ -106,7 +106,8 @@ class EswIrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       processExecutor
         .runCommand(List(script.toString, tcsContainerConfPath.toString), Prefix(Container, "TcsContainer"))
         .rightValue
-
+      // wait for tcs-zip to download
+      Thread.sleep(20000)
       containerLoc = locationService.resolve(TestData.tcsContainerConnection, 20.seconds).futureValue
       containerLoc.isDefined shouldBe true
 
