@@ -11,6 +11,8 @@ on:
 
 jobs:
   build:
+    env:
+      INTERFACE_NAME: "eth0"
     runs-on: ubuntu-latest
 
     steps:
