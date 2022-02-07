@@ -7,4 +7,4 @@ ROOT="$(
 
 cd $ROOT/../../../../simulation-scripts/
 
-sh ./start-tcs-assemblies.sh
+./start-tcs-assemblies.sh
