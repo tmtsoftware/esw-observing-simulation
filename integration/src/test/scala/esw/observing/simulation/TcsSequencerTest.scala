@@ -6,6 +6,7 @@ import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.LoggerFactory
 import csw.params.commands.CommandResponse
 import csw.params.core.models.Angle
+import csw.params.core.models.Angle.double2angle
 import csw.params.events.SystemEvent
 import csw.prefix.models.Subsystem.Container
 import csw.prefix.models.{Prefix, Subsystem}
@@ -101,7 +102,7 @@ class TcsSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       eventually {
         val event = pkAssemblyTestProbe.expectMessageType[SystemEvent]
         event.eventName.name shouldBe "MountPosition"
-        assertMountPositionError(event, 0.5)
+        assertMountPositionError(event, 5.0)
       }
 
       // Assert CurrentPosition for SlewToTarget command
@@ -115,7 +116,7 @@ class TcsSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       eventually {
         val event = pkAssemblyTestProbe.expectMessageType[SystemEvent]
         event.eventName.name shouldBe "MountPosition"
-        assertMountPositionError(event, 0.1)
+        assertMountPositionError(event, 0.5)
       }
 
       val eventualResponse = sequencerApi.queryFinal(initialSubmitRes.runId)(20.seconds).futureValue
@@ -126,7 +127,10 @@ class TcsSequencerTest extends EswTestKit(EventServer, MachineAgent) {
     def assertMountPositionError(event: SystemEvent, tolerance: Double) = {
       val current = event(currentEqCoordKey).head
       val demand  = event(demandEqCoordKey).head
-      Angle.distance(current.ra.toRadian, current.dec.toRadian, demand.ra.toRadian, demand.dec.toRadian) should be < tolerance
+      Angle
+        .distance(current.ra.toRadian, current.dec.toRadian, demand.ra.toRadian, demand.dec.toRadian)
+        .radian
+        .toArcSec should be < tolerance
     }
 
     def assertCapAndBaseError(event: SystemEvent) = {
@@ -135,10 +139,10 @@ class TcsSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       val baseDemandValue  = event(baseDemandKey).head
       val capDemandValue   = event(capDemandKey).head
 
-      val capError  = Math.abs(capCurrentValue - capDemandValue)
-      val baseError = Math.abs(baseCurrentValue - baseDemandValue)
-      capError should be < 0.5
-      baseError should be < 0.5
+      val capError  = Math.abs(capCurrentValue.degree.toArcSec - capDemandValue.degree.toArcSec)
+      val baseError = Math.abs(baseCurrentValue.degree.toArcSec - baseDemandValue.degree.toArcSec)
+      capError should be < 5.0
+      baseError should be < 5.0
     }
   }
 }
