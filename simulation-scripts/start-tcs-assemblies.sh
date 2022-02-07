@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 export TPK_USE_FAKE_SYSTEM_CLOCK=1
 
 ROOT="$(
@@ -7,13 +6,14 @@ ROOT="$(
     pwd -P
 )"
 
-cd $ROOT/../
+version=0.7
+TCS_VSLICE="$HOME/tcs-vslice-04/$version"
 
-if [ -d "tcs-vslice-04" ]
+if [ -d $TCS_VSLICE ]
 then
     echo "starting tcs-vslice container"
 else
    sh $ROOT/install-tcs-assemblies.sh
 fi
 
-tcs-vslice-04/bin/tcs-deploy --local tcs-vslice-04/conf/McsEncPkContainer.conf
+sh "$TCS_VSLICE/tcs-vslice-04/bin/tcs-deploy" --local "$TCS_VSLICE/tcs-vslice-04/conf/McsEncPkContainer.conf"

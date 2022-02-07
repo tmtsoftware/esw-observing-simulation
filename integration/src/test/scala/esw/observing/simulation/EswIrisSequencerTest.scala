@@ -72,8 +72,6 @@ class EswIrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
   "Iris top level esw sequencer" must {
     "handle the submitted sequence | ESW-554, ESW-82, ESW-570" in {
 
-      val tcsContainerConfPath = Paths.get(getClass.getResource("/TcsContainer.conf").toURI)
-
       // spawn the iris container
       frameworkTestKit.spawnContainer(ConfigFactory.load("IrisContainer.conf"))
 
@@ -104,7 +102,7 @@ class EswIrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       val script = Paths.get(getClass.getResource("/test-setup.sh").toURI)
 
       processExecutor
-        .runCommand(List(script.toString, tcsContainerConfPath.toString), Prefix(Container, "TcsContainer"))
+        .runCommand(List(script.toString), Prefix(Container, "TcsContainer"))
         .rightValue
       // wait for tcs-zip to download
       Thread.sleep(20000)

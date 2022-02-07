@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+version=0.7
+
 if [[ "$OSTYPE" == "darwin"* ]]; then
   #Please do not remove below , as this zip is used when we run tcs assembly on Mac
   V_SLICE_ZIP=https://github.com/tmtsoftware/tcs-vslice-0.4/releases/download/v0.7/tcs-vslice-0.7.zip
@@ -8,14 +10,10 @@ else
   V_SLICE_ZIP=https://github.com/tmtsoftware/tcs-vslice-0.4/releases/download/v0.7/tcs-vslice-07-Ubuntu-20.04.zip
 fi
 
-ROOT="$(
-    cd "$(dirname "$0")" >/dev/null 2>&1 || exit
-    pwd -P
-)"
+TCS_VSLICE="$HOME/tcs-vslice-04"
 
-cd $ROOT/../
-
-rm -rf tcs-vslice-04
+rm -rf "$TCS_VSLICE/$version"
+mkdir -p "$TCS_VSLICE/$version"
 echo "downloading.." $V_SLICE_ZIP
-curl -L $V_SLICE_ZIP -o tcs-vslice-04.zip
-unzip -o tcs-vslice-04.zip
+curl -L $V_SLICE_ZIP -o "tcs-vslice-04.zip"
+unzip -o "tcs-vslice-04.zip" -d "$TCS_VSLICE/$version"

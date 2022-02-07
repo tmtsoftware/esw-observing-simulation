@@ -208,7 +208,7 @@ object TestData {
   )
 
   val tcsContainerConnection: AkkaConnection = AkkaConnection(
-    ComponentId(Prefix(Container, "TcsContainer"), ComponentType.Container)
+    ComponentId(Prefix(Container, "McsEncPkContainer"), ComponentType.Container)
   )
 
   val tcsPkAssemblyConnection: AkkaConnection = AkkaConnection(
