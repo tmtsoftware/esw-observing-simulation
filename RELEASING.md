@@ -28,14 +28,12 @@ A milestone release is cut from master branch as we expect bug fixes / feedback 
 6. Update bodyFile field of create release step in release.yml with the above markdown file. 
 7. Update `CSW_VERSION` in `start-csw-services.sh`.
 8. Update `ESW_VERSION & SEQ_SCRIPT_VERSION version` in `start-esw-services.sh`.
-9. Update `V_SLICE_ZIP` with latest vslice zip url in `start-tcs-assemblies.sh`.
-10. Update `ESW_VERSION` in `start-components.sh`.
-11. Uncomment `Release section` in `install-eng-ui.sh`.
-12. Uncomment `Release section` in `install-monitor-ui.sh`.
+9. Update `V_SLICE_ZIP` & `version` with latest vslice zip url in `install-tcs-assemblies.sh`.
+10. Update `version` with latest vslice zip url in `start-tcs-assemblies.sh`.
+11. Update `ESW_VERSION` in `start-components.sh`.
+12. Uncomment `Release section` & Comment out dev section, also update link of eng-ui release in `install-eng-ui.sh`.
 13. Update version field with recent sha of `iris-irisdeploy` & `wfos-wfosdeploy` in `sample-configs/HostConfig.conf`.
 14. Update latest RTM version in Github and jenkins workflow files(this step to be done only in milestone & RC release).
-15. Update versions in `release.yml'` for other repos like `ESW_TS_VERSION` etc. which we will be releasing next. (These versions are used to create parameterized links in the documentation)
-16. Commit and push the changes to `branch-<major>.<minor>.x` branch.
-17. Make sure build is green for dev and paradox link check pipeline for this branch.
-18. Set `PROD=true` environment variable and Run `release.sh $VERSION$` script by providing version number argument (This triggers release workflow)
-19. Applicable for final release only - Upgrade all the versions of all csw apps in [here](https://github.com/tmtsoftware/osw-apps/blob/master/apps.json)
+15. Commit and push the changes to `branch-<major>.<minor>.x` branch.
+16. Make sure build is green for dev for this branch.
+17. Set `PROD=true` environment variable and Run `release.sh $VERSION$` script by providing version number argument (This triggers release workflow)
