@@ -32,7 +32,7 @@ A milestone release is cut from master branch as we expect bug fixes / feedback 
 10. Update `version` with latest vslice zip url in `start-tcs-assemblies.sh`.
 11. Update `ESW_VERSION` in `start-components.sh`.
 12. Uncomment `Release section` & Comment out dev section, also update link of eng-ui release in `install-eng-ui.sh`.
-13. Update version field with recent sha of `iris-irisdeploy` & `wfos-wfosdeploy` in `sample-configs/HostConfig.conf`.
+13. Update version field with upcoming tag for `iris-irisdeploy` & `wfos-wfosdeploy` in `sample-configs/HostConfig.conf`.
 14. Update latest RTM version in Github and jenkins workflow files(this step to be done only in milestone & RC release).
 15. Commit and push the changes to `branch-<major>.<minor>.x` branch.
 16. Make sure build is green for dev for this branch.
