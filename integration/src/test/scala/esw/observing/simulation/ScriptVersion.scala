@@ -1,5 +1,5 @@
 package esw.observing.simulation
 
 object ScriptVersion {
-  val value = "d47bb00"
+  val value = "bfb76bf"
 }
