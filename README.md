@@ -96,10 +96,10 @@ communication is properly happening between the following components.
 
 | Date       | Tag    | Source                                                                            | Docs                                                                             | Assets                                                                                           |
 |------------|--------|-----------------------------------------------------------------------------------|----------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|
-| 2022-02-14 | v0.1.0 | [esw-observing-simulation-0.1.0](https://github.com/tmtsoftware/esw-observing-simulation/tree/v0.1.0) | [esw-observing-simulation-0.1.0 docs](https://tmtsoftware.github.io/esw-observing-simulation/0.1.0/) | [esw-observing-simulation-0.1.0 assets](https://github.com/tmtsoftware/esw-observing-simulation/releases/tag/v0.1.0) |
+| 2022-02-14 | v0.1.0 | [esw-observing-simulation-0.1.0](https://github.com/tmtsoftware/esw-observing-simulation/tree/v0.1.0) | [esw-observing-simulation-0.1.0 docs](https://github.com/tmtsoftware/esw-observing-simulation/blob/v0.1.0/README.md) | [esw-observing-simulation-0.1.0 assets](https://github.com/tmtsoftware/esw-observing-simulation/releases/tag/v0.1.0) |
 
 ## Pre-Release History
 
-| Date       | Tag | Source | Docs |     | Assets |
-|------------|-----|-----|-----|-----|-----|
-| 2022-02-08 | v0.1.0-RC1 | [esw-observing-simulation-0.1.0-RC1](https://github.com/tmtsoftware/esw-observing-simulation/tree/v0.1.0-RC1) | [esw-observing-simulation-0.1.0-RC1 docs](https://tmtsoftware.github.io/esw-observing-simulation/0.1.0-RC1/) |     | [esw-observing-simulation-0.1.0-RC1 assets](https://github.com/tmtsoftware/esw-observing-simulation/releases/tag/v0.1.0-RC1) |
+| Date       | Tag | Source | Docs                                                                                              |     | Assets |
+|------------|-----|-----|---------------------------------------------------------------------------------------------------|-----|-----|
+| 2022-02-08 | v0.1.0-RC1 | [esw-observing-simulation-0.1.0-RC1](https://github.com/tmtsoftware/esw-observing-simulation/tree/v0.1.0-RC1) | [esw-observing-simulation-0.1.0-RC1 docs](https://github.com/tmtsoftware/esw-observing-simulation/blob/v0.1.0/README.md) |     | [esw-observing-simulation-0.1.0-RC1 assets](https://github.com/tmtsoftware/esw-observing-simulation/releases/tag/v0.1.0-RC1) |
