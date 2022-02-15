@@ -5,7 +5,7 @@ addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.9.3")
 addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.10.0")
 
 resolvers += "jitpack" at "https://jitpack.io"
-libraryDependencies += "com.github.tmtsoftware" % "sbt-docs" % "0.5.0"
+libraryDependencies += "com.github.tmtsoftware" % "sbt-docs" % "4bcadf7"
 
 classpathTypes += "maven-plugin"
 
