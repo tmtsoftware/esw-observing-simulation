@@ -6,14 +6,14 @@ ROOT="$(
     pwd -P
 )"
 
-version=0.7
+version=0.8
 TCS_VSLICE="$HOME/tcs-vslice-04/$version"
 
 if [ -d $TCS_VSLICE ]
 then
     echo "starting tcs-vslice container"
 else  
-   $ROOT/install-tcs-assemblies.sh
+   "$ROOT/install-tcs-assemblies.sh" "$version"
 fi
 
 "$TCS_VSLICE/tcs-vslice-04/bin/tcs-deploy" --local "$TCS_VSLICE/tcs-vslice-04/conf/McsEncPkContainer.conf"

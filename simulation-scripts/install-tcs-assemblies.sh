@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
-
-version=0.7
-
+version=$1
+ubuntuVersion="${version//.}"
 if [[ "$OSTYPE" == "darwin"* ]]; then
   #Please do not remove below , as this zip is used when we run tcs assembly on Mac
-  V_SLICE_ZIP=https://github.com/tmtsoftware/tcs-vslice-0.4/releases/download/v0.7/tcs-vslice-0.7.zip
+  V_SLICE_ZIP="https://github.com/tmtsoftware/tcs-vslice-0.4/releases/download/v$version/tcs-vslice-$version.zip"
 else
   # this zip is used when we run tcs assembly on ubuntu
-  V_SLICE_ZIP=https://github.com/tmtsoftware/tcs-vslice-0.4/releases/download/v0.7/tcs-vslice-07-Ubuntu-20.04.zip
+  V_SLICE_ZIP=https://github.com/tmtsoftware/tcs-vslice-0.4/releases/download/v$version/tcs-vslice-$ubuntuVersion-Ubuntu-20.04.zip
 fi
 
 TCS_VSLICE="$HOME/tcs-vslice-04"
