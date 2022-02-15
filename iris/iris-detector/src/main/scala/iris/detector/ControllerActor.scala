@@ -29,7 +29,7 @@ class ControllerActor(cswContext: CswContext, config: Config) {
 
   private def generateFakeImageData(xs: Int, ys: Int) = Array.tabulate(xs, ys)((x, y) => x * xs + y)
 
-  lazy val uninitialized: Behavior[ControllerMessage] = {
+  def uninitialized: Behavior[ControllerMessage] = {
     log.info("Detector is now in 'UnInitialised' state")
     receiveWithDefaultBehavior("UnInitialised") {
       case Initialize(runId) =>
@@ -53,7 +53,7 @@ class ControllerActor(cswContext: CswContext, config: Config) {
       Behaviors.same
   }
 
-  private lazy val idle: Behavior[ControllerMessage] = {
+  private def idle: Behavior[ControllerMessage] = {
     log.info("Detector is now in 'Non-Configured' state")
     receiveWithDefaultBehavior("Non-Configured")(idleHandler)
   }
@@ -78,12 +78,11 @@ class ControllerActor(cswContext: CswContext, config: Config) {
       log.info("Exposure Started and Detector is now in 'Exposing' state")
       var isExposureRunning = true
 
-      def finishExposure(runId: Id, event: ObserveEvent): Behavior[ControllerMessage] = {
+      def finishExposure(runId: Id, event: ObserveEvent): Unit = {
         isExposureRunning = false
         eventPublisher.publish(event)
         val fitsData = FitsData(generateFakeImageData(detectorDimensions._1, detectorDimensions._2))
         replyTo ! WriteData(runId, fitsData, data.exposureId, data.filename)
-        loaded(data)
       }
 
       receiveWithDefaultBehavior("exposing") {
@@ -114,9 +113,15 @@ class ControllerActor(cswContext: CswContext, config: Config) {
         case AbortExposure(runId) =>
           log.info(s"Exposure Aborted for runId $runId")
           finishExposure(runId, IRDetectorEvent.exposureAborted(detectorPrefix, data.exposureId))
+          loaded(data)
+        case Shutdown(runId) =>
+          log.info(s"Exposure Aborted before shutting down for runId $runId")
+          finishExposure(runId, IRDetectorEvent.exposureAborted(detectorPrefix, data.exposureId))
+          uninitialized
         case ExposureFinished(runId) =>
           log.info(s"Exposure Finished for runId $runId")
           finishExposure(runId, IRDetectorEvent.exposureEnd(detectorPrefix, data.exposureId))
+          loaded(data)
         case IsValid(runId, commandName, replyTo) if commandName == Constants.Shutdown || commandName == Constants.AbortExposure =>
           replyTo ! Accepted(runId)
           Behaviors.same
