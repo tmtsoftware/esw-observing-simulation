@@ -4,7 +4,7 @@ ROOT="$(
     pwd -P
 )"
 
-ESW_VERSION=6740f6a
+ESW_VERSION=cae47ca
 
 sampleConfDir=$ROOT/../sample-configs
 hostConfPath=$sampleConfDir/HostConfig.conf
