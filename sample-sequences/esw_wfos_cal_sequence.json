@@ -49,7 +49,7 @@
         "StringKey": {
           "keyName": "redExposureType",
           "values": [
-            "SKY"
+            "CAL"
           ],
           "units": "NoUnits"
         }
@@ -67,7 +67,7 @@
         "IntKey": {
           "keyName": "blueNumRamps",
           "values": [
-            2
+            5
           ],
           "units": "NoUnits"
         }
@@ -76,7 +76,7 @@
         "IntKey": {
           "keyName": "redNumRamps",
           "values": [
-            2
+            8
           ],
           "units": "NoUnits"
         }
@@ -85,43 +85,25 @@
         "IntKey": {
           "keyName": "blueIntegrationTime",
           "values": [
-            2000
+            5000
           ],
-          "units": "NoUnits"
-        }
-      },
-      {
-        "StringKey": {
-          "keyName": "blueExposureId",
-          "values": [
-            "2020A-001-123-IRIS-BLU-SKY1-0002"
-          ],
-          "units": "NoUnits"
+          "units": "millisecond"
         }
       },
       {
         "IntKey": {
           "keyName": "redIntegrationTime",
           "values": [
-            2000
+            3000
           ],
-          "units": "NoUnits"
-        }
-      },
-      {
-        "StringKey": {
-          "keyName": "redExposureId",
-          "values": [
-            "2020A-001-123-IRIS-BLU-SKY1-0002"
-          ],
-          "units": "NoUnits"
+          "units": "millisecond"
         }
       },
       {
         "StringKey": {
           "keyName": "blueExposureType",
           "values": [
-            "SKY"
+            "CAL"
           ],
           "units": "NoUnits"
         }

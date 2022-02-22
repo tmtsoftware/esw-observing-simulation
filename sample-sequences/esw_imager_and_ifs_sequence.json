@@ -3,14 +3,14 @@
     "_type": "Setup",
     "source": "ESW.ImagerAndIFS",
     "commandName": "observationStart",
-    "maybeObsId": "2020A-001-123",
+    "maybeObsId": "2030B-032-010",
     "paramSet": []
   },
   {
     "_type": "Setup",
     "source": "ESW.ImagerAndIFS",
     "commandName": "preset",
-    "maybeObsId": "2020A-001-123",
+    "maybeObsId": "2030B-032-010",
     "paramSet": [
       {
         "ChoiceKey": {
@@ -55,10 +55,10 @@
             {
               "_type": "EqCoord",
               "tag": "BASE",
-              "ra": 540000000000,
-              "dec": 108000000000,
+              "ra": 567000000000,
+              "dec": 162000000000,
               "frame": "ICRS",
-              "catalogName": "none",
+              "catalogName": "NGC2022",
               "pm": {
                 "pmx": 0.0,
                 "pmy": 0.0
@@ -74,7 +74,7 @@
     "_type": "Observe",
     "source": "ESW.ImagerAndIFS",
     "commandName": "coarseAcquisition",
-    "maybeObsId": "2020A-001-123",
+    "maybeObsId": "2030B-032-010",
     "paramSet": [
       {
         "StringKey": {
@@ -100,14 +100,14 @@
           "values": [
             5000
           ],
-          "units": "NoUnits"
+          "units": "millisecond"
         }
       },
       {
         "IntKey": {
           "keyName": "imagerNumRamps",
           "values": [
-            1
+            2
           ],
           "units": "NoUnits"
         }
@@ -118,14 +118,14 @@
     "_type": "Observe",
     "source": "ESW.ImagerAndIFS",
     "commandName": "fineAcquisition",
-    "maybeObsId": "2020A-001-123",
+    "maybeObsId": "2030B-032-010",
     "paramSet": []
   },
   {
     "_type": "Setup",
     "source": "ESW.ImagerAndIFS",
     "commandName": "setupObservation",
-    "maybeObsId": "2020A-001-123",
+    "maybeObsId": "2030B-032-010",
     "paramSet": [
       {
         "ChoiceKey": {
@@ -167,18 +167,18 @@
         "DoubleKey": {
           "keyName": "p",
           "values": [
-            20.0
+            0.0
           ],
-          "units": "NoUnits"
+          "units": "arcsec"
         }
       },
       {
         "DoubleKey": {
           "keyName": "q",
           "values": [
-            10.0
+            0.0
           ],
-          "units": "NoUnits"
+          "units": "arcsec"
         }
       }
     ]
@@ -187,7 +187,7 @@
     "_type": "Observe",
     "source": "ESW.ImagerAndIFS",
     "commandName": "observe",
-    "maybeObsId": "2020A-001-123",
+    "maybeObsId": "2030B-032-010",
     "paramSet": [
       {
         "StringKey": {
@@ -211,16 +211,16 @@
         "IntKey": {
           "keyName": "ifsIntegrationTime",
           "values": [
-            5000
+            2000
           ],
-          "units": "NoUnits"
+          "units": "arcsec"
         }
       },
       {
         "IntKey": {
           "keyName": "ifsNumRamps",
           "values": [
-            1
+            4
           ],
           "units": "NoUnits"
         }
@@ -229,9 +229,9 @@
         "IntKey": {
           "keyName": "imagerIntegrationTime",
           "values": [
-            5000
+            4000
           ],
-          "units": "NoUnits"
+          "units": "arcsec"
         }
       },
       {
@@ -247,7 +247,7 @@
         "IntKey": {
           "keyName": "imagerNumRamps",
           "values": [
-            1
+            4
           ],
           "units": "NoUnits"
         }
@@ -258,7 +258,7 @@
     "_type": "Observe",
     "source": "ESW.ImagerAndIFS",
     "commandName": "observe",
-    "maybeObsId": "2020A-001-123",
+    "maybeObsId": "2030B-032-010",
     "paramSet": [
       {
         "StringKey": {
@@ -282,16 +282,16 @@
         "IntKey": {
           "keyName": "ifsIntegrationTime",
           "values": [
-            3000
+            2500
           ],
-          "units": "NoUnits"
+          "units": "millisecond"
         }
       },
       {
         "IntKey": {
           "keyName": "ifsNumRamps",
           "values": [
-            1
+            5
           ],
           "units": "NoUnits"
         }
@@ -300,9 +300,9 @@
         "IntKey": {
           "keyName": "imagerIntegrationTime",
           "values": [
-            3000
+            2000
           ],
-          "units": "NoUnits"
+          "units": "millisecond"
         }
       },
       {
@@ -318,7 +318,7 @@
         "IntKey": {
           "keyName": "imagerNumRamps",
           "values": [
-            1
+            5
           ],
           "units": "NoUnits"
         }
@@ -329,7 +329,7 @@
     "_type": "Setup",
     "source": "ESW.ImagerAndIFS",
     "commandName": "setupObservation",
-    "maybeObsId": "2020A-001-123",
+    "maybeObsId": "2030B-032-010",
     "paramSet": [
       {
         "ChoiceKey": {
@@ -371,18 +371,18 @@
         "DoubleKey": {
           "keyName": "p",
           "values": [
-            20.0
+            30.0
           ],
-          "units": "NoUnits"
+          "units": "arcsec"
         }
       },
       {
         "DoubleKey": {
           "keyName": "q",
           "values": [
-            10.0
+            30.0
           ],
-          "units": "NoUnits"
+          "units": "arcsec"
         }
       }
     ]
@@ -391,7 +391,7 @@
     "_type": "Observe",
     "source": "ESW.ImagerAndIFS",
     "commandName": "observe",
-    "maybeObsId": "2020A-001-123",
+    "maybeObsId": "2030B-032-010",
     "paramSet": [
       {
         "StringKey": {
@@ -406,7 +406,7 @@
         "StringKey": {
           "keyName": "ifsExposureType",
           "values": [
-            "SCI"
+            "SKY"
           ],
           "units": "NoUnits"
         }
@@ -415,16 +415,16 @@
         "IntKey": {
           "keyName": "ifsIntegrationTime",
           "values": [
-            5000
+            3000
           ],
-          "units": "NoUnits"
+          "units": "millisecond"
         }
       },
       {
         "IntKey": {
           "keyName": "ifsNumRamps",
           "values": [
-            1
+            3
           ],
           "units": "NoUnits"
         }
@@ -435,7 +435,7 @@
           "values": [
             5000
           ],
-          "units": "NoUnits"
+          "units": "millisecond"
         }
       },
       {
@@ -451,7 +451,7 @@
         "IntKey": {
           "keyName": "imagerNumRamps",
           "values": [
-            1
+            2
           ],
           "units": "NoUnits"
         }
@@ -462,7 +462,7 @@
     "_type": "Observe",
     "source": "ESW.ImagerAndIFS",
     "commandName": "observe",
-    "maybeObsId": "2020A-001-123",
+    "maybeObsId": "2030B-032-010",
     "paramSet": [
       {
         "StringKey": {
@@ -488,14 +488,14 @@
           "values": [
             3000
           ],
-          "units": "NoUnits"
+          "units": "millisecond"
         }
       },
       {
         "IntKey": {
           "keyName": "ifsNumRamps",
           "values": [
-            1
+            2
           ],
           "units": "NoUnits"
         }
@@ -506,14 +506,14 @@
           "values": [
             3000
           ],
-          "units": "NoUnits"
+          "units": "millisecond"
         }
       },
       {
         "StringKey": {
           "keyName": "imagerExposureType",
           "values": [
-            "SCI"
+            "SKY"
           ],
           "units": "NoUnits"
         }
@@ -522,7 +522,7 @@
         "IntKey": {
           "keyName": "imagerNumRamps",
           "values": [
-            1
+            2
           ],
           "units": "NoUnits"
         }
@@ -533,7 +533,7 @@
     "_type": "Setup",
     "source": "ESW.ImagerAndIFS",
     "commandName": "observationEnd",
-    "maybeObsId": "2020A-001-123",
+    "maybeObsId": "2030B-032-010",
     "paramSet": []
   }
 ]

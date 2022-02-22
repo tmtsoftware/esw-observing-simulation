@@ -3,14 +3,14 @@
     "_type": "Setup",
     "source": "ESW.ImagerOnly",
     "commandName": "observationStart",
-    "maybeObsId": "2020A-001-123",
+    "maybeObsId": "2030A-101-023",
     "paramSet": []
   },
   {
     "_type": "Setup",
     "source": "ESW.ImagerOnly",
     "commandName": "preset",
-    "maybeObsId": "2020A-001-123",
+    "maybeObsId": "2030A-101-023",
     "paramSet": [
       {
         "ChoiceKey": {
@@ -37,8 +37,8 @@
             {
               "_type": "EqCoord",
               "tag": "BASE",
-              "ra": 540000000000,
-              "dec": 108000000000,
+              "ra": 621000000000,
+              "dec": -36000000000,
               "frame": "ICRS",
               "catalogName": "none",
               "pm": {
@@ -56,7 +56,7 @@
     "_type": "Observe",
     "source": "ESW.ImagerOnly",
     "commandName": "coarseAcquisition",
-    "maybeObsId": "2020A-001-123",
+    "maybeObsId": "2030A-101-023",
     "paramSet": [
       {
         "StringKey": {
@@ -82,7 +82,7 @@
           "values": [
             5000
           ],
-          "units": "NoUnits"
+          "units": "millisecond"
         }
       },
       {
@@ -100,14 +100,14 @@
     "_type": "Observe",
     "source": "ESW.ImagerOnly",
     "commandName": "fineAcquisition",
-    "maybeObsId": "2020A-001-123",
+    "maybeObsId": "2030A-101-023",
     "paramSet": []
   },
   {
     "_type": "Setup",
     "source": "ESW.ImagerOnly",
     "commandName": "setupObservation",
-    "maybeObsId": "2020A-001-123",
+    "maybeObsId": "2030A-101-023",
     "paramSet": [
       {
         "ChoiceKey": {
@@ -131,18 +131,18 @@
         "DoubleKey": {
           "keyName": "p",
           "values": [
-            20.0
+            0.0
           ],
-          "units": "NoUnits"
+          "units": "arcsec"
         }
       },
       {
         "DoubleKey": {
           "keyName": "q",
           "values": [
-            10.0
+            0.0
           ],
-          "units": "NoUnits"
+          "units": "arcsec"
         }
       }
     ]
@@ -151,7 +151,7 @@
     "_type": "Observe",
     "source": "ESW.ImagerOnly",
     "commandName": "observe",
-    "maybeObsId": "2020A-001-123",
+    "maybeObsId": "2030A-101-023",
     "paramSet": [
       {
         "StringKey": {
@@ -175,7 +175,7 @@
         "IntKey": {
           "keyName": "imagerIntegrationTime",
           "values": [
-            5000
+            3000
           ],
           "units": "NoUnits"
         }
@@ -184,7 +184,7 @@
         "IntKey": {
           "keyName": "imagerNumRamps",
           "values": [
-            1
+            3
           ],
           "units": "NoUnits"
         }
@@ -195,7 +195,7 @@
     "_type": "Setup",
     "source": "ESW.ImagerOnly",
     "commandName": "setupObservation",
-    "maybeObsId": "2020A-001-123",
+    "maybeObsId": "2030A-101-023",
     "paramSet": [
       {
         "ChoiceKey": {
@@ -221,7 +221,7 @@
           "values": [
             20.0
           ],
-          "units": "NoUnits"
+          "units": "arcsec"
         }
       },
       {
@@ -230,7 +230,7 @@
           "values": [
             10.0
           ],
-          "units": "NoUnits"
+          "units": "arcsec"
         }
       }
     ]
@@ -239,7 +239,7 @@
     "_type": "Observe",
     "source": "ESW.ImagerOnly",
     "commandName": "observe",
-    "maybeObsId": "2020A-001-123",
+    "maybeObsId": "2030A-101-023",
     "paramSet": [
       {
         "StringKey": {
@@ -254,7 +254,7 @@
         "StringKey": {
           "keyName": "imagerExposureType",
           "values": [
-            "SCI"
+            "SKY"
           ],
           "units": "NoUnits"
         }
@@ -263,9 +263,9 @@
         "IntKey": {
           "keyName": "imagerIntegrationTime",
           "values": [
-            5000
+            3000
           ],
-          "units": "NoUnits"
+          "units": "millisecond"
         }
       },
       {
@@ -283,7 +283,7 @@
     "_type": "Setup",
     "source": "ESW.ImagerOnly",
     "commandName": "setupObservation",
-    "maybeObsId": "2020A-001-123",
+    "maybeObsId": "2030A-101-023",
     "paramSet": [
       {
         "ChoiceKey": {
@@ -307,18 +307,18 @@
         "DoubleKey": {
           "keyName": "p",
           "values": [
-            20.0
+            -20.0
           ],
-          "units": "NoUnits"
+          "units": "arcsec"
         }
       },
       {
         "DoubleKey": {
           "keyName": "q",
           "values": [
-            10.0
+            -10.0
           ],
-          "units": "NoUnits"
+          "units": "arcsec"
         }
       }
     ]
@@ -327,7 +327,7 @@
     "_type": "Observe",
     "source": "ESW.ImagerOnly",
     "commandName": "observe",
-    "maybeObsId": "2020A-001-123",
+    "maybeObsId": "2030A-101-023",
     "paramSet": [
       {
         "StringKey": {
@@ -351,16 +351,16 @@
         "IntKey": {
           "keyName": "imagerIntegrationTime",
           "values": [
-            5000
+            4000
           ],
-          "units": "NoUnits"
+          "units": "millisecond"
         }
       },
       {
         "IntKey": {
           "keyName": "imagerNumRamps",
           "values": [
-            1
+            3
           ],
           "units": "NoUnits"
         }
@@ -371,7 +371,7 @@
     "_type": "Setup",
     "source": "ESW.ImagerAndIFS",
     "commandName": "observationEnd",
-    "maybeObsId": "2020A-001-123",
+    "maybeObsId": "2030A-101-023",
     "paramSet": []
   }
 ]
