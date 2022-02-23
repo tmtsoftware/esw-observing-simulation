@@ -41,7 +41,7 @@ Run the container cmd script with arguments. For example:
 * Run the HCD in a standalone mode with a local config file (The standalone config format is different than the container format):
 
 ```
-sbt "wfos-wfosdeploy/runMain wfos.wfosdeploy.WfosContainerCmdApp --standalone --local ./src/main/resources/WfoshcdStandalone.conf"
+sbt "wfos-wfosdeploy/runMain wfos.wfosdeploy.WfosContainerCmdApp --local ./src/main/resources/WfoshcdStandalone.conf"
 ```
 
 * Start the HCD and assembly in a container using the Java implementations:
