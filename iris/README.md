@@ -41,7 +41,7 @@ Run the container cmd script with arguments. For example:
 * Run the HCD in a standalone mode with a local config file (The standalone config format is different than the container format):
 
 ```
-sbt "iris-irisdeploy/runMain iris.irisdeploy.IrisContainerCmdApp --standalone --local ./src/main/resources/IrishcdStandalone.conf"
+sbt "iris-irisdeploy/runMain iris.irisdeploy.IrisContainerCmdApp --local ./src/main/resources/IrishcdStandalone.conf"
 ```
 
 * Start the HCD and assembly in a container using the Java implementations:
