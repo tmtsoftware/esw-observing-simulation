@@ -99,8 +99,8 @@ export const MCSAssembly = (): JSX.Element => {
   }, [eventService])
 
   const labelValueMap: LabelValueMap[] = [
-    { label: 'LST', ...siderealTime },
-    { label: 'HA', ...hourAngle },
+    { label: 'sidereal time', ...siderealTime },
+    { label: 'hour angle', ...hourAngle },
     { label: 'ra', ...raValue },
     { label: 'dec', ...decValue },
     { label: 'az', ...azPosition },
