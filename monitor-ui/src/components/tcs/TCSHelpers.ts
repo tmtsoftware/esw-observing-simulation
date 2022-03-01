@@ -4,7 +4,8 @@ import {
   eqCoordKey,
   EventKey,
   EventName,
-  Prefix
+  Prefix,
+  Units
 } from '@tmtsoftware/esw-ts'
 
 export type AngleP = {
@@ -36,6 +37,9 @@ export const baseDemandKey = doubleKey('baseDemand')
 export const capDemandKey = doubleKey('capDemand')
 export const currentPosKey = eqCoordKey('currentPos')
 export const demandPosKey = eqCoordKey('demandPos')
+export const siderealTimeKey = doubleKey('siderealTime', Units.hour)
+export const currentHourAngleKey = doubleKey('currentHourAngle', Units.degree)
+export const demandHourAngleKey = doubleKey('demandHourAngle', Units.degree)
 
 export const round = (num?: number) =>
   num ? Math.floor(Math.abs(num) * 100) / 100 : num

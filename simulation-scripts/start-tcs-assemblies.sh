@@ -6,7 +6,7 @@ ROOT="$(
     pwd -P
 )"
 
-version=0.8
+version=0.9
 TCS_VSLICE="$HOME/tcs-vslice-04/$version"
 
 if [ -d $TCS_VSLICE ]

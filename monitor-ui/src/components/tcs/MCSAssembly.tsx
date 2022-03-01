@@ -8,11 +8,14 @@ import { Assembly } from '../common/Assembly'
 import type { AngleP, EqCoordP } from './TCSHelpers'
 import {
   currentAltAzCoordKey,
+  currentHourAngleKey,
   currentPosKey,
   demandAltAzCoordKey,
+  demandHourAngleKey,
   demandPosKey,
   mountPositionEventKey,
-  round
+  round,
+  siderealTimeKey
 } from './TCSHelpers'
 
 export const MCSAssembly = (): JSX.Element => {
@@ -21,6 +24,8 @@ export const MCSAssembly = (): JSX.Element => {
   const [azPosition, setAzPosition] = useState<AngleP>()
   const [raValue, setRaValue] = useState<EqCoordP>()
   const [decValue, setDecValue] = useState<EqCoordP>()
+  const [siderealTime, setSiderealTime] = useState<{ current?: number }>()
+  const [hourAngle, setHourAngle] = useState<AngleP>()
 
   useEffect(() => {
     const onEvent = (event: Event) => {
@@ -69,6 +74,20 @@ export const MCSAssembly = (): JSX.Element => {
         target: targetAz,
         error: currentAz && targetAz ? round(targetAz - currentAz) : undefined
       })
+
+      const siderealTimeP = event.get(siderealTimeKey)?.values[0]
+      const currentHourAngle = round(event.get(currentHourAngleKey)?.values[0])
+      const demandHourAngle = round(event.get(demandHourAngleKey)?.values[0])
+
+      setSiderealTime({ current: round(siderealTimeP) })
+      setHourAngle({
+        current: currentHourAngle,
+        target: demandHourAngle,
+        error:
+          currentHourAngle && demandHourAngle
+            ? round(demandHourAngle - currentHourAngle)
+            : undefined
+      })
     }
 
     const subscription = eventService?.subscribe(
@@ -80,6 +99,8 @@ export const MCSAssembly = (): JSX.Element => {
   }, [eventService])
 
   const labelValueMap: LabelValueMap[] = [
+    { label: 'LST', ...siderealTime },
+    { label: 'HA', ...hourAngle },
     { label: 'ra', ...raValue },
     { label: 'dec', ...decValue },
     { label: 'az', ...azPosition },
