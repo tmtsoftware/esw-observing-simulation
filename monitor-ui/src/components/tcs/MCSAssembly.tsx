@@ -18,13 +18,18 @@ import {
   siderealTimeKey
 } from './TCSHelpers'
 
+const degreeToString = (angleInDegrees?: number) =>
+  angleInDegrees
+    ? Angle.raToString(Angle.D2R * angleInDegrees, true)
+    : undefined
+
 export const MCSAssembly = (): JSX.Element => {
   const eventService = useEventService()
   const [altPosition, setAltPosition] = useState<AngleP>()
   const [azPosition, setAzPosition] = useState<AngleP>()
   const [raValue, setRaValue] = useState<EqCoordP>()
   const [decValue, setDecValue] = useState<EqCoordP>()
-  const [siderealTime, setSiderealTime] = useState<{ current?: number }>()
+  const [siderealTime, setSiderealTime] = useState<{ current?: string }>()
   const [hourAngle, setHourAngle] = useState<AngleP>()
 
   useEffect(() => {
@@ -75,18 +80,23 @@ export const MCSAssembly = (): JSX.Element => {
         error: currentAz && targetAz ? round(targetAz - currentAz) : undefined
       })
 
-      const siderealTimeP = event.get(siderealTimeKey)?.values[0]
+      const siderealTimeP = round(event.get(siderealTimeKey)?.values[0])
       const currentHourAngle = round(event.get(currentHourAngleKey)?.values[0])
       const demandHourAngle = round(event.get(demandHourAngleKey)?.values[0])
+      const hourAngleError =
+        currentHourAngle &&
+        demandHourAngle &&
+        round(demandHourAngle - currentHourAngle)
 
-      setSiderealTime({ current: round(siderealTimeP) })
+      setSiderealTime({
+        current: siderealTimeP
+          ? Angle.raToString(Angle.H2R * siderealTimeP, true)
+          : undefined
+      })
       setHourAngle({
-        current: currentHourAngle,
-        target: demandHourAngle,
-        error:
-          currentHourAngle && demandHourAngle
-            ? round(demandHourAngle - currentHourAngle)
-            : undefined
+        current: degreeToString(currentHourAngle),
+        target: degreeToString(demandHourAngle),
+        error: degreeToString(hourAngleError)
       })
     }
 

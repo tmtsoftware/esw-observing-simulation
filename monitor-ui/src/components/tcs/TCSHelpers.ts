@@ -9,9 +9,9 @@ import {
 } from '@tmtsoftware/esw-ts'
 
 export type AngleP = {
-  current: number | undefined
-  target: number | undefined
-  error: number | undefined
+  current: string | number | undefined
+  target: string | number | undefined
+  error: string | number | undefined
 }
 
 export type EqCoordP = {
