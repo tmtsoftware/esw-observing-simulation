@@ -20,7 +20,7 @@ import {
 
 const degreeToString = (angleInDegrees?: number) =>
   angleInDegrees
-    ? Angle.raToString(Angle.D2R * angleInDegrees, true)
+    ? Angle.deToString(Angle.D2R * angleInDegrees, true)
     : undefined
 
 export const MCSAssembly = (): JSX.Element => {
