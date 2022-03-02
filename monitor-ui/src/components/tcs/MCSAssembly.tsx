@@ -93,10 +93,12 @@ export const MCSAssembly = (): JSX.Element => {
           ? Angle.raToString(Angle.H2R * siderealTimeP, true)
           : undefined
       })
+      // Divide by 15 to display in hours
+      // (don't use Angle.raToString(), since the values may be negative, which is not allowed for RA values)
       setHourAngle({
-        current: degreeToString(currentHourAngle),
-        target: degreeToString(demandHourAngle),
-        error: degreeToString(hourAngleError)
+        current: degreeToString(currentHourAngle ? currentHourAngle / 15.0 : currentHourAngle),
+        target: degreeToString(demandHourAngle ? demandHourAngle / 15.0 : demandHourAngle),
+        error: degreeToString(hourAngleError ? hourAngleError / 15.0 : hourAngleError)
       })
     }
 
