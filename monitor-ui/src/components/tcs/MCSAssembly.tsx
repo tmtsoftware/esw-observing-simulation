@@ -80,9 +80,9 @@ export const MCSAssembly = (): JSX.Element => {
         error: currentAz && targetAz ? round(targetAz - currentAz) : undefined
       })
 
-      const siderealTimeP = round(event.get(siderealTimeKey)?.values[0])
-      const currentHourAngle = round(event.get(currentHourAngleKey)?.values[0])
-      const demandHourAngle = round(event.get(demandHourAngleKey)?.values[0])
+      const siderealTimeP = event.get(siderealTimeKey)?.values[0]
+      const currentHourAngle = event.get(currentHourAngleKey)?.values[0]
+      const demandHourAngle = event.get(demandHourAngleKey)?.values[0]
       const hourAngleError =
         currentHourAngle &&
         demandHourAngle &&
