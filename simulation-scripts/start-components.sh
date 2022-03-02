@@ -3,8 +3,8 @@ ROOT="$(
     cd "$(dirname "$0")" >/dev/null 2>&1 || exit
     pwd -P
 )"
-
-ESW_VERSION=f93d3c5
+cd $ROOT
+source ./versions.sh
 
 sampleConfDir=$ROOT/../sample-configs
 hostConfPath=$sampleConfDir/HostConfig.conf

@@ -5,8 +5,10 @@ ROOT="$(
     cd "$(dirname "$0")" >/dev/null 2>&1 || exit
     pwd -P
 )"
+cd $ROOT
+source ./versions.sh
 
-version=0.9
+version=$TCS_VERSION
 TCS_VSLICE="$HOME/tcs-vslice-04/$version"
 
 if [ -d $TCS_VSLICE ]
