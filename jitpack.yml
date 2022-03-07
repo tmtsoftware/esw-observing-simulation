@@ -4,5 +4,5 @@ before_install:
   - ./coursier java --jvm temurin:1.17
   - wget https://repo1.maven.org/maven2/org/scala-sbt/sbt-launch/1.6.1/sbt-launch-1.6.1.jar
 install:
-  - eval $(./coursier java --jvm temurin:1.17 --env -m offline)
+  - eval $(./coursier java --jvm temurin:1.17 --env)
   - ./publish.sh
