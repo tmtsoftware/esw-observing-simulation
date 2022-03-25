@@ -1,5 +1,6 @@
 import type { Event, EventName } from '@tmtsoftware/esw-ts'
-import { Card, Col, Collapse, List, Row, Space, Typography } from 'antd'
+import { ObserveEventNames } from '@tmtsoftware/esw-ts'
+import { Card, Col, Collapse, Row, Space, Typography } from 'antd'
 import * as React from 'react'
 import { useEventService } from '../../contexts/EventServiceContext'
 import { formatParameters } from './ParamFormatter'
@@ -9,8 +10,8 @@ export const extractEventName = (eventName: EventName) => {
   return eventName.name.split('ObserveEvent.')[1]
 }
 
-const createDataSource = (event: Event): JSX.Element[] => {
-  return event.paramSet.map((parameter) => (
+const paramSet = (event: Event): JSX.Element[] =>
+  event.paramSet.map((parameter) => (
     <Row key={parameter.keyName} gutter={8}>
       <Col style={{ textAlign: 'right' }} span={8}>
         <Typography.Text type='secondary' strong>
@@ -25,19 +26,26 @@ const createDataSource = (event: Event): JSX.Element[] => {
       </Col>
     </Row>
   ))
-}
 
 const { Panel } = Collapse
+
+const ignoreList = [
+  ObserveEventNames.IRDetectorExposureData.name,
+  ObserveEventNames.OpticalDetectorExposureData.name
+]
+
 export const ObserveEvents = () => {
   const eventService = useEventService()
   const [observeEvents, setObserveEvents] = React.useState<Event[]>([])
 
   React.useEffect(() => {
     const onObserveEvent = (event: Event) => {
-      //prepend new event & append recent 19 event to the list
-      setObserveEvents((preList) => [event, ...preList.slice(0, 19)])
+      if (!ignoreList.includes(event.eventName.name)) {
+        //prepend new event & append recent 19 event to the list
+        setObserveEvents((preList) => [event, ...preList.slice(0, 19)])
+      }
     }
-    const subscription = eventService?.subscribeObserveEvents(1)(onObserveEvent)
+    const subscription = eventService?.subscribeObserveEvents()(onObserveEvent)
     return () => subscription?.cancel()
   }, [eventService])
 
@@ -61,24 +69,20 @@ export const ObserveEvents = () => {
         </Col>
       </Row>
       <Collapse accordion style={{ backgroundColor: 'white' }}>
-        {observeEvents.map((event) => {
-          return (
-            <Panel
-              header={
-                <>
-                  <Typography.Text>
-                    {event.source.toJSON()}:{' '}
-                    <Typography.Text strong>
-                      {extractEventName(event.eventName)}
-                    </Typography.Text>
-                  </Typography.Text>
-                </>
-              }
-              key={event.eventId}>
-              {createDataSource(event)}
-            </Panel>
-          )
-        })}
+        {observeEvents.map((event) => (
+          <Panel
+            header={
+              <Typography.Text>
+                {event.source.toJSON()}:{' '}
+                <Typography.Text strong>
+                  {extractEventName(event.eventName)}
+                </Typography.Text>
+              </Typography.Text>
+            }
+            key={event.eventId}>
+            {paramSet(event)}
+          </Panel>
+        ))}
       </Collapse>
     </Card>
   )
