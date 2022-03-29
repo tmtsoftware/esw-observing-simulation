@@ -12,6 +12,13 @@ export const extractEventName = (eventName: EventName) => {
   return eventName.name.split('ObserveEvent.')[1]
 }
 
+const dateFormatter = new Intl.DateTimeFormat('en', {
+  timeStyle: 'medium'
+  // timeZone: 'UTC'
+})
+
+const getTime = (dateStr: string) => dateFormatter.format(new Date(dateStr))
+
 const paramSet = (event: Event): JSX.Element[] =>
   event.paramSet.map((parameter) => (
     <Row key={parameter.keyName} gutter={8}>
@@ -70,7 +77,7 @@ export const ObserveEvents = () => {
         }}>
         <Col span={18}>
           <Typography.Title level={5} style={{ marginBottom: '0' }}>
-            {'OBSERVE EVENT'}
+            {'Observe Events'}
           </Typography.Title>
         </Col>
         <Col>
@@ -94,7 +101,7 @@ export const ObserveEvents = () => {
             header={
               <div key={index} ref={(el) => (elem.current = el)}>
                 <Typography.Text>
-                  {event.source.toJSON()}:{' '}
+                  {getTime(event.eventTime)}: {event.source.toJSON()}:{' '}
                   <Typography.Text strong>
                     {extractEventName(event.eventName)}
                   </Typography.Text>
