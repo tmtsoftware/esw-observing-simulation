@@ -1,7 +1,9 @@
+import { DeleteOutlined } from '@ant-design/icons'
 import type { Event, EventName } from '@tmtsoftware/esw-ts'
 import { ObserveEventNames } from '@tmtsoftware/esw-ts'
-import { Card, Col, Collapse, Row, Space, Typography } from 'antd'
+import { Button, Card, Col, Collapse, Row, Space, Typography } from 'antd'
 import * as React from 'react'
+import { useRef } from 'react'
 import { useEventService } from '../../contexts/EventServiceContext'
 import { formatParameters } from './ParamFormatter'
 import './styles.module.css'
@@ -37,12 +39,15 @@ const ignoreList = [
 export const ObserveEvents = () => {
   const eventService = useEventService()
   const [observeEvents, setObserveEvents] = React.useState<Event[]>([])
-
+  const elem = useRef<HTMLDivElement | null>(null)
   React.useEffect(() => {
     const onObserveEvent = (event: Event) => {
       if (!ignoreList.includes(event.eventName.name)) {
         //prepend new event & append recent 19 event to the list
-        setObserveEvents((preList) => [event, ...preList.slice(0, 19)])
+        setObserveEvents((preList) => [...preList.slice(0, 1000), event])
+        elem.current?.scrollIntoView({
+          behavior: 'smooth'
+        })
       }
     }
     const subscription = eventService?.subscribeObserveEvents()(onObserveEvent)
@@ -51,33 +56,50 @@ export const ObserveEvents = () => {
 
   return (
     <Card
-      style={{ marginBottom: '1.5rem' }}
+      style={{ marginBottom: '0.25rem' }}
       headStyle={{ display: 'none' }}
-      bodyStyle={{ padding: '12px' }}>
+      bodyStyle={{ padding: '6px' }}>
       <Row
         gutter={16}
         style={{
           display: 'flex',
           alignItems: 'center',
+          justifyContent: 'space-between',
           backgroundColor: 'rgb(240,240,240)',
           marginBottom: '8px'
         }}>
-        <Col span={24}>
+        <Col span={18}>
           <Typography.Title level={5} style={{ marginBottom: '0' }}>
-            {'Observe events'}
+            {'OBSERVE EVENT'}
           </Typography.Title>
         </Col>
+        <Col>
+          <Button
+            type='text'
+            icon={<DeleteOutlined />}
+            onClick={() => setObserveEvents([])}
+          />
+        </Col>
       </Row>
-      <Collapse accordion style={{ backgroundColor: 'white' }}>
-        {observeEvents.map((event) => (
+      <Collapse
+        accordion
+        style={{
+          backgroundColor: 'white',
+          maxHeight: '24rem',
+          overflow: 'scroll'
+        }}
+        ghost>
+        {observeEvents.map((event, index) => (
           <Panel
             header={
-              <Typography.Text>
-                {event.source.toJSON()}:{' '}
-                <Typography.Text strong>
-                  {extractEventName(event.eventName)}
+              <div key={index} ref={(el) => (elem.current = el)}>
+                <Typography.Text>
+                  {event.source.toJSON()}:{' '}
+                  <Typography.Text strong>
+                    {extractEventName(event.eventName)}
+                  </Typography.Text>
                 </Typography.Text>
-              </Typography.Text>
+              </div>
             }
             key={event.eventId}>
             {paramSet(event)}

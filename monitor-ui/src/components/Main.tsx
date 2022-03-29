@@ -9,12 +9,10 @@ export const Main = (): JSX.Element => (
   <Row gutter={16}>
     <Col xs={24} md={24} lg={12} xl={8}>
       <IRIS />
-    </Col>
-    <Col xs={24} md={24} lg={12} xl={8}>
-      <WFOS />
       <TCS />
     </Col>
     <Col xs={24} md={24} lg={12} xl={8}>
+      <WFOS />
       <ObserveEvents />
     </Col>
   </Row>

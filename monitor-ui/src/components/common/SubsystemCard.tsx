@@ -11,9 +11,9 @@ export const SubsystemCard = ({
 }): JSX.Element => {
   return (
     <Card
-      style={{ marginBottom: '1.5rem' }}
+      style={{ marginBottom: '0.25rem' }}
       headStyle={{ display: 'none' }}
-      bodyStyle={{ padding: '12px' }}>
+      bodyStyle={{ padding: '6px' }}>
       <>
         <Row
           gutter={16}
