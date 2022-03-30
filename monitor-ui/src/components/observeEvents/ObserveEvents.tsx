@@ -12,9 +12,13 @@ export const extractEventName = (eventName: EventName) => {
   return eventName.name.split('ObserveEvent.')[1]
 }
 
+const randomInThousands = Math.floor(1000 + Math.random() * 9000)
+
 const dateFormatter = new Intl.DateTimeFormat('en', {
-  timeStyle: 'medium'
-  // timeZone: 'UTC'
+  hour: 'numeric',
+  minute: 'numeric',
+  second: 'numeric',
+  fractionalSecondDigits: 3
 })
 
 const getTime = (dateStr: string) => dateFormatter.format(new Date(dateStr))
@@ -112,6 +116,7 @@ export const ObserveEvents = () => {
             {paramSet(event)}
           </Panel>
         ))}
+        <Panel header={''} disabled key={randomInThousands} />
       </Collapse>
     </Card>
   )
