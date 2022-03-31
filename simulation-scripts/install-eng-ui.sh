@@ -23,6 +23,7 @@ curl -L -O https://github.com/tmtsoftware/esw-ocs-eng-ui/archive/$version.zip
 
 unzip -o $version.zip
 cd esw-ocs-eng-ui-$version* && npm install && npm run build
+rm -rf ../esw-ocs-eng-ui
 mv esw-ocs-eng-ui ../esw-ocs-eng-ui
 cd ..
 rm -rf esw-ocs-eng-ui-$version*
