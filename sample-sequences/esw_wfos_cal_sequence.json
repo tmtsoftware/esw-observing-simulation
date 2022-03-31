@@ -7,13 +7,6 @@
     "paramSet": []
   },
   {
-    "_type": "Observe",
-    "source": "ESW.WFOS_Cal",
-    "commandName": "fineAcquisition",
-    "maybeObsId": "2020A-001-123",
-    "paramSet": []
-  },
-  {
     "_type": "Setup",
     "source": "ESW.wfos_science",
     "commandName": "setupObservation",
@@ -67,7 +60,7 @@
         "IntKey": {
           "keyName": "blueNumRamps",
           "values": [
-            5
+            1
           ],
           "units": "NoUnits"
         }
@@ -76,7 +69,7 @@
         "IntKey": {
           "keyName": "redNumRamps",
           "values": [
-            8
+            1
           ],
           "units": "NoUnits"
         }
@@ -94,7 +87,246 @@
         "IntKey": {
           "keyName": "redIntegrationTime",
           "values": [
+            4000
+          ],
+          "units": "millisecond"
+        }
+      },
+      {
+        "StringKey": {
+          "keyName": "blueExposureType",
+          "values": [
+            "CAL"
+          ],
+          "units": "NoUnits"
+        }
+      }
+    ]
+  },
+  {
+    "_type": "Observe",
+    "source": "ESW.WFOS_Cal",
+    "commandName": "observe",
+    "maybeObsId": "2020A-001-123",
+    "paramSet": [
+      {
+        "StringKey": {
+          "keyName": "redExposureType",
+          "values": [
+            "CAL"
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "StringKey": {
+          "keyName": "directory",
+          "values": [
+            "/tmp"
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "IntKey": {
+          "keyName": "blueNumRamps",
+          "values": [
+            1
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "IntKey": {
+          "keyName": "redNumRamps",
+          "values": [
+            1
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "IntKey": {
+          "keyName": "blueIntegrationTime",
+          "values": [
+            5000
+          ],
+          "units": "millisecond"
+        }
+      },
+      {
+        "IntKey": {
+          "keyName": "redIntegrationTime",
+          "values": [
+            4000
+          ],
+          "units": "millisecond"
+        }
+      },
+      {
+        "StringKey": {
+          "keyName": "blueExposureType",
+          "values": [
+            "CAL"
+          ],
+          "units": "NoUnits"
+        }
+      }
+    ]
+  },
+  {
+    "_type": "Setup",
+    "source": "ESW.wfos_science",
+    "commandName": "setupObservation",
+    "maybeObsId": "2020A-001-123",
+    "paramSet": [
+      {
+        "ChoiceKey": {
+          "keyName": "blueFilter",
+          "values": [
+            "u'"
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "ChoiceKey": {
+          "keyName": "redFilter",
+          "values": [
+            "r'"
+          ],
+          "units": "NoUnits"
+        }
+      }
+    ]
+  },
+  {
+    "_type": "Observe",
+    "source": "ESW.WFOS_Cal",
+    "commandName": "observe",
+    "maybeObsId": "2020A-001-123",
+    "paramSet": [
+      {
+        "StringKey": {
+          "keyName": "redExposureType",
+          "values": [
+            "CAL"
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "StringKey": {
+          "keyName": "directory",
+          "values": [
+            "/tmp"
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "IntKey": {
+          "keyName": "blueNumRamps",
+          "values": [
+            1
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "IntKey": {
+          "keyName": "redNumRamps",
+          "values": [
+            1
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "IntKey": {
+          "keyName": "blueIntegrationTime",
+          "values": [
             3000
+          ],
+          "units": "millisecond"
+        }
+      },
+      {
+        "IntKey": {
+          "keyName": "redIntegrationTime",
+          "values": [
+            4000
+          ],
+          "units": "millisecond"
+        }
+      },
+      {
+        "StringKey": {
+          "keyName": "blueExposureType",
+          "values": [
+            "CAL"
+          ],
+          "units": "NoUnits"
+        }
+      }
+    ]
+  },
+  {
+    "_type": "Observe",
+    "source": "ESW.WFOS_Cal",
+    "commandName": "observe",
+    "maybeObsId": "2020A-001-123",
+    "paramSet": [
+      {
+        "StringKey": {
+          "keyName": "redExposureType",
+          "values": [
+            "CAL"
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "StringKey": {
+          "keyName": "directory",
+          "values": [
+            "/tmp"
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "IntKey": {
+          "keyName": "blueNumRamps",
+          "values": [
+            1
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "IntKey": {
+          "keyName": "redNumRamps",
+          "values": [
+            1
+          ],
+          "units": "NoUnits"
+        }
+      },
+      {
+        "IntKey": {
+          "keyName": "blueIntegrationTime",
+          "values": [
+            3500
+          ],
+          "units": "millisecond"
+        }
+      },
+      {
+        "IntKey": {
+          "keyName": "redIntegrationTime",
+          "values": [
+            4500
           ],
           "units": "millisecond"
         }
