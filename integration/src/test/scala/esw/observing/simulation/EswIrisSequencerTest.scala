@@ -48,11 +48,11 @@ class EswIrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
   private lazy val agentLoc    = locationService.find(agentConnection).futureValue
   private lazy val agentClient = new AgentClient(agentLoc.get)
 
-  private val locationServiceUtil                = new LocationServiceUtil(locationService)
-  private val sequenceComponentUtil              = new SequenceComponentUtil(locationServiceUtil, new SequenceComponentAllocator())
-  private var seqComp1Loc: Option[AkkaLocation]  = None
-  private var seqComp2Loc: Option[AkkaLocation]  = None
-  private var seqComp3Loc: Option[AkkaLocation]  = None
+  private val locationServiceUtil               = new LocationServiceUtil(locationService)
+  private val sequenceComponentUtil             = new SequenceComponentUtil(locationServiceUtil, new SequenceComponentAllocator())
+  private var seqComp1Loc: Option[AkkaLocation] = None
+  private var seqComp2Loc: Option[AkkaLocation] = None
+  private var seqComp3Loc: Option[AkkaLocation] = None
   private var containerLoc: Option[AkkaLocation] = None
 
   override def afterAll(): Unit = {
@@ -70,7 +70,7 @@ class EswIrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
    We subscribe and validate all observe events are published by ESW sequencer and in correct order.
    */
   "Iris top level esw sequencer" must {
-    "handle the submitted sequence | ESW-554, ESW-82, ESW-570" in {
+    "handle the submitted sequence | ESW-554, ESW-82, ESW-570, ESW-589" in {
 
       // spawn the iris container
       frameworkTestKit.spawnContainer(ConfigFactory.load("IrisContainer.conf"))
@@ -154,6 +154,7 @@ class EswIrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
         TestData.observeEventKeys
           ++ TestData.detectorObsEvents(Prefix("IRIS.ifs.detector"))
           ++ Set(TestData.encCurrentPositionEventKey)
+          ++ Set(TestData.offsetStartEventKey, TestData.offsetEndEventKey)
       )
 
       val sequencerApi = sequencerClient(Subsystem.ESW, obsMode)
@@ -207,6 +208,16 @@ class EswIrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
     eventually {
       val event = testProbe.expectMessageType[ObserveEvent]
       event.eventName.name shouldBe ObserveEventNames.ScitargetAcqEnd.name
+    }
+
+    eventually {
+      val event = testProbe.expectMessageType[ObserveEvent]
+      event.eventName.name shouldBe ObserveEventNames.OffsetStart.name
+    }
+
+    eventually {
+      val event = testProbe.expectMessageType[ObserveEvent]
+      event.eventName.name shouldBe ObserveEventNames.OffsetEnd.name
     }
 
     eventually {

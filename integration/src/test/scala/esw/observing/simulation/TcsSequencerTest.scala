@@ -7,7 +7,7 @@ import csw.logging.client.scaladsl.LoggerFactory
 import csw.params.commands.CommandResponse
 import csw.params.core.models.Angle
 import csw.params.core.models.Angle.double2angle
-import csw.params.events.SystemEvent
+import csw.params.events.{ObserveEvent, SystemEvent}
 import csw.prefix.models.Subsystem.Container
 import csw.prefix.models.{Prefix, Subsystem}
 import csw.testkit.scaladsl.CSWService.EventServer
@@ -52,7 +52,7 @@ class TcsSequencerTest extends EswTestKit(EventServer, MachineAgent) {
   }
 
   "TcsSequencer" must {
-    "handle the submitted sequence | ESW-569" in {
+    "handle the submitted sequence | ESW-569, ESW-589" in {
 
       val script = Paths.get(getClass.getResource("/test-setup.sh").toURI)
 
@@ -92,6 +92,7 @@ class TcsSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       // ********************************************************************
 
       val pkAssemblyTestProbe = createTestProbe(Set(TestData.mcsDemandPositionEventKey, TestData.encCurrentPositionEventKey))
+      val tcsSequencerTestProbe = createTestProbe(Set(TestData.offsetStartEventKey, TestData.offsetEndEventKey))
 
       val sequencerApi     = sequencerClient(Subsystem.TCS, obsMode)
       val initialSubmitRes = sequencerApi.submit(TestData.tcsSequence).futureValue
@@ -112,11 +113,20 @@ class TcsSequencerTest extends EswTestKit(EventServer, MachineAgent) {
         assertCapAndBaseError(event)
       }
 
+      eventually {
+        val event = tcsSequencerTestProbe.expectMessageType[ObserveEvent]
+        event.eventName.name shouldBe "ObserveEvent.OffsetStart"
+      }
       // Assert MountPosition for SetOffset command
       eventually {
         val event = pkAssemblyTestProbe.expectMessageType[SystemEvent]
         event.eventName.name shouldBe "MountPosition"
         assertMountPositionError(event, 0.5)
+      }
+
+      eventually {
+        val event = tcsSequencerTestProbe.expectMessageType[ObserveEvent]
+        event.eventName.name shouldBe "ObserveEvent.OffsetEnd"
       }
 
       val eventualResponse = sequencerApi.queryFinal(initialSubmitRes.runId)(20.seconds).futureValue
