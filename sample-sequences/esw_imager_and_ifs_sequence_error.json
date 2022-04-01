@@ -229,7 +229,7 @@
         "IntKey": {
           "keyName": "imagerIntegrationTime",
           "values": [
-            2000
+            1000
           ],
           "units": "arcsec"
         }
@@ -247,7 +247,7 @@
         "IntKey": {
           "keyName": "imagerNumRamps",
           "values": [
-            3
+            4
           ],
           "units": "NoUnits"
         }
@@ -495,7 +495,7 @@
         "IntKey": {
           "keyName": "imagerIntegrationTime",
           "values": [
-            2000
+            1000
           ],
           "units": "millisecond"
         }
@@ -513,7 +513,7 @@
         "IntKey": {
           "keyName": "imagerNumRamps",
           "values": [
-            3
+            4
           ],
           "units": "NoUnits"
         }
@@ -610,7 +610,7 @@
         "IntKey": {
           "keyName": "ifsIntegrationTime",
           "values": [
-            3500
+            4000
           ],
           "units": "millisecond"
         }
@@ -619,7 +619,7 @@
         "IntKey": {
           "keyName": "ifsNumRamps",
           "values": [
-            3
+            2
           ],
           "units": "NoUnits"
         }
@@ -628,7 +628,7 @@
         "IntKey": {
           "keyName": "imagerIntegrationTime",
           "values": [
-            2000
+            1000
           ],
           "units": "millisecond"
         }

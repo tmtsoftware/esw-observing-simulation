@@ -184,7 +184,7 @@
         "IntKey": {
           "keyName": "imagerNumRamps",
           "values": [
-            3
+            2
           ],
           "units": "NoUnits"
         }
@@ -272,7 +272,7 @@
         "IntKey": {
           "keyName": "imagerNumRamps",
           "values": [
-            3
+            2
           ],
           "units": "NoUnits"
         }
@@ -289,7 +289,7 @@
         "ChoiceKey": {
           "keyName": "filter",
           "values": [
-            "FeII"
+            "H"
           ],
           "units": "NoUnits"
         }
@@ -360,7 +360,7 @@
         "IntKey": {
           "keyName": "imagerNumRamps",
           "values": [
-            4
+            2
           ],
           "units": "NoUnits"
         }
