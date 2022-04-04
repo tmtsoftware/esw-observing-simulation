@@ -26,7 +26,7 @@ const getTime = (dateStr: string) => dateFormatter.format(new Date(dateStr))
 const paramSet = (event: Event): JSX.Element[] =>
   event.paramSet.map((parameter) => (
     <Row key={parameter.keyName} gutter={8}>
-      <Col style={{ textAlign: 'right' }} span={8}>
+      <Col style={{ textAlign: 'right' }} span={6}>
         <Typography.Text type='secondary' strong>
           {parameter.keyName + ': '}
         </Typography.Text>
