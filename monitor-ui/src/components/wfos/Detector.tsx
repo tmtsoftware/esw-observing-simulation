@@ -42,8 +42,11 @@ const Detector = ({
     const onObserveEvent = (event: Event) => {
       setObsEvent(getObserveEventName(event))
       setExposureId(event.get(exposureIdKey)?.values[0])
+      // Note: See tsconfig.json:     "noFallthroughCasesInSwitch": true
       switch (event.eventName.name) {
         case dataWriteStartEvent.eventName.name:
+          setFilename(event.get(filenameKey)?.values[0])
+          break
         case dataWriteEndEvent.eventName.name:
           setFilename(event.get(filenameKey)?.values[0])
           break
