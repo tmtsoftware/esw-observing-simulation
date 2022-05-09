@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
-export ESW_VERSION=1ea12a9
+#export ESW_VERSION=1ea12a9
+export ESW_VERSION=0.1.0-SNAPSHOT
 export CSW_VERSION=f1a1b5b
-export SEQ_SCRIPT_VERSION=058cdad
+#export SEQ_SCRIPT_VERSION=058cdad
+export SEQ_SCRIPT_VERSION=0.1.0-SNAPSHOT
 export TCS_VERSION=0.9
 export ENG_UI_VERSION=b9bd307
