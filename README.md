@@ -55,7 +55,7 @@ Run the shell scripts in this order in different terminals.
       on `http:localhost:9000/` to show events from observing-simulation.
 
 Once, everything is up and running, You can login to Eng UI app at
-this [Browser Link](http://localhost:8000/esw-ocs-eng-ui) with user `osw-user1`.
+this [Browser Link](http://localhost:8000/esw-ocs-eng-ui/) with user `osw-user1`.
 
 - First, we need to provision sequence components, which can be done on `Manage Infrastructure page`. Provision let's
   say 3 sequence components for `IRIS`, `TCS` & `ESW` subsystem.
