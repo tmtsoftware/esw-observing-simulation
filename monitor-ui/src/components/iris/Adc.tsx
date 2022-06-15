@@ -43,8 +43,7 @@ export const ADC = (): JSX.Element => {
     }
 
     const subscription = eventService?.subscribe(
-      new Set([prismStateEvent, prismRetractEvent, prismEvent]),
-      10
+      new Set([prismStateEvent, prismRetractEvent, prismEvent])
     )(onPrismEvent)
 
     return () => subscription?.cancel()
