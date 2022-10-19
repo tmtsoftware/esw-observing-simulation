@@ -4,6 +4,9 @@ version=$1
 if [[ "$OSTYPE" == "darwin"* ]]; then
   #Please do not remove below , as this zip is used when we run tcs assembly on Mac
   V_SLICE_ZIP="https://github.com/tmtsoftware/tcs-vslice-0.4/releases/download/v$version/tcs-vslice-$version.zip"
+elif [ "$USER" == "jenkins" ]; then
+  # this zip is used when we run tcs assembly on BTE
+  V_SLICE_ZIP="https://github.com/tmtsoftware/tcs-vslice-0.4/releases/download/v$version/tcs-vslice-$version-CentOS-7.zip"
 else
   # this zip is used when we run tcs assembly on ubuntu
   V_SLICE_ZIP="https://github.com/tmtsoftware/tcs-vslice-0.4/releases/download/v$version/tcs-vslice-$version-Ubuntu-20.04.zip"
