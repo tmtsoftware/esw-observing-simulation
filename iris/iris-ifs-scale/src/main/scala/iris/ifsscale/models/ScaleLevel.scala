@@ -16,7 +16,7 @@ object ScaleLevel extends Enum[ScaleLevel] {
   override def values: IndexedSeq[ScaleLevel] = findValues
 
   private lazy val choices: Choices              = Choices.from(ScaleLevel.values.map(_.entryName): _*)
-  def makeChoiceKey(keyName: String): GChoiceKey = ChoiceKey.make(keyName, Units.marcsec, choices)
+  def makeChoiceKey(keyName: String): GChoiceKey = ChoiceKey.make(keyName, Units.microarcsec, choices)
 
   case object S4  extends ScaleLevel("4")
   case object S9  extends ScaleLevel("9")
