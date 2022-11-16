@@ -26,14 +26,9 @@ A milestone release is cut from master branch as we expect bug fixes / feedback 
 4. Update `Libs.scala` & `plugins.sbt` with latest version if applicable.
 5. Update release notes (`notes/<version>.markdown`) in `esw-obsering-simulation` repo.
 6. Update bodyFile field of create release step in release.yml with the above markdown file. 
-7. Update `CSW_VERSION` in `start-csw-services.sh`.
-8. Update `ESW_VERSION & SEQ_SCRIPT_VERSION version` in `start-esw-services.sh`.
-9. Update `V_SLICE_ZIP` & `version` with latest vslice zip url in `install-tcs-assemblies.sh`.
-10. Update `version` with latest vslice zip url in `start-tcs-assemblies.sh`.
-11. Update `ESW_VERSION` in `start-components.sh`.
-12. Update link of eng-ui release in `install-eng-ui.sh`.
-13. Update version field with upcoming tag for `iris-irisdeploy` & `wfos-wfosdeploy` in `sample-configs/HostConfig.conf`.
-14. Update latest RTM version in Github and jenkins workflow files(this step to be done only in milestone & RC release).
-15. Commit and push the changes to `branch-<major>.<minor>.x` branch.
-16. Make sure build is green for dev for this branch.
-17. Set `PROD=true` environment variable and Run `release.sh $VERSION$` script by providing version number argument (This triggers release workflow)
+7. Update `CSW_VERSION`, `ESW_VERSION`, `SEQ_SCRIPT_VERSION`, `ENG_UI_VERSION` and `TCS_VERSION` in `versions.sh` with required version.
+8. Update version field with upcoming tag for `iris-irisdeploy` & `wfos-wfosdeploy` in `sample-configs/HostConfig.conf`.
+9. Update latest RTM version in Github and jenkins workflow files(this step to be done only in milestone & RC release).
+10. Commit and push the changes to `branch-<major>.<minor>.x` branch.
+11. Make sure build is green for dev for this branch.
+12. Set `PROD=true` environment variable and Run `release.sh $VERSION$` script by providing version number argument (This triggers release workflow)
