@@ -124,7 +124,7 @@
           "values": [
             "25"
           ],
-          "units": "marcsec"
+          "units": "mas"
         }
       },
       {
@@ -230,7 +230,7 @@
           "values": [
             "50"
           ],
-          "units": "marcsec"
+          "units": "mas"
         }
       },
       {

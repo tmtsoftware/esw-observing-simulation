@@ -34,7 +34,7 @@ object TestData {
   val IfsScaleCurrentPositionKey: GChoiceKey = ChoiceKey.make("current", ifsScaleChoices)
   val IfsScaleTargetPositionKey: GChoiceKey  = ChoiceKey.make("target", ifsScaleChoices)
 
-  val IfsScaleP: Parameter[Choice] = ChoiceKey.make("scale", Units.marcsec, ifsScaleChoices).set("9")
+  val IfsScaleP: Parameter[Choice] = ChoiceKey.make("scale", Units.mas, ifsScaleChoices).set("9")
 
   // adc
   val adcPrismRetractKey: GChoiceKey      = ChoiceKey.make("position", Choices.from("IN", "OUT"))

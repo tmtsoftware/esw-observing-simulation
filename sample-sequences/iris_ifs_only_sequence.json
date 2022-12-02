@@ -81,7 +81,7 @@
         "ChoiceKey": {
           "keyName": "scale",
           "values": ["9"],
-          "units": "marcsec"
+          "units": "mas"
         }
       },
       {

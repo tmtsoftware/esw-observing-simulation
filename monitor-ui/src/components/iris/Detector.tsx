@@ -62,9 +62,9 @@ const Detector = ({
       }
     }
 
-    const subscription = eventService?.subscribe(
-      new Set(eventKeys)
-    )(onObserveEvent)
+    const subscription = eventService?.subscribe(new Set(eventKeys))(
+      onObserveEvent
+    )
 
     return () => subscription?.cancel()
   }, [eventKeys, eventService])

@@ -27,7 +27,7 @@
           "values": [
             "9"
           ],
-          "units": "marcsec"
+          "units": "mas"
         }
       },
       {
@@ -142,7 +142,7 @@
           "values": [
             "9"
           ],
-          "units": "marcsec"
+          "units": "mas"
         }
       },
       {
@@ -275,7 +275,7 @@
           "values": [
             "4"
           ],
-          "units": "marcsec"
+          "units": "mas"
         }
       },
       {
@@ -408,7 +408,7 @@
           "values": [
             "9"
           ],
-          "units": "marcsec"
+          "units": "mas"
         }
       },
       {
@@ -541,7 +541,7 @@
           "values": [
             "9"
           ],
-          "units": "marcsec"
+          "units": "mas"
         }
       },
       {
@@ -674,7 +674,7 @@
           "values": [
             "9"
           ],
-          "units": "marcsec"
+          "units": "mas"
         }
       },
       {
