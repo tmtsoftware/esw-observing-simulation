@@ -87,19 +87,23 @@ communication is properly happening between the following components.
 
 ## Version compatibility
 
-| esw-observing-simulation | esw        | csw        | esw-ts      |
-|-------------------------|------------|------------|-------------|
-| v0.1.0                  | v0.4.0     | v4.0.1     | v0.3.0      |
-| v0.1.0-RC1              | v0.4.0-RC1 | v4.0.1-RC1 | v0.3.0-RC1  |
+| esw-observing-simulation | esw        | csw        | esw-ts     |
+|--------------------------|------------|------------|------------|
+| v0.2.0                   | v0.5.0     | v5.0.0     | v0.4.0     |
+| v0.2.0-RC1               | v0.5.0-RC2 | v5.0.0-RC2 | v0.4.0-RC2 |
+| v0.1.0                   | v0.4.0     | v4.0.1     | v0.3.0     |
+| v0.1.0-RC1               | v0.4.0-RC1 | v4.0.1-RC1 | v0.3.0-RC1 |
 
 ## Public Release History
 
-| Date       | Tag    | Source                                                                            | Docs                                                                             | Assets                                                                                           |
-|------------|--------|-----------------------------------------------------------------------------------|----------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|
+| Date       | Tag    | Source                                                                                                | Docs                                                                                                                 | Assets                                                                                                               |
+|------------|--------|-------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|
+| 2022-11-16 | v0.2.0 | [esw-observing-simulation-0.2.0](https://github.com/tmtsoftware/esw-observing-simulation/tree/v0.2.0) | [esw-observing-simulation-0.2.0 docs](https://github.com/tmtsoftware/esw-observing-simulation/blob/v0.2.0/README.md) | [esw-observing-simulation-0.2.0 assets](https://github.com/tmtsoftware/esw-observing-simulation/releases/tag/v0.2.0) |
 | 2022-02-14 | v0.1.0 | [esw-observing-simulation-0.1.0](https://github.com/tmtsoftware/esw-observing-simulation/tree/v0.1.0) | [esw-observing-simulation-0.1.0 docs](https://github.com/tmtsoftware/esw-observing-simulation/blob/v0.1.0/README.md) | [esw-observing-simulation-0.1.0 assets](https://github.com/tmtsoftware/esw-observing-simulation/releases/tag/v0.1.0) |
 
 ## Pre-Release History
 
-| Date       | Tag | Source | Docs                                                                                              |     | Assets |
-|------------|-----|-----|---------------------------------------------------------------------------------------------------|-----|-----|
+| Date       | Tag        | Source                                                                                                        | Docs                                                                                                                     |     | Assets                                                                                                                       |
+|------------|------------|---------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------|-----|------------------------------------------------------------------------------------------------------------------------------|
+| 2022-10-19 | v0.2.0-RC1 | [esw-observing-simulation-0.2.0-RC1](https://github.com/tmtsoftware/esw-observing-simulation/tree/v0.2.0-RC1) | [esw-observing-simulation-0.2.0-RC1 docs](https://github.com/tmtsoftware/esw-observing-simulation/blob/v0.2.0/README.md) |     | [esw-observing-simulation-0.2.0-RC1 assets](https://github.com/tmtsoftware/esw-observing-simulation/releases/tag/v0.2.0-RC1) |
 | 2022-02-08 | v0.1.0-RC1 | [esw-observing-simulation-0.1.0-RC1](https://github.com/tmtsoftware/esw-observing-simulation/tree/v0.1.0-RC1) | [esw-observing-simulation-0.1.0-RC1 docs](https://github.com/tmtsoftware/esw-observing-simulation/blob/v0.1.0/README.md) |     | [esw-observing-simulation-0.1.0-RC1 assets](https://github.com/tmtsoftware/esw-observing-simulation/releases/tag/v0.1.0-RC1) |

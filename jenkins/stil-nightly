@@ -1,0 +1,118 @@
+pipeline {
+    agent {
+        label 'master'
+    }
+
+    options {
+        timeout(time: 2, unit: 'HOURS')
+        timestamps()
+    }
+
+    environment {
+        INTERFACE_NAME = 'eth0'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                sh "git checkout $VERSION"
+                sh "git pull origin $VERSION"
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh "cs java --jvm temurin:1.17.0 -version"
+                dir("iris") {
+                    sh "eval \$(cs java --jvm temurin:1.17.0 --env) && sbt clean"
+                    sh "eval \$(cs java --jvm temurin:1.17.0 --env) && sbt scalafmtCheck"
+                }
+                dir("wfos") {
+                    sh "eval \$(cs java --jvm temurin:1.17.0 --env) && sbt clean"
+                    sh "eval \$(cs java --jvm temurin:1.17.0 --env) && sbt scalafmtCheck"
+                }
+                dir("integration") {
+                    sh "eval \$(cs java --jvm temurin:1.17.0 --env) && sbt clean"
+                    sh "eval \$(cs java --jvm temurin:1.17.0 --env) && sbt scalafmtCheck"
+                }
+            }
+        }
+
+        stage('IRIS Tests') {
+            steps {
+                dir("iris") {
+                    sh "eval \$(cs java --jvm temurin:1.17.0 --env) && sbt -DenableFatalWarnings=true -DenableCoverage=true -DgenerateStoryReport=true test:test"
+                }
+            }
+        }
+
+        stage('WFOS Tests') {
+            steps {
+                dir("wfos") {
+                    sh "eval \$(cs java --jvm temurin:1.17.0 --env) && sbt -DenableFatalWarnings=true -DenableCoverage=true -DgenerateStoryReport=true test:test"
+                }
+            }
+        }
+
+        stage('Integration Tests') {
+            steps {
+                dir("integration") {
+                    sh "eval \$(cs java --jvm temurin:1.17.0 --env) && sbt -DenableFatalWarnings=true -DgenerateStoryReport=true test:test"
+                }
+            }
+        }
+
+        stage('Generate RTM') {
+            steps {
+                // concat test reports
+                sh "mkdir -p target/RTM"
+                sh "cat iris/target/RTM/testStoryMapping.txt wfos/target/RTM/testStoryMapping.txt integration/target/RTM/testStoryMapping.txt > target/RTM/testStoryMappingAll.txt"
+                // Generate RTM
+                sh "cs launch --channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/master/apps.json rtm:0.3.0 -- target/RTM/testStoryMappingAll.txt tools/RTM/storyRequirementMapping.csv target/RTM/testRequirementsMapping.txt"
+                // Upload RTM
+                publishHTML(target: [
+                    alwaysLinkToLastBuild: false,
+                    keepAll              : true,
+                    reportDir            : './target/RTM/',
+                    reportFiles          : 'index.html',
+                    reportName           : "Test-Story-Requirement mapping"
+                ])
+            }
+        }
+    }
+    post {
+        always {
+            script {
+                sendNotification(currentBuild.result)
+            }
+        }
+    }
+}
+
+def sendNotification(String buildStatus = 'STARTED') {
+    buildStatus = buildStatus ?: 'SUCCESS'
+
+    def colorCode = '#FF0000'
+    def subject = "${buildStatus}: Job '${env.JOB_NAME}' [${VERSION}] [${env.BUILD_NUMBER}]"
+    def summary = "${subject} (${env.BUILD_URL})"
+    def details = '${JELLY_SCRIPT,template="html"}'
+
+    // Override default values based on build status
+    if (buildStatus == 'STARTED') {
+        color = 'YELLOW'
+        colorCode = '#FFFF00'
+    } else if (buildStatus == 'SUCCESS') {
+        color = 'GREEN'
+        colorCode = '#00FF00'
+    } else {
+        color = 'RED'
+        colorCode = '#FF0000'
+        emailext(
+                subject: subject,
+                body: details,
+                to: "jweiss@tmt.org"
+        )
+    }
+
+    slackSend(channel: "#${SLACK_CH}", color: colorCode, message: summary)
+}
