@@ -1,5 +1,6 @@
 package esw.observing.simulation
 
 object ScriptVersion {
-  val value = "058cdad"
+  // This is the version (or Git SHA) of the version of the sequencer-scripts repo to use
+  val value = "0.5.0"
 }
