@@ -48,11 +48,11 @@ class EswIrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
   private lazy val agentLoc    = locationService.find(agentConnection).futureValue
   private lazy val agentClient = new AgentClient(agentLoc.get)
 
-  private val locationServiceUtil               = new LocationServiceUtil(locationService)
-  private val sequenceComponentUtil             = new SequenceComponentUtil(locationServiceUtil, new SequenceComponentAllocator())
-  private var seqComp1Loc: Option[AkkaLocation] = None
-  private var seqComp2Loc: Option[AkkaLocation] = None
-  private var seqComp3Loc: Option[AkkaLocation] = None
+  private val locationServiceUtil                = new LocationServiceUtil(locationService)
+  private val sequenceComponentUtil              = new SequenceComponentUtil(locationServiceUtil, new SequenceComponentAllocator())
+  private var seqComp1Loc: Option[AkkaLocation]  = None
+  private var seqComp2Loc: Option[AkkaLocation]  = None
+  private var seqComp3Loc: Option[AkkaLocation]  = None
   private var containerLoc: Option[AkkaLocation] = None
 
   override def afterAll(): Unit = {

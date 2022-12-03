@@ -118,8 +118,8 @@ object TestData {
 
   val mcsDemandPositionEventKey: EventKey  = EventKey(Prefix("TCS.MCSAssembly"), EventName("MountPosition"))
   val encCurrentPositionEventKey: EventKey = EventKey(Prefix("TCS.ENCAssembly"), EventName("CurrentPosition"))
-  val offsetStartEventKey: EventKey = EventKey(Prefix("TCS.IRIS_ImagerAndIFS"), EventName("ObserveEvent.OffsetStart"))
-  val offsetEndEventKey: EventKey = EventKey(Prefix("TCS.IRIS_ImagerAndIFS"), EventName("ObserveEvent.OffsetEnd"))
+  val offsetStartEventKey: EventKey        = EventKey(Prefix("TCS.IRIS_ImagerAndIFS"), EventName("ObserveEvent.OffsetStart"))
+  val offsetEndEventKey: EventKey          = EventKey(Prefix("TCS.IRIS_ImagerAndIFS"), EventName("ObserveEvent.OffsetEnd"))
 
   val imagerFilterPrefix: Prefix               = Prefix(Subsystem.IRIS, "imager.filter")
   val imagerFilterPositionEventName: EventName = EventName("Wheel1Position")

@@ -91,7 +91,7 @@ class TcsSequencerTest extends EswTestKit(EventServer, MachineAgent) {
 
       // ********************************************************************
 
-      val pkAssemblyTestProbe = createTestProbe(Set(TestData.mcsDemandPositionEventKey, TestData.encCurrentPositionEventKey))
+      val pkAssemblyTestProbe   = createTestProbe(Set(TestData.mcsDemandPositionEventKey, TestData.encCurrentPositionEventKey))
       val tcsSequencerTestProbe = createTestProbe(Set(TestData.offsetStartEventKey, TestData.offsetEndEventKey))
 
       val sequencerApi     = sequencerClient(Subsystem.TCS, obsMode)
