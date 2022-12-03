@@ -21,7 +21,7 @@ A milestone release is cut from master branch as we expect bug fixes / feedback 
 
 1. Create a branch named `branch-<major>.<minor>.x` if not already exists from `main`. Example branch name `branch-0.1.x`.
    All subsequent release for this release cycle should be done on this branch. All further steps are to be done on this branch.
-2. Update version in `Common.scala` for `wfos`, `iris` & `integration` project.
+2. Update version in `Common.scala` for `wfos`, `iris` & `integration` project (build.sbt).
 3. Update csw.version in build.properties of `wfos`, `iris` & `integration` project.
 4. Update `Libs.scala` & `plugins.sbt` with latest version if applicable.
 5. Update release notes (`notes/<version>.markdown`) in `esw-obsering-simulation` repo.
@@ -32,3 +32,4 @@ A milestone release is cut from master branch as we expect bug fixes / feedback 
 10. Commit and push the changes to `branch-<major>.<minor>.x` branch.
 11. Make sure build is green for dev for this branch.
 12. Set `PROD=true` environment variable and Run `release.sh $VERSION$` script by providing version number argument (This triggers release workflow)
+13. Update version of sequencer-scripts repo (branch esw-observing-simulation) in integration/src/test/scala/esw/observing/simulation/ScriptVersion.scala (important for integration tests)
