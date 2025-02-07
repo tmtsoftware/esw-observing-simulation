@@ -82,6 +82,7 @@ pipeline {
     }
     post {
         always {
+            sh "redis-server --version"
             script {
                 sendNotification(currentBuild.result)
             }
