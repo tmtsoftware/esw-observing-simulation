@@ -21,27 +21,19 @@ object Common extends AutoPlugin {
   override lazy val projectSettings: Seq[Setting[_]] = Seq(
     organization := "com.github.tmtsoftware.esw-observing-simulation",
     organizationName := "TMT",
-    scalaVersion := "2.13.8",
+    scalaVersion := "3.6.2",
     organizationHomepage := Some(url("http://www.tmt.org")),
     scalacOptions ++= Seq(
       "-encoding",
       "UTF-8",
       "-feature",
       "-unchecked",
-      "-deprecation",
-      "-Xlint",
-      "-Ywarn-dead-code",
-      //-W Options
-      "-Wconf:any:warning-verbose",
-      //-X Options
-      "-Xlint:_,-missing-interpolator",
-      "-Xcheckinit",
-      "-Xasync"
+      "-deprecation"
     ),
     Compile / doc / javacOptions ++= Seq("-Xdoclint:none"),
     Test / testOptions ++= reporterOptions,
     resolvers += "jitpack" at "https://jitpack.io",
-    version := "0.2.1",
+    version := "0.3.0",
     fork := true,
     Test / parallelExecution := false,
     autoCompilerPlugins := true,

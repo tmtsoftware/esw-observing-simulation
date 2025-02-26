@@ -1,8 +1,8 @@
 before_install:
   - curl -fLo coursier https://github.com/coursier/launchers/raw/master/coursier
   - chmod +x coursier
-  - ./coursier java --jvm temurin:1.17
-  - wget https://repo1.maven.org/maven2/org/scala-sbt/sbt-launch/1.6.1/sbt-launch-1.6.1.jar
+  - ./coursier java --jvm temurin:1.21
+  - wget https://repo1.maven.org/maven2/org/scala-sbt/sbt-launch/1.10.6/sbt-launch-1.10.6.jar
 install:
-  - eval $(./coursier java --jvm temurin:1.17 --env)
+  - eval $(./coursier java --jvm temurin:1.21 --env)
   - ./publish.sh

@@ -24,7 +24,7 @@ sealed abstract class FilterWheelPosition(override val entryName: String) extend
 object FilterWheelPosition extends Enum[FilterWheelPosition] {
   override def values: IndexedSeq[FilterWheelPosition] = findValues
 
-  private lazy val choices: Choices              = Choices.from(FilterWheelPosition.values.map(_.entryName): _*)
+  private lazy val choices: Choices              = Choices.from(FilterWheelPosition.values.map(_.entryName)*)
   def makeChoiceKey(keyName: String): GChoiceKey = ChoiceKey.make(keyName, choices)
 
   case object Z        extends FilterWheelPosition("Z")

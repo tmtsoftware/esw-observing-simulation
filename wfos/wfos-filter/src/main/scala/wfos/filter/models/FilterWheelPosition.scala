@@ -54,7 +54,7 @@ sealed abstract class BlueFilterWheelPosition(override val entryName: String) ex
 object RedFilterWheelPosition extends Enum[RedFilterWheelPosition] {
   override def values: IndexedSeq[RedFilterWheelPosition] = findValues
 
-  private lazy val choices: Choices              = Choices.from(values.map(_.entryName): _*)
+  private lazy val choices: Choices              = Choices.from(values.map(_.entryName)*)
   def makeChoiceKey(keyName: String): GChoiceKey = ChoiceKey.make(keyName, choices)
 
   case object RPrime      extends RedFilterWheelPosition("r'")
@@ -66,7 +66,7 @@ object RedFilterWheelPosition extends Enum[RedFilterWheelPosition] {
 object BlueFilterWheelPosition extends Enum[BlueFilterWheelPosition] {
   override def values: IndexedSeq[BlueFilterWheelPosition] = findValues
 
-  private lazy val choices: Choices              = Choices.from(values.map(_.entryName): _*)
+  private lazy val choices: Choices              = Choices.from(values.map(_.entryName)*)
   def makeChoiceKey(keyName: String): GChoiceKey = ChoiceKey.make(keyName, choices)
 
   case object UPrime      extends BlueFilterWheelPosition("u'")

@@ -1,9 +1,9 @@
 package iris.ifsres
 
-import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.util.Timeout
+import org.apache.pekko.actor.testkit.typed.scaladsl.TestProbe
+import org.apache.pekko.util.Timeout
 import csw.command.client.CommandServiceFactory
-import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.Connection.PekkoConnection
 import csw.location.api.models.{ComponentId, ComponentType}
 import csw.params.commands.CommandResponse.{Completed, Invalid, Started}
 import csw.params.commands.Setup
@@ -34,9 +34,9 @@ class IfsResTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSuite
   test("IFS Resolution Assembly behaviour | ESW-545") {
     implicit val patienceConfig: PatienceConfig = PatienceConfig(10.seconds)
     val sequencerPrefix                         = Prefix(IRIS, "darknight")
-    val connection                              = AkkaConnection(ComponentId(Prefix("IRIS.ifs.res"), ComponentType.Assembly))
-    val akkaLocation                            = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
-    akkaLocation.connection shouldBe connection
+    val connection                              = PekkoConnection(ComponentId(Prefix("IRIS.ifs.res"), ComponentType.Assembly))
+    val pekkoLocation                           = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
+    pekkoLocation.connection shouldBe connection
 
     val testProbe = TestProbe[Event]()
     // Subscribe to event's which will be published by imager in it's lifecycle
@@ -54,7 +54,7 @@ class IfsResTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSuite
     demandPosition shouldBe R4000_Z.entryName
     currentPosition shouldBe R4000_Z.entryName
 
-    val commandService = CommandServiceFactory.make(akkaLocation)
+    val commandService = CommandServiceFactory.make(pekkoLocation)
 
     // move position forwards
     val selectCommand =
@@ -118,9 +118,9 @@ class IfsResTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSuite
   test("IFS Resolution Assembly behaviour should return Invalid when concurrent commands received | ESW-545") {
     implicit val patienceConfig: PatienceConfig = PatienceConfig(10.seconds)
     val sequencerPrefix                         = Prefix(IRIS, "darknight")
-    val connection                              = AkkaConnection(ComponentId(Prefix("IRIS.ifs.res"), ComponentType.Assembly))
-    val akkaLocation                            = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
-    akkaLocation.connection shouldBe connection
+    val connection                              = PekkoConnection(ComponentId(Prefix("IRIS.ifs.res"), ComponentType.Assembly))
+    val pekkoLocation                           = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
+    pekkoLocation.connection shouldBe connection
 
     val testProbe = TestProbe[Event]()
     // Subscribe to event's which will be published by imager in it's lifecycle
@@ -138,7 +138,7 @@ class IfsResTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSuite
     demandPosition shouldBe R4000_Z.entryName
     currentPosition shouldBe R4000_Z.entryName
 
-    val commandService = CommandServiceFactory.make(akkaLocation)
+    val commandService = CommandServiceFactory.make(pekkoLocation)
 
     // move position forwards
     val selectCommand =

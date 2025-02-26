@@ -1,12 +1,12 @@
 package wfos.detector
 
-import akka.Done
-import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.util.Timeout
+import org.apache.pekko.Done
+import org.apache.pekko.actor.testkit.typed.scaladsl.TestProbe
+import org.apache.pekko.util.Timeout
 import csw.command.api.scaladsl.CommandService
 import csw.command.client.CommandServiceFactory
-import csw.location.api.models.Connection.AkkaConnection
-import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
+import csw.location.api.models.Connection.PekkoConnection
+import csw.location.api.models.{PekkoLocation, ComponentId, ComponentType}
 import csw.params.commands.CommandResponse.{Completed, Invalid, Started}
 import csw.params.commands.{Observe, Setup}
 import csw.params.core.models.{ExposureId, ObsId}
@@ -42,11 +42,11 @@ class DetectorTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSui
     {
       test(s" $detectorPrefix - test the whole cycle of an observation | ESW-558, ESW-559") {
         obsIdCount += 1
-        val obsId        = ObsId(s"2020A-001-12$obsIdCount")
-        val exposureId   = ExposureId(s"$obsId-WFOS-IMG-DRK1-0023")
-        val connection   = AkkaConnection(ComponentId(detectorPrefix, ComponentType.Assembly))
-        val akkaLocation = locationService.resolve(connection, seconds).futureValue.get
-        akkaLocation.connection shouldBe connection
+        val obsId         = ObsId(s"2020A-001-12$obsIdCount")
+        val exposureId    = ExposureId(s"$obsId-WFOS-IMG-DRK1-0023")
+        val connection    = PekkoConnection(ComponentId(detectorPrefix, ComponentType.Assembly))
+        val pekkoLocation = locationService.resolve(connection, seconds).futureValue.get
+        pekkoLocation.connection shouldBe connection
 
         val testProbe = TestProbe[Event]()
 
@@ -71,7 +71,7 @@ class DetectorTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSui
         )
         dataSubscription.ready().futureValue shouldBe Done
 
-        val commandService: CommandService = assertAssemblyIsConfigured(obsId, exposureId, testPrefix, akkaLocation)
+        val commandService: CommandService = assertAssemblyIsConfigured(obsId, exposureId, testPrefix, pekkoLocation)
 
         val exposureStarted = commandService.submit(Observe(testPrefix, Constants.StartExposure, Some(obsId))).futureValue
         exposureStarted shouldBe a[Started]
@@ -126,11 +126,11 @@ class DetectorTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSui
 
       test(s" $detectorPrefix - test abort exposure within an observation | ESW-558, ESW-559") {
         obsIdCount += 1
-        val obsId        = ObsId(s"2020A-001-12$obsIdCount")
-        val exposureId   = ExposureId(s"$obsId-WFOS-IMG-DRK1-0023")
-        val connection   = AkkaConnection(ComponentId(detectorPrefix, ComponentType.Assembly))
-        val akkaLocation = locationService.resolve(connection, seconds).futureValue.get
-        akkaLocation.connection shouldBe connection
+        val obsId         = ObsId(s"2020A-001-12$obsIdCount")
+        val exposureId    = ExposureId(s"$obsId-WFOS-IMG-DRK1-0023")
+        val connection    = PekkoConnection(ComponentId(detectorPrefix, ComponentType.Assembly))
+        val pekkoLocation = locationService.resolve(connection, seconds).futureValue.get
+        pekkoLocation.connection shouldBe connection
 
         val testProbe = TestProbe[Event]()
 
@@ -148,7 +148,7 @@ class DetectorTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSui
 
         subscription.ready().futureValue shouldBe Done
 
-        val commandService: CommandService = assertAssemblyIsConfigured(obsId, exposureId, testPrefix, akkaLocation)
+        val commandService: CommandService = assertAssemblyIsConfigured(obsId, exposureId, testPrefix, pekkoLocation)
 
         val exposureStarted = commandService.submit(Observe(testPrefix, Constants.StartExposure, Some(obsId))).futureValue
         exposureStarted shouldBe a[Started]
@@ -195,12 +195,12 @@ class DetectorTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSui
       ) {
         implicit val patienceConfig: PatienceConfig = PatienceConfig(10.seconds)
         obsIdCount += 1
-        val obsId        = ObsId(s"2020A-001-12$obsIdCount")
-        val exposureId   = ExposureId(s"$obsId-WFOS-IMG-DRK1-0023")
-        val testPrefix   = Prefix(WFOS, "darknight")
-        val connection   = AkkaConnection(ComponentId(detectorPrefix, ComponentType.Assembly))
-        val akkaLocation = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
-        akkaLocation.connection shouldBe connection
+        val obsId         = ObsId(s"2020A-001-12$obsIdCount")
+        val exposureId    = ExposureId(s"$obsId-WFOS-IMG-DRK1-0023")
+        val testPrefix    = Prefix(WFOS, "darknight")
+        val connection    = PekkoConnection(ComponentId(detectorPrefix, ComponentType.Assembly))
+        val pekkoLocation = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
+        pekkoLocation.connection shouldBe connection
 
         val testProbe = TestProbe[Event]()
         // Subscribe to event's which will be published by prism in it's lifecycle
@@ -217,7 +217,7 @@ class DetectorTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSui
 
         subscription.ready().futureValue shouldBe Done
 
-        val commandService: CommandService = assertAssemblyIsConfigured(obsId, exposureId, testPrefix, akkaLocation)
+        val commandService: CommandService = assertAssemblyIsConfigured(obsId, exposureId, testPrefix, pekkoLocation)
 
         val startExposure = Observe(testPrefix, Constants.StartExposure, Some(obsId))
 
@@ -229,8 +229,8 @@ class DetectorTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSui
     }
   }
 
-  private def assertAssemblyIsConfigured(obsId: ObsId, exposureId: ExposureId, testPrefix: Prefix, akkaLocation: AkkaLocation) = {
-    val commandService = CommandServiceFactory.make(akkaLocation)
+  private def assertAssemblyIsConfigured(obsId: ObsId, exposureId: ExposureId, testPrefix: Prefix, pekkoLocation: PekkoLocation) = {
+    val commandService = CommandServiceFactory.make(pekkoLocation)
 
     val eventualResponse = commandService.submit(Setup(testPrefix, Constants.Initialize)).futureValue
     eventualResponse shouldBe a[Started]

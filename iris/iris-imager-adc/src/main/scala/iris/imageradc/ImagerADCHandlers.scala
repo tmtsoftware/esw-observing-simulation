@@ -1,9 +1,9 @@
 package iris.imageradc
 
-import akka.actor.typed.Scheduler
-import akka.actor.typed.scaladsl.ActorContext
-import akka.actor.typed.scaladsl.AskPattern.Askable
-import akka.util.Timeout
+import org.apache.pekko.actor.typed.Scheduler
+import org.apache.pekko.actor.typed.scaladsl.ActorContext
+import org.apache.pekko.actor.typed.scaladsl.AskPattern.Askable
+import org.apache.pekko.util.Timeout
 import csw.command.client.messages.TopLevelActorMessage
 import csw.event.api.scaladsl.EventSubscription
 import csw.framework.models.CswContext

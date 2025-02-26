@@ -1,9 +1,9 @@
 package iris.imageradc
 
-import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.util.Timeout
+import org.apache.pekko.actor.testkit.typed.scaladsl.TestProbe
+import org.apache.pekko.util.Timeout
 import csw.command.client.CommandServiceFactory
-import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.Connection.PekkoConnection
 import csw.location.api.models.{ComponentId, ComponentType}
 import csw.params.commands.CommandResponse.{Completed, Invalid, Started}
 import csw.params.commands.Setup
@@ -44,9 +44,9 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
   test("ADC Assembly behaviour | ESW-547, ESW-566") {
     implicit val patienceConfig: PatienceConfig = PatienceConfig(10.seconds)
     val sequencerPrefix                         = Prefix(IRIS, "darknight")
-    val connection                              = AkkaConnection(ComponentId(Prefix("IRIS.imager.adc"), ComponentType.Assembly))
-    val akkaLocation                            = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
-    akkaLocation.connection shouldBe connection
+    val connection                              = PekkoConnection(ComponentId(Prefix("IRIS.imager.adc"), ComponentType.Assembly))
+    val pekkoLocation                           = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
+    pekkoLocation.connection shouldBe connection
 
     val testProbe = TestProbe[Event]()
     // Subscribe to event's which will be published by prism in it's lifecycle
@@ -65,7 +65,7 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
     prismCurrentState shouldBe PrismState.STOPPED.entryName
     isOnTarget shouldBe true
 
-    val commandService = CommandServiceFactory.make(akkaLocation)
+    val commandService = CommandServiceFactory.make(pekkoLocation)
     // Retract prism from OUT to IN
     val InCommand =
       Setup(sequencerPrefix, ADCCommand.RetractSelect, None).add(PrismPosition.RetractKey.set(PrismPosition.IN.entryName))
@@ -175,9 +175,9 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
   test("ADC Assembly behaviour should return Invalid when concurrent (RETRACT IN) commands received | ESW-547") {
     implicit val patienceConfig: PatienceConfig = PatienceConfig(10.seconds)
     val sequencerPrefix                         = Prefix(IRIS, "darknight")
-    val connection                              = AkkaConnection(ComponentId(Prefix("IRIS.imager.adc"), ComponentType.Assembly))
-    val akkaLocation                            = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
-    akkaLocation.connection shouldBe connection
+    val connection                              = PekkoConnection(ComponentId(Prefix("IRIS.imager.adc"), ComponentType.Assembly))
+    val pekkoLocation                           = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
+    pekkoLocation.connection shouldBe connection
 
     val testProbe = TestProbe[Event]()
     // Subscribe to event's which will be published by prism in it's lifecycle
@@ -196,7 +196,7 @@ class ImagerADCTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
     prismCurrentState shouldBe PrismState.STOPPED.entryName
     isOnTarget shouldBe true
 
-    val commandService = CommandServiceFactory.make(akkaLocation)
+    val commandService = CommandServiceFactory.make(pekkoLocation)
     // Retract prism from OUT to IN
     val InCommand =
       Setup(sequencerPrefix, ADCCommand.RetractSelect, None).add(PrismPosition.RetractKey.set(PrismPosition.IN.entryName))

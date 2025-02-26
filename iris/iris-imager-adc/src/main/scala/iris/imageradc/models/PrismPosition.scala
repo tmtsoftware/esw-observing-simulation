@@ -12,7 +12,7 @@ sealed abstract class PrismPosition(override val entryName: String) extends Enum
 object PrismPosition extends Enum[PrismPosition] {
   override def values: IndexedSeq[PrismPosition] = findValues
   val RetractKey: GChoiceKey                     = PrismPosition.makeChoiceKey("position")
-  private lazy val choices: Choices              = Choices.from(PrismPosition.values.map(_.entryName): _*)
+  private lazy val choices: Choices              = Choices.from(PrismPosition.values.map(_.entryName)*)
   def makeChoiceKey(keyName: String): GChoiceKey = ChoiceKey.make(keyName, choices)
 
   case object IN  extends PrismPosition("IN")

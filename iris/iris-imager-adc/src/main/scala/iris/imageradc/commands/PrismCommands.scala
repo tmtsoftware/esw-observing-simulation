@@ -1,6 +1,6 @@
 package iris.imageradc.commands
 
-import akka.actor.typed.ActorRef
+import org.apache.pekko.actor.typed.ActorRef
 import csw.params.commands.CommandResponse.ValidateCommandResponse
 import csw.params.commands.Setup
 import csw.params.core.models.Id

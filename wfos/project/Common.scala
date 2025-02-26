@@ -31,20 +31,12 @@ object Common extends AutoPlugin {
       "UTF-8",
       "-feature",
       "-unchecked",
-      "-deprecation",
-      "-Xlint",
-      "-Ywarn-dead-code",
-      //-W Options
-      if (enableFatalWarnings) "-Wconf:any:error" else "-Wconf:any:warning-verbose",
-      //-X Options
-      "-Xlint:_,-missing-interpolator",
-      "-Xcheckinit",
-      "-Xasync"
+      "-deprecation"
     ),
     Compile / doc / javacOptions ++= Seq("-Xdoclint:none"),
     Test / testOptions ++= reporterOptions,
     resolvers += "jitpack" at "https://jitpack.io",
-    version := "0.2.1",
+    version := "0.3.0",
     fork := true,
     Test / parallelExecution := false,
     autoCompilerPlugins := true,

@@ -1,7 +1,7 @@
 package iris.detector
 
-import akka.actor.typed.Behavior
-import akka.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.actor.typed.Behavior
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
 import com.typesafe.config.Config
 import csw.command.client.CommandResponseManager
 import csw.event.api.scaladsl.EventPublisher
@@ -10,9 +10,9 @@ import csw.logging.api.scaladsl.Logger
 import csw.params.commands.CommandResponse.Completed
 import csw.params.events.IRDetectorEvent
 import iris.detector.commands.{FitsData, FitsMessage}
-import iris.detector.commands.FitsMessage._
+import iris.detector.commands.FitsMessage.*
 import nom.tam.fits.{Fits, FitsFactory}
-import nom.tam.util.BufferedFile
+import nom.tam.util.{BufferedFile, FitsFile}
 
 class FitsActor(cswContext: CswContext, config: Config) {
   val crm: CommandResponseManager    = cswContext.commandResponseManager
@@ -31,8 +31,8 @@ class FitsActor(cswContext: CswContext, config: Config) {
   private def writeData(data: FitsData, filename: String): Unit = {
     if (config.getBoolean("writeDataToFile")) {
       val fits = new Fits()
-      fits.addHDU(FitsFactory.hduFactory(data.data))
-      val bf = new BufferedFile(filename, "rw")
+      fits.addHDU(Fits.makeHDU(data.data))
+      val bf = new FitsFile(filename, "rw")
       fits.write(bf)
       bf.close()
       log.info(s"Data has been written to $filename")

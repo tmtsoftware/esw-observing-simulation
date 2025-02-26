@@ -24,7 +24,7 @@ sealed abstract class ResWheelPosition(override val entryName: String) extends L
 object ResWheelPosition extends Enum[ResWheelPosition] {
   override def values: IndexedSeq[ResWheelPosition] = findValues
 
-  private lazy val choices: Choices              = Choices.from(ResWheelPosition.values.map(_.entryName): _*)
+  private lazy val choices: Choices              = Choices.from(ResWheelPosition.values.map(_.entryName)*)
   def makeChoiceKey(keyName: String): GChoiceKey = ChoiceKey.make(keyName, choices)
 
   case object R4000_Z     extends ResWheelPosition("4000-Z")

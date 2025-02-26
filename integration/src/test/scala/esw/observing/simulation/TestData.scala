@@ -1,6 +1,6 @@
 package esw.observing.simulation
 
-import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.Connection.PekkoConnection
 import csw.location.api.models.{ComponentId, ComponentType}
 import csw.params.commands.{CommandName, Observe, Sequence, Setup}
 import csw.params.core.generics.KeyType._
@@ -205,23 +205,23 @@ object TestData {
   val ImagerDetectorPrefix: Prefix = Prefix("IRIS.imager.detector")
   val IfsDetectorPrefix: Prefix    = Prefix("IRIS.ifs.detector")
 
-  val irisContainerConnection: AkkaConnection = AkkaConnection(
+  val irisContainerConnection: PekkoConnection = PekkoConnection(
     ComponentId(Prefix(Container, "IrisContainer"), ComponentType.Container)
   )
 
-  val tcsContainerConnection: AkkaConnection = AkkaConnection(
+  val tcsContainerConnection: PekkoConnection = PekkoConnection(
     ComponentId(Prefix(Container, "McsEncPkContainer"), ComponentType.Container)
   )
 
-  val tcsPkAssemblyConnection: AkkaConnection = AkkaConnection(
+  val tcsPkAssemblyConnection: PekkoConnection = PekkoConnection(
     ComponentId(Prefix(TCS, "PointingKernelAssembly"), ComponentType.Assembly)
   )
 
-  val tcsMcsAssemblyConnection: AkkaConnection = AkkaConnection(
+  val tcsMcsAssemblyConnection: PekkoConnection = PekkoConnection(
     ComponentId(Prefix(TCS, "MCSAssembly"), ComponentType.Assembly)
   )
 
-  val tcsEncAssemblyConnection: AkkaConnection = AkkaConnection(
+  val tcsEncAssemblyConnection: PekkoConnection = PekkoConnection(
     ComponentId(Prefix(TCS, "ENCAssembly"), ComponentType.Assembly)
   )
 

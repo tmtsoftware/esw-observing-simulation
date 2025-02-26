@@ -18,6 +18,7 @@ rm -r *.zip
 
 ENG_UI_HOME="$ROOT/../apps/"
 
+# XXX TODO FIXME
 echo "downloading.. esw-ocs-eng-ui with $version"
 curl -L -O https://github.com/tmtsoftware/esw-ocs-eng-ui/archive/$version.zip
 

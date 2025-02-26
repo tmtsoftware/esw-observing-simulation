@@ -1,7 +1,7 @@
 package esw.observing.simulation
 
-import csw.location.api.models.Connection.AkkaConnection
-import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
+import csw.location.api.models.Connection.PekkoConnection
+import csw.location.api.models.{PekkoLocation, ComponentId, ComponentType}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.LoggerFactory
 import csw.params.commands.CommandResponse
@@ -11,8 +11,8 @@ import csw.params.events.{ObserveEvent, SystemEvent}
 import csw.prefix.models.Subsystem.Container
 import csw.prefix.models.{Prefix, Subsystem}
 import csw.testkit.scaladsl.CSWService.EventServer
-import esw.agent.akka.app.process.{ProcessExecutor, ProcessOutput}
-import esw.agent.akka.client.AgentClient
+import esw.agent.pekko.app.process.{ProcessExecutor, ProcessOutput}
+import esw.agent.pekko.client.AgentClient
 import esw.commons.utils.location.LocationServiceUtil
 import esw.observing.simulation.TestData._
 import esw.ocs.api.models.ObsMode
@@ -32,8 +32,8 @@ class TcsSequencerTest extends EswTestKit(EventServer, MachineAgent) {
   lazy val processExecutor                             = new ProcessExecutor(processOutput)
   private val obsMode                                  = ObsMode("IRIS_ImagerAndIFS")
   private val seqComponentName                         = "testComponent"
-  private val agentConnection: AkkaConnection          = AkkaConnection(ComponentId(agentSettings.prefix, ComponentType.Machine))
-  private val testSeqCompConnection = AkkaConnection(
+  private val agentConnection: PekkoConnection          = PekkoConnection(ComponentId(agentSettings.prefix, ComponentType.Machine))
+  private val testSeqCompConnection = PekkoConnection(
     ComponentId(Prefix(agentSettings.prefix.subsystem, seqComponentName), ComponentType.SequenceComponent)
   )
 
@@ -42,8 +42,8 @@ class TcsSequencerTest extends EswTestKit(EventServer, MachineAgent) {
 
   private val locationServiceUtil                = new LocationServiceUtil(locationService)
   private val sequenceComponentUtil              = new SequenceComponentUtil(locationServiceUtil, new SequenceComponentAllocator())
-  private var seqCompLoc: Option[AkkaLocation]   = None
-  private var containerLoc: Option[AkkaLocation] = None
+  private var seqCompLoc: Option[PekkoLocation]   = None
+  private var containerLoc: Option[PekkoLocation] = None
 
   override def afterAll(): Unit = {
     seqCompLoc.map(seqCompLocation => agentClient.killComponent(seqCompLocation).futureValue)

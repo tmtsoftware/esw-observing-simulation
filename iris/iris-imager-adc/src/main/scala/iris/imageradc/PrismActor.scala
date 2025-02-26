@@ -1,7 +1,7 @@
 package iris.imageradc
 
-import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.{ActorRef, Behavior}
+import org.apache.pekko.actor.typed.scaladsl.Behaviors
+import org.apache.pekko.actor.typed.{ActorRef, Behavior}
 import csw.framework.models.CswContext
 import csw.logging.api.scaladsl.Logger
 import csw.params.commands.CommandIssue.UnsupportedCommandIssue

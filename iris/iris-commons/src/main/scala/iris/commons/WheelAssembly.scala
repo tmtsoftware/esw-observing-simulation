@@ -1,8 +1,8 @@
 package iris.commons
 
-import akka.Done
-import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
-import akka.actor.typed.{ActorRef, Behavior}
+import org.apache.pekko.Done
+import org.apache.pekko.actor.typed.scaladsl.{ActorContext, Behaviors}
+import org.apache.pekko.actor.typed.{ActorRef, Behavior}
 import csw.framework.models.CswContext
 import csw.params.commands.CommandIssue.AssemblyBusyIssue
 import csw.params.commands.CommandResponse.{Accepted, Completed, Invalid}
@@ -31,6 +31,9 @@ abstract class WheelAssembly[B <: Position[B]](cswContext: CswContext, configura
           Behaviors.same
         case cmd @ WheelCommand.MoveStep =>
           log.error(unhandledMessage("idle"))
+          Behaviors.unhandled
+        case x =>
+          log.error(unhandledMessage(s"Unexpected WheelCommand: $x"))
           Behaviors.unhandled
       }
     }
@@ -69,6 +72,9 @@ abstract class WheelAssembly[B <: Position[B]](cswContext: CswContext, configura
           val errMsg = unhandledMessage("moving")
           log.error(errMsg)
           crm.updateCommand(Invalid(runId, AssemblyBusyIssue(errMsg)))
+          Behaviors.unhandled
+        case x =>
+          log.error(unhandledMessage(s"Unexpected WheelCommand: $x"))
           Behaviors.unhandled
       }
     }

@@ -5,4 +5,4 @@ ROOT="$(
 )"
 cd $ROOT
 source ./versions.sh
-cs launch csw-services:$CSW_VERSION -- start -e -c -k
+cs launch --channel $CHANNEL csw-services:$CSW_VERSION -- start -e -c -k

@@ -1,9 +1,9 @@
 package esw.observing.simulation
 
-import akka.actor.testkit.typed.scaladsl.TestProbe
+import org.apache.pekko.actor.testkit.typed.scaladsl.TestProbe
 import com.typesafe.config.ConfigFactory
-import csw.location.api.models.Connection.AkkaConnection
-import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
+import csw.location.api.models.Connection.PekkoConnection
+import csw.location.api.models.{PekkoLocation, ComponentId, ComponentType}
 import csw.logging.api.scaladsl.Logger
 import csw.logging.client.scaladsl.LoggerFactory
 import csw.params.commands.CommandResponse
@@ -12,8 +12,8 @@ import csw.params.events._
 import csw.prefix.models.Subsystem.Container
 import csw.prefix.models.{Prefix, Subsystem}
 import csw.testkit.scaladsl.CSWService.EventServer
-import esw.agent.akka.app.process.{ProcessExecutor, ProcessOutput}
-import esw.agent.akka.client.AgentClient
+import esw.agent.pekko.app.process.{ProcessExecutor, ProcessOutput}
+import esw.agent.pekko.client.AgentClient
 import esw.commons.utils.location.LocationServiceUtil
 import esw.ocs.api.models.ObsMode
 import esw.ocs.testkit.EswTestKit
@@ -34,14 +34,14 @@ class EswIrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
   private val seqComponentName1                        = "testComponent1"
   private val seqComponentName2                        = "testComponent2"
   private val seqComponentName3                        = "testComponent3"
-  private val agentConnection: AkkaConnection          = AkkaConnection(ComponentId(agentSettings.prefix, ComponentType.Machine))
-  private val testSeqCompConnection1 = AkkaConnection(
+  private val agentConnection: PekkoConnection          = PekkoConnection(ComponentId(agentSettings.prefix, ComponentType.Machine))
+  private val testSeqCompConnection1 = PekkoConnection(
     ComponentId(Prefix(agentSettings.prefix.subsystem, seqComponentName1), ComponentType.SequenceComponent)
   )
-  private val testSeqCompConnection2 = AkkaConnection(
+  private val testSeqCompConnection2 = PekkoConnection(
     ComponentId(Prefix(agentSettings.prefix.subsystem, seqComponentName2), ComponentType.SequenceComponent)
   )
-  private val testSeqCompConnection3 = AkkaConnection(
+  private val testSeqCompConnection3 = PekkoConnection(
     ComponentId(Prefix(agentSettings.prefix.subsystem, seqComponentName3), ComponentType.SequenceComponent)
   )
 
@@ -50,10 +50,10 @@ class EswIrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
 
   private val locationServiceUtil                = new LocationServiceUtil(locationService)
   private val sequenceComponentUtil              = new SequenceComponentUtil(locationServiceUtil, new SequenceComponentAllocator())
-  private var seqComp1Loc: Option[AkkaLocation]  = None
-  private var seqComp2Loc: Option[AkkaLocation]  = None
-  private var seqComp3Loc: Option[AkkaLocation]  = None
-  private var containerLoc: Option[AkkaLocation] = None
+  private var seqComp1Loc: Option[PekkoLocation]  = None
+  private var seqComp2Loc: Option[PekkoLocation]  = None
+  private var seqComp3Loc: Option[PekkoLocation]  = None
+  private var containerLoc: Option[PekkoLocation] = None
 
   override def afterAll(): Unit = {
     seqComp1Loc.map(seqCompLocation => agentClient.killComponent(seqCompLocation).futureValue)
@@ -75,27 +75,27 @@ class EswIrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
       // spawn the iris container
       frameworkTestKit.spawnContainer(ConfigFactory.load("IrisContainer.conf"))
 
-      val containerLocation: Option[AkkaLocation] =
+      val containerLocation: Option[PekkoLocation] =
         locationService.resolve(TestData.irisContainerConnection, 15.seconds).futureValue
       containerLocation.isDefined shouldBe true
 
       locationService
-        .resolve(AkkaConnection(ComponentId(TestData.imagerFilterPrefix, ComponentType.Assembly)), 5.seconds)
+        .resolve(PekkoConnection(ComponentId(TestData.imagerFilterPrefix, ComponentType.Assembly)), 5.seconds)
         .futureValue
         .value
 
       locationService
-        .resolve(AkkaConnection(ComponentId(TestData.IfsDetectorPrefix, ComponentType.Assembly)), 5.seconds)
+        .resolve(PekkoConnection(ComponentId(TestData.IfsDetectorPrefix, ComponentType.Assembly)), 5.seconds)
         .futureValue
         .value
 
       locationService
-        .resolve(AkkaConnection(ComponentId(TestData.ImagerDetectorPrefix, ComponentType.Assembly)), 5.seconds)
+        .resolve(PekkoConnection(ComponentId(TestData.ImagerDetectorPrefix, ComponentType.Assembly)), 5.seconds)
         .futureValue
         .value
 
       locationService
-        .resolve(AkkaConnection(ComponentId(TestData.ImagerADCAssemblyPrefix, ComponentType.Assembly)), 5.seconds)
+        .resolve(PekkoConnection(ComponentId(TestData.ImagerADCAssemblyPrefix, ComponentType.Assembly)), 5.seconds)
         .futureValue
         .value
 

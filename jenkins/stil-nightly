@@ -22,18 +22,18 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh "cs java --jvm temurin:1.17.0 -version"
+                sh "cs java --jvm temurin:1.21.0 -version"
                 dir("iris") {
-                    sh "eval \$(cs java --jvm temurin:1.17.0 --env) && sbt clean"
-                    sh "eval \$(cs java --jvm temurin:1.17.0 --env) && sbt scalafmtCheck"
+                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt clean"
+                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt scalafmtCheck"
                 }
                 dir("wfos") {
-                    sh "eval \$(cs java --jvm temurin:1.17.0 --env) && sbt clean"
-                    sh "eval \$(cs java --jvm temurin:1.17.0 --env) && sbt scalafmtCheck"
+                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt clean"
+                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt scalafmtCheck"
                 }
                 dir("integration") {
-                    sh "eval \$(cs java --jvm temurin:1.17.0 --env) && sbt clean"
-                    sh "eval \$(cs java --jvm temurin:1.17.0 --env) && sbt scalafmtCheck"
+                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt clean"
+                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt scalafmtCheck"
                 }
             }
         }
@@ -41,7 +41,7 @@ pipeline {
         stage('IRIS Tests') {
             steps {
                 dir("iris") {
-                    sh "eval \$(cs java --jvm temurin:1.17.0 --env) && sbt -DenableFatalWarnings=true -DenableCoverage=true -DgenerateStoryReport=true test:test"
+                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -DenableFatalWarnings=true -DenableCoverage=true -DgenerateStoryReport=true test:test"
                 }
             }
         }
@@ -49,7 +49,7 @@ pipeline {
         stage('WFOS Tests') {
             steps {
                 dir("wfos") {
-                    sh "eval \$(cs java --jvm temurin:1.17.0 --env) && sbt -DenableFatalWarnings=true -DenableCoverage=true -DgenerateStoryReport=true test:test"
+                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -DenableFatalWarnings=true -DenableCoverage=true -DgenerateStoryReport=true test:test"
                 }
             }
         }
@@ -57,7 +57,7 @@ pipeline {
         stage('Integration Tests') {
             steps {
                 dir("integration") {
-                    sh "eval \$(cs java --jvm temurin:1.17.0 --env) && sbt -DenableFatalWarnings=true -DgenerateStoryReport=true test:test"
+                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -DenableFatalWarnings=true -DgenerateStoryReport=true test:test"
                 }
             }
         }

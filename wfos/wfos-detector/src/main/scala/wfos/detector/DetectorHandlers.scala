@@ -1,9 +1,9 @@
 package wfos.detector
 
-import akka.actor.typed.scaladsl.ActorContext
-import akka.actor.typed.scaladsl.AskPattern.Askable
-import akka.actor.typed.{ActorRef, Scheduler}
-import akka.util.Timeout
+import org.apache.pekko.actor.typed.scaladsl.ActorContext
+import org.apache.pekko.actor.typed.scaladsl.AskPattern.Askable
+import org.apache.pekko.actor.typed.{ActorRef, Scheduler}
+import org.apache.pekko.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.command.client.messages.TopLevelActorMessage
 import csw.framework.models.CswContext
@@ -43,7 +43,7 @@ class DetectorHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswConte
     }
   }
 
-  private def validateObserve(runId: Id, command: Observe) = {
+  private def validateObserve(runId: Id, command: Observe): CommandResponse.ValidateCommandResponse = {
     command.commandName match {
       case Constants.StartExposure | Constants.AbortExposure =>
         command.maybeObsId match {
@@ -55,7 +55,7 @@ class DetectorHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswConte
 
   }
 
-  private def sendIsValid(runId: Id, command: ControlCommand) = {
+  private def sendIsValid(runId: Id, command: ControlCommand): CommandResponse.ValidateCommandResponse = {
     Await.result(controller ? (IsValid(runId, command.commandName, _)), timeout)
   }
 

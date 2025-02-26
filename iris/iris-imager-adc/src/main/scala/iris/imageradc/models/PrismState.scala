@@ -10,7 +10,7 @@ sealed class PrismState(override val entryName: String) extends EnumEntry
 object PrismState extends Enum[PrismState] {
   override def values: IndexedSeq[PrismState] = findValues
 
-  private lazy val choices: Choices              = Choices.from(PrismState.values.map(_.entryName): _*)
+  private lazy val choices: Choices              = Choices.from(PrismState.values.map(_.entryName)*)
   def makeChoiceKey(keyName: String): GChoiceKey = ChoiceKey.make(keyName, choices)
 
   case object FOLLOWING extends PrismState("FOLLOWING")

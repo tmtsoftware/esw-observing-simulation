@@ -1,6 +1,6 @@
 package esw.observing.simulation
 
-import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.Connection.PekkoConnection
 import csw.location.api.models.{ComponentId, ComponentType}
 import csw.params.commands.{CommandName, Observe, Sequence, Setup}
 import csw.params.core.generics.KeyType.{BooleanKey, ChoiceKey, IntKey, StringKey}
@@ -26,7 +26,7 @@ object WFOSTestData {
   val blueFilterDemandPositionKey: GChoiceKey  = ChoiceKey.make("demand", blueFilterChoices)
   val blueFilterKey: GChoiceKey                = ChoiceKey.make("blueFilter", Units.NoUnits, blueFilterChoices)
 
-  val wfosContainerConnection: AkkaConnection = AkkaConnection(
+  val wfosContainerConnection: PekkoConnection = PekkoConnection(
     ComponentId(Prefix(Container, "WfosContainer"), ComponentType.Container)
   )
 

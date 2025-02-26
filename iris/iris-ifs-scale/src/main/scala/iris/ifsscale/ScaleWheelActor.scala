@@ -1,7 +1,7 @@
 package iris.ifsscale
 
-import akka.Done
-import akka.actor.typed.Behavior
+import org.apache.pekko.Done
+import org.apache.pekko.actor.typed.Behavior
 import csw.framework.models.CswContext
 import iris.commons.WheelAssembly
 import iris.commons.models.{WheelCommand, AssemblyConfiguration}

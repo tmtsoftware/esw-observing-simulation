@@ -1,9 +1,9 @@
 package iris.imagerfilter
 
-import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.util.Timeout
+import org.apache.pekko.actor.testkit.typed.scaladsl.TestProbe
+import org.apache.pekko.util.Timeout
 import csw.command.client.CommandServiceFactory
-import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.Connection.PekkoConnection
 import csw.location.api.models.{ComponentId, ComponentType}
 import csw.params.commands.CommandResponse.{Completed, Invalid, Started}
 import csw.params.commands.Setup
@@ -36,9 +36,9 @@ class ImagerFilterTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFu
   test("Imager Filter Assembly behaviour | ESW-544") {
     implicit val patienceConfig: PatienceConfig = PatienceConfig(10.seconds)
     val sequencerPrefix                         = Prefix(IRIS, "darknight")
-    val connection                              = AkkaConnection(ComponentId(Prefix("IRIS.imager.filter"), ComponentType.Assembly))
-    val akkaLocation                            = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
-    akkaLocation.connection shouldBe connection
+    val connection                              = PekkoConnection(ComponentId(Prefix("IRIS.imager.filter"), ComponentType.Assembly))
+    val pekkoLocation                           = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
+    pekkoLocation.connection shouldBe connection
 
     val testProbe = TestProbe[Event]()
     // Subscribe to event's which will be published by imager in it's lifecycle
@@ -58,7 +58,7 @@ class ImagerFilterTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFu
     currentPosition shouldBe FilterWheelPosition.Z.entryName
     dark shouldBe false
 
-    val commandService = CommandServiceFactory.make(akkaLocation)
+    val commandService = CommandServiceFactory.make(pekkoLocation)
 
     // move position forwards
     val selectCommand =
@@ -128,9 +128,9 @@ class ImagerFilterTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFu
   test("Imager Filter Assembly behaviour should return Invalid when concurrent commands received | ESW-544") {
     implicit val patienceConfig: PatienceConfig = PatienceConfig(10.seconds)
     val sequencerPrefix                         = Prefix(IRIS, "darknight")
-    val connection                              = AkkaConnection(ComponentId(Prefix("IRIS.imager.filter"), ComponentType.Assembly))
-    val akkaLocation                            = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
-    akkaLocation.connection shouldBe connection
+    val connection                              = PekkoConnection(ComponentId(Prefix("IRIS.imager.filter"), ComponentType.Assembly))
+    val pekkoLocation                           = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
+    pekkoLocation.connection shouldBe connection
 
     val testProbe = TestProbe[Event]()
     // Subscribe to event's which will be published by imager in it's lifecycle
@@ -150,7 +150,7 @@ class ImagerFilterTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFu
     currentPosition shouldBe FilterWheelPosition.Z.entryName
     dark shouldBe false
 
-    val commandService = CommandServiceFactory.make(akkaLocation)
+    val commandService = CommandServiceFactory.make(pekkoLocation)
 
     // move position forwards
     val selectCommand =

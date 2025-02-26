@@ -1,5 +1,5 @@
-import Common._
 ThisBuild / scalafmtConfig := file("../.scalafmt.conf")
+import Common._
 
 lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `iris-imager-filter`,

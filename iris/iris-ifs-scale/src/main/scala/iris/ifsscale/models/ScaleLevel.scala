@@ -15,7 +15,7 @@ sealed class ScaleLevel(override val entryName: String) extends Position[ScaleLe
 object ScaleLevel extends Enum[ScaleLevel] {
   override def values: IndexedSeq[ScaleLevel] = findValues
 
-  private lazy val choices: Choices              = Choices.from(ScaleLevel.values.map(_.entryName): _*)
+  private lazy val choices: Choices              = Choices.from(ScaleLevel.values.map(_.entryName)*)
   def makeChoiceKey(keyName: String): GChoiceKey = ChoiceKey.make(keyName, Units.mas, choices)
 
   case object S4  extends ScaleLevel("4")

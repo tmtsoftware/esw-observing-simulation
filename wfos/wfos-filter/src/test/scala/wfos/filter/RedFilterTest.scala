@@ -1,9 +1,9 @@
 package wfos.filter
 
-import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.util.Timeout
+import org.apache.pekko.actor.testkit.typed.scaladsl.TestProbe
+import org.apache.pekko.util.Timeout
 import csw.command.client.CommandServiceFactory
-import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.Connection.PekkoConnection
 import csw.location.api.models.{ComponentId, ComponentType}
 import csw.params.commands.CommandResponse.{Completed, Invalid, Started}
 import csw.params.commands.Setup
@@ -36,10 +36,10 @@ class RedFilterTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
   test(s"$prefix - Assembly behaviour | ESW-556") {
     implicit val patienceConfig: PatienceConfig = PatienceConfig(10.seconds)
     val sequencerPrefix                         = Prefix(WFOS, "darknight")
-    val connection                              = AkkaConnection(ComponentId(prefix, ComponentType.Assembly))
+    val connection                              = PekkoConnection(ComponentId(prefix, ComponentType.Assembly))
 
-    val akkaLocation = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
-    akkaLocation.connection shouldBe connection
+    val pekkoLocation = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
+    pekkoLocation.connection shouldBe connection
 
     val testProbe = TestProbe[Event]()
     // Subscribe to event's which will be published by red filter in it's lifecycle
@@ -59,7 +59,7 @@ class RedFilterTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
     currentPosition shouldBe RedFilterWheelPosition.RPrime.entryName
     dark shouldBe false
 
-    val commandService = CommandServiceFactory.make(akkaLocation)
+    val commandService = CommandServiceFactory.make(pekkoLocation)
 
     // move position forwards
     val setup =
@@ -130,9 +130,9 @@ class RedFilterTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
   test(s"${prefix} - Assembly behaviour should return Invalid when concurrent commands received | ESW-556") {
     implicit val patienceConfig: PatienceConfig = PatienceConfig(10.seconds)
     val sequencerPrefix                         = Prefix(WFOS, "darknight")
-    val connection                              = AkkaConnection(ComponentId(prefix, ComponentType.Assembly))
-    val akkaLocation                            = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
-    akkaLocation.connection shouldBe connection
+    val connection                              = PekkoConnection(ComponentId(prefix, ComponentType.Assembly))
+    val pekkoLocation                           = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
+    pekkoLocation.connection shouldBe connection
 
     val testProbe = TestProbe[Event]()
     // Subscribe to event's which will be published by red filter in it's lifecycle
@@ -152,7 +152,7 @@ class RedFilterTest extends ScalaTestFrameworkTestKit(EventServer) with AnyFunSu
     currentPosition shouldBe RedFilterWheelPosition.RPrime.entryName
     dark shouldBe false
 
-    val commandService = CommandServiceFactory.make(akkaLocation)
+    val commandService = CommandServiceFactory.make(pekkoLocation)
 
     // move position forwards
     val selectCommand =

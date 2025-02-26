@@ -41,7 +41,7 @@ Run the shell scripts in this order in different terminals.
     - it starts required esw services for observation : sequence manager, agent service along with that 6 agents(
       Machines) are also started.
 3. sh simulation-scripts/start-components.sh
-    - this scripts starts the container containing all the `WFOS` & `IRIS` assemblies using `esw-agent-akka-app`.
+    - this scripts starts the container containing all the `WFOS` & `IRIS` assemblies using `esw-agent-pekko-app`.
     - this script uses `HostConfig.conf` which has entries of the `IRIS` & `WFOS` container.
 4. sh simulation-scripts/start-tcs-assemblies.sh
     - this download tcs assemblies release zip and start them. For mac users, refer the following for
