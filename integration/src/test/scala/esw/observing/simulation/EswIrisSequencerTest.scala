@@ -34,7 +34,7 @@ class EswIrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
   private val seqComponentName1                        = "testComponent1"
   private val seqComponentName2                        = "testComponent2"
   private val seqComponentName3                        = "testComponent3"
-  private val agentConnection: PekkoConnection          = PekkoConnection(ComponentId(agentSettings.prefix, ComponentType.Machine))
+  private val agentConnection: PekkoConnection         = PekkoConnection(ComponentId(agentSettings.prefix, ComponentType.Machine))
   private val testSeqCompConnection1 = PekkoConnection(
     ComponentId(Prefix(agentSettings.prefix.subsystem, seqComponentName1), ComponentType.SequenceComponent)
   )
@@ -48,8 +48,8 @@ class EswIrisSequencerTest extends EswTestKit(EventServer, MachineAgent) {
   private lazy val agentLoc    = locationService.find(agentConnection).futureValue
   private lazy val agentClient = new AgentClient(agentLoc.get)
 
-  private val locationServiceUtil                = new LocationServiceUtil(locationService)
-  private val sequenceComponentUtil              = new SequenceComponentUtil(locationServiceUtil, new SequenceComponentAllocator())
+  private val locationServiceUtil                 = new LocationServiceUtil(locationService)
+  private val sequenceComponentUtil               = new SequenceComponentUtil(locationServiceUtil, new SequenceComponentAllocator())
   private var seqComp1Loc: Option[PekkoLocation]  = None
   private var seqComp2Loc: Option[PekkoLocation]  = None
   private var seqComp3Loc: Option[PekkoLocation]  = None
