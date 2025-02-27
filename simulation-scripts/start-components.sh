@@ -18,4 +18,4 @@ cp "$hostConfPath" "$tempConfPath"
 awk  -v searchStr="irisContainerPath" -v replaceStr="$irisContainerPath" '{sub(searchStr,replaceStr); print;}' "$tempConfPath" > tempfile && mv tempfile "$tempConfPath"
 awk  -v searchStr="wfosContainerPath" -v replaceStr="$wfosContainerPath" '{sub(searchStr,replaceStr); print;}' "$tempConfPath" > tempfile && mv tempfile "$tempConfPath"
 set -x
-cs launch --chanel $CHANNEL esw-agent-pekko-app:$ESW_VERSION -- start -p "iris.machine99" -l --host-config-path "$tempConfPath"
+cs launch --channel $CHANNEL esw-agent-pekko-app:$ESW_VERSION -- start -p "iris.machine99" -l --host-config-path "$tempConfPath"
