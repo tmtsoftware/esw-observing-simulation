@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 # Note: This script is called from jitpack.yml.
 # The sbt version should be kept up to date with build.properties.
