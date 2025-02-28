@@ -12,13 +12,8 @@ cd $ROOT/../apps
 rm -r *.txt
 rm -r *.zip
 
-#curl -L -O https://github.com/tmtsoftware/esw-ocs-eng-ui/releases/download/v0.2.0/esw-ocs-eng-ui.zip
-#unzip -o esw-ocs-eng-ui.zip
-## use following for installing latest eng-ui
-
 ENG_UI_HOME="$ROOT/../apps/"
 
-# XXX TODO FIXME
 echo "downloading.. esw-ocs-eng-ui with $version"
 curl -L -O https://github.com/tmtsoftware/esw-ocs-eng-ui/archive/$version.zip
 
