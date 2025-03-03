@@ -15,13 +15,13 @@ zip /tmp/release-artifacts/integration-requirement-test-mapping.zip integration/
 # RTM.zip
 zip /tmp/release-artifacts/iris-requirement-test-mapping.zip iris/target/RTM/*
 # scoverage-report.zip
-zip /tmp/release-artifacts/iris-scoverage-report.zip iris/target/scala-2.13/scoverage-report/*
+zip /tmp/release-artifacts/iris-scoverage-report.zip iris/target/scala-3.6.2/scoverage-report/*
 
 # WFOS
 # RTM zip
 zip /tmp/release-artifacts/wfos-requirement-test-mapping.zip wfos/target/RTM/*
 # scoverage.zip
-zip /tmp/release-artifacts/wfos-scoverage-report.zip wfos/target/scala-2.13/scoverage-report/*
+zip /tmp/release-artifacts/wfos-scoverage-report.zip wfos/target/scala-3.6.2/scoverage-report/*
 
 
 # Find all xml files in all target folders & create wfos-test-reports.zip

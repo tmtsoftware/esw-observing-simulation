@@ -61,7 +61,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: IRIS Coverage Report
-          path: iris/target/scala-2.13/scoverage-report
+          path: iris/target/scala-3.6.2/scoverage-report
 
       - name: Notify slack
         if: always()
