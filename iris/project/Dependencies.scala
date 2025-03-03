@@ -6,8 +6,8 @@ object Dependencies {
     CSW.`csw-testkit`               % Test,
     Libs.`scalatest`                % Test,
     Libs.`junit-4-13`               % Test,
-    Libs.`pekko-actor-testkit-typed` % Test
-//    Libs.`tmt-test-reporter`        % Test
+    Libs.`pekko-actor-testkit-typed` % Test,
+    Libs.`tmt-test-reporter`        % Test
   )
 
   val IrisDeploy = Seq(
