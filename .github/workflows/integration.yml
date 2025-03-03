@@ -52,7 +52,9 @@ jobs:
       
       - name: Generate RTM
         working-directory: integration
-        run: cs launch --channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/Allan/pekko-scala3-update/apps.json rtm:d520268 -- target/RTM/testStoryMapping.txt ../tools/RTM/storyRequirementMapping.csv target/RTM/testRequirementsMapping.txt
+        run: |
+          rm -rf $HOME/.cache/coursier/v1/https/raw.githubusercontent.com/tmtsoftware/osw-apps/
+          cs launch --channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/Allan/pekko-scala3-update/apps.json rtm:d520268 -- target/RTM/testStoryMapping.txt ../tools/RTM/storyRequirementMapping.csv target/RTM/testRequirementsMapping.txt
 
       - name: Upload RTM
         uses: actions/upload-artifact@v4
