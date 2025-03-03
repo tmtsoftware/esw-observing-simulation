@@ -43,7 +43,7 @@ jobs:
       
       - name: Generate RTM
         working-directory: iris
-        run: cs launch --channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/Allan/pekko-scala3-update/apps.json rtm:b7997a9 -- target/RTM/testStoryMapping.txt ../tools/RTM/storyRequirementMapping.csv target/RTM/testRequirementsMapping.txt
+        run: cs launch --channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/Allan/pekko-scala3-update/apps.json rtm:d520268 -- target/RTM/testStoryMapping.txt ../tools/RTM/storyRequirementMapping.csv target/RTM/testRequirementsMapping.txt
 
       - name: Generate Coverage
         working-directory: iris

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -x
 version=$1
 
 if [[ "$OSTYPE" == "darwin"* ]]; then

@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - uses: coursier/setup-action@v1.2.0
         with:
@@ -31,7 +31,7 @@ jobs:
         run: |
           curl -s https://get.sdkman.io | bash
           source "/home/runner/.sdkman/bin/sdkman-init.sh"
-          sdk install kotlin
+          sdk install kotlin 2.1.0
           sudo ln -s $(which kotlinc) /usr/local/bin/kotlinc
 
       - name: Build
@@ -48,11 +48,11 @@ jobs:
 
       - name: Tests
         working-directory: integration
-        run: sbt -DenableFatalWarnings=true -DgenerateStoryReport=true test:test
+        run: sbt -DenableFatalWarnings=true -DgenerateStoryReport=true Test/test
       
       - name: Generate RTM
         working-directory: integration
-        run: cs launch --channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/Allan/pekko-scala3-update/apps.json rtm:b7997a9 -- target/RTM/testStoryMapping.txt ../tools/RTM/storyRequirementMapping.csv target/RTM/testRequirementsMapping.txt
+        run: cs launch --channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/Allan/pekko-scala3-update/apps.json rtm:d520268 -- target/RTM/testStoryMapping.txt ../tools/RTM/storyRequirementMapping.csv target/RTM/testRequirementsMapping.txt
 
       - name: Upload RTM
         uses: actions/upload-artifact@v4
