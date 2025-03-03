@@ -53,12 +53,12 @@ jobs:
 
       - name: Upload RTM
         if: always()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: WFOS RTM
           path: wfos/target/RTM
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: WFOS Coverage Report
           path: wfos/target/scala-2.13/scoverage-report

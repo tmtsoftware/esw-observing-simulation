@@ -58,7 +58,7 @@ jobs:
         run: cs launch --channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/Allan/pekko-scala3-update/apps.json rtm:d520268 -- target/RTM/testStoryMapping.txt ../tools/RTM/storyRequirementMapping.csv target/RTM/testRequirementsMapping.txt
 
       - name: Integration - Upload RTM 
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: Integration RTM
@@ -85,13 +85,13 @@ jobs:
 
       - name: IRIS - Upload RTM 
         if: always()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: IRIS RTM
           path: iris/target/RTM
 
       - name: IRIS - Uplaod scoverage
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: IRIS Coverage Report
           path: iris/target/scala-2.13/scoverage-report
@@ -111,13 +111,13 @@ jobs:
 
       - name: WFOS - Upload RTM 
         if: always()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: WFOS RTM
           path: wfos/target/RTM
 
       - name: WFOS - Upload scoverage
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: WFOS Coverage Report
           path: wfos/target/scala-2.13/scoverage-report
