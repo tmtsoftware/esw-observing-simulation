@@ -39,7 +39,7 @@ jobs:
 
       - name: Tests
         working-directory: iris
-        run: sbt -DenableFatalWarnings=true -DenableCoverage=true -DgenerateStoryReport=true test:test
+        run: sbt -DenableFatalWarnings=true -DenableCoverage=true -DgenerateStoryReport=true Test/test
       
       - name: Generate RTM
         working-directory: iris

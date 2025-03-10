@@ -52,7 +52,7 @@ jobs:
 
       - name: Integration - Tests 
         working-directory: integration
-        run: sbt -DenableFatalWarnings=true -DgenerateStoryReport=true "test:test; packagedArtifacts"
+        run: sbt -DenableFatalWarnings=true -DgenerateStoryReport=true "Test/test; packagedArtifacts"
 
       - name: Integration- Generate RTM 
         working-directory: integration
@@ -73,7 +73,7 @@ jobs:
     
       - name: IRIS - Tests 
         working-directory: iris
-        run: sbt -DenableFatalWarnings=true -DenableCoverage=true -DgenerateStoryReport=true "test:test; packagedArtifacts"
+        run: sbt -DenableFatalWarnings=true -DenableCoverage=true -DgenerateStoryReport=true "Test/test; packagedArtifacts"
 
       - name: IRIS - Generate RTM 
         working-directory: iris
@@ -99,7 +99,7 @@ jobs:
 
       - name: WFOS - Tests 
         working-directory: wfos
-        run: sbt -DenableFatalWarnings=true -DenableCoverage=true -DgenerateStoryReport=true "test:test; packagedArtifacts"
+        run: sbt -DenableFatalWarnings=true -DenableCoverage=true -DgenerateStoryReport=true "Test/test; packagedArtifacts"
 
       - name: WFOS - Generate RTM 
         working-directory: wfos

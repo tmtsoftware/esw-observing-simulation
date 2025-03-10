@@ -25,7 +25,9 @@ pipeline {
             steps {
                 sh "cs java --jvm temurin:1.21.0 -version"
                 sh "redis-server --version"
-                sh "lsof -i tcp:6379 | awk 'NR!=1 {print $2}' | xargs kill"
+                def command = $/"lsof -i tcp:6379 | awk 'NR!=1 {print $2}' | xargs kill"/$
+                res = sh(returnStdout: true, script: command).trim()
+                sh("echo ${res}")
                 dir("iris") {
                     sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt clean"
                     sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt scalafmtCheck"
@@ -44,7 +46,7 @@ pipeline {
         stage('IRIS Tests') {
             steps {
                 dir("iris") {
-                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -DenableFatalWarnings=true -DenableCoverage=true -DgenerateStoryReport=true test:test"
+                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -DenableFatalWarnings=true -DenableCoverage=true -DgenerateStoryReport=true Test/test"
                 }
             }
         }
@@ -52,7 +54,7 @@ pipeline {
         stage('WFOS Tests') {
             steps {
                 dir("wfos") {
-                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -DenableFatalWarnings=true -DenableCoverage=true -DgenerateStoryReport=true test:test"
+                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -DenableFatalWarnings=true -DenableCoverage=true -DgenerateStoryReport=true Test/test"
                 }
             }
         }
@@ -60,7 +62,7 @@ pipeline {
         stage('Integration Tests') {
             steps {
                 dir("integration") {
-                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -DenableFatalWarnings=true -DgenerateStoryReport=true test:test"
+                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -DenableFatalWarnings=true -DgenerateStoryReport=true Test/test"
                 }
             }
         }
