@@ -26,6 +26,7 @@ pipeline {
                 sh "cs java --jvm temurin:1.21.0 -version"
                 sh "redis-server --version"
                 sh "redis-cli shutdown"
+                sh "cs update"
                 dir("iris") {
                     sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt clean"
                     sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt scalafmtCheck"
