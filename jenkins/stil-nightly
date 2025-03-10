@@ -25,7 +25,7 @@ pipeline {
             steps {
                 sh "cs java --jvm temurin:1.21.0 -version"
                 sh "redis-server --version"
-                sh "redis-cli shutdown || echo "Redis was not running"
+                sh "sh -c 'redis-cli shutdown || echo "Redis was not running"'
                 sh "cs update"
                 dir("iris") {
                     sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt clean"
@@ -45,7 +45,7 @@ pipeline {
         stage('IRIS Tests') {
             steps {
                 dir("iris") {
-                    sh "redis-cli shutdown || echo "Redis was not running"
+                    sh "sh -c 'redis-cli shutdown || echo "Redis was not running"'
                     sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -DenableFatalWarnings=true -DenableCoverage=true -DgenerateStoryReport=true Test/test"
                 }
             }
@@ -54,7 +54,7 @@ pipeline {
         stage('WFOS Tests') {
             steps {
                 dir("wfos") {
-                    sh "redis-cli shutdown || echo "Redis was not running"
+                    sh "sh -c 'redis-cli shutdown || echo "Redis was not running"'
                     sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -DenableFatalWarnings=true -DenableCoverage=true -DgenerateStoryReport=true Test/test"
                 }
             }
@@ -63,7 +63,7 @@ pipeline {
         stage('Integration Tests') {
             steps {
                 dir("integration") {
-                    sh "redis-cli shutdown || echo "Redis was not running"
+                    sh "sh -c 'redis-cli shutdown || echo "Redis was not running"'
                     sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -DenableFatalWarnings=true -DgenerateStoryReport=true Test/test"
                 }
             }
