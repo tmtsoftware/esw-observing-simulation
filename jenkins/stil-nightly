@@ -10,6 +10,7 @@ pipeline {
 
     environment {
         INTERFACE_NAME = 'eth0'
+        SBT_OPTS = "${SBT_OPTS} -Dsbt.color=false"
     }
 
     stages {
@@ -24,18 +25,18 @@ pipeline {
             steps {
                 sh "cs java --jvm temurin:1.21.0 -version"
                 sh "redis-server --version"
-                sh "redis-cli shutdown"
+                sh "lsof -i tcp:6379 | awk 'NR!=1 {print $2}' | xargs kill"
                 dir("iris") {
-                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -Dsbt.color=false clean"
-                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -Dsbt.color=false scalafmtCheck"
+                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt clean"
+                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt scalafmtCheck"
                 }
                 dir("wfos") {
-                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -Dsbt.color=false clean"
-                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -Dsbt.color=false scalafmtCheck"
+                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt clean"
+                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt scalafmtCheck"
                 }
                 dir("integration") {
-                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -Dsbt.color=false clean"
-                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -Dsbt.color=false scalafmtCheck"
+                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt clean"
+                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt scalafmtCheck"
                 }
             }
         }
@@ -43,7 +44,7 @@ pipeline {
         stage('IRIS Tests') {
             steps {
                 dir("iris") {
-                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -Dsbt.color=false -DenableFatalWarnings=true -DenableCoverage=true -DgenerateStoryReport=true test:test"
+                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -DenableFatalWarnings=true -DenableCoverage=true -DgenerateStoryReport=true test:test"
                 }
             }
         }
@@ -51,7 +52,7 @@ pipeline {
         stage('WFOS Tests') {
             steps {
                 dir("wfos") {
-                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -Dsbt.color=false -DenableFatalWarnings=true -DenableCoverage=true -DgenerateStoryReport=true test:test"
+                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -DenableFatalWarnings=true -DenableCoverage=true -DgenerateStoryReport=true test:test"
                 }
             }
         }
@@ -59,7 +60,7 @@ pipeline {
         stage('Integration Tests') {
             steps {
                 dir("integration") {
-                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -Dsbt.color=false -DenableFatalWarnings=true -DgenerateStoryReport=true test:test"
+                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -DenableFatalWarnings=true -DgenerateStoryReport=true test:test"
                 }
             }
         }
