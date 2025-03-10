@@ -10,7 +10,7 @@ pipeline {
 
     environment {
         INTERFACE_NAME = 'eth0'
-        SBT_OPTS = "${SBT_OPTS} -Dsbt.color=false -Dsbt.log.noformat=true"
+        SBT_OPTS = "-Dsbt.color=false -Dsbt.log.noformat=true"
     }
 
     stages {
@@ -27,16 +27,16 @@ pipeline {
                 sh "redis-server --version"
                 sh "cs update"
                 dir("iris") {
-                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt clean"
-                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt scalafmtCheck"
+                    sh "sbt clean"
+                    sh "sbt scalafmtCheck"
                 }
                 dir("wfos") {
-                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt clean"
-                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt scalafmtCheck"
+                    sh "sbt clean"
+                    sh "sbt scalafmtCheck"
                 }
                 dir("integration") {
-                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt clean"
-                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt scalafmtCheck"
+                    sh "sbt clean"
+                    sh "sbt scalafmtCheck"
                 }
             }
         }
@@ -44,7 +44,7 @@ pipeline {
         stage('IRIS Tests') {
             steps {
                 dir("iris") {
-                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -DenableFatalWarnings=true -DenableCoverage=true -DgenerateStoryReport=true Test/test"
+                    sh "sbt -DenableFatalWarnings=true -DenableCoverage=true -DgenerateStoryReport=true Test/test"
                 }
             }
         }
@@ -52,7 +52,7 @@ pipeline {
         stage('WFOS Tests') {
             steps {
                 dir("wfos") {
-                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -DenableFatalWarnings=true -DenableCoverage=true -DgenerateStoryReport=true Test/test"
+                    sh "sbt -DenableFatalWarnings=true -DenableCoverage=true -DgenerateStoryReport=true Test/test"
                 }
             }
         }
@@ -60,7 +60,7 @@ pipeline {
         stage('Integration Tests') {
             steps {
                 dir("integration") {
-                    sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt -DenableFatalWarnings=true -DgenerateStoryReport=true Test/test"
+                    sh "sbt -DenableFatalWarnings=true -DgenerateStoryReport=true Test/test"
                 }
             }
         }
