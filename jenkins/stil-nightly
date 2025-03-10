@@ -10,7 +10,7 @@ pipeline {
 
     environment {
         INTERFACE_NAME = 'eth0'
-        SBT_OPTS = "${SBT_OPTS} -Dsbt.color=false"
+        SBT_OPTS = "${SBT_OPTS} -Dsbt.color=false -Dsbt.log.noformat=true"
     }
 
     stages {
