@@ -25,9 +25,7 @@ pipeline {
             steps {
                 sh "cs java --jvm temurin:1.21.0 -version"
                 sh "redis-server --version"
-                def command = $/"lsof -i tcp:6379 | awk 'NR!=1 {print $2}' | xargs kill"/$
-                res = sh(returnStdout: true, script: command).trim()
-                sh("echo ${res}")
+                sh "redis-cli shutdown"
                 dir("iris") {
                     sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt clean"
                     sh "eval \$(cs java --jvm temurin:1.21.0 --env) && sbt scalafmtCheck"
