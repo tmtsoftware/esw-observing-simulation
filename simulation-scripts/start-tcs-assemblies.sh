@@ -11,6 +11,9 @@ source ./versions.sh
 version=$TCS_VERSION
 TCS_VSLICE="$HOME/tcs-vslice-04/$version"
 
+# temp
+rm -rf $TCS_VSLICE
+
 if [ -d $TCS_VSLICE ]
 then
     echo "starting tcs-vslice container"
