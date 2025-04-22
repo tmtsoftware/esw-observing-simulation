@@ -54,7 +54,7 @@ jobs:
         working-directory: integration
         run: |
           rm -rf $HOME/.cache/coursier/v1/https/raw.githubusercontent.com/tmtsoftware/osw-apps/
-          cs launch --channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/Allan/pekko-scala3-update/apps.json rtm:d520268 -- target/RTM/testStoryMapping.txt ../tools/RTM/storyRequirementMapping.csv target/RTM/testRequirementsMapping.txt
+          cs launch --channel https://raw.githubusercontent.com/tmtsoftware/osw-apps/Allan/pekko-scala3-update/apps.json rtm:0.4.1 -- target/RTM/testStoryMapping.txt ../tools/RTM/storyRequirementMapping.csv target/RTM/testRequirementsMapping.txt
 
       - name: Upload RTM
         uses: actions/upload-artifact@v4
