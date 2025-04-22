@@ -17,7 +17,8 @@ A milestone release is cut from master branch as we expect bug fixes / feedback 
 - RC branch will be considered final & not the master branch.
 - After getting the approval, `V*.*.*` tag will be created.
 
-## Steps
+## Steps 
+___Important: Multiple versions need to be hard coded in multiple subprojects, including sequencer-scripts in Scala code!___
 
 1. Create a branch named `branch-<major>.<minor>.x` if not already exists from `main`. Example branch name `branch-0.1.x`.
    All subsequent release for this release cycle should be done on this branch. All further steps are to be done on this branch.
