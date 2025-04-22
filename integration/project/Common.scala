@@ -33,7 +33,7 @@ object Common extends AutoPlugin {
     Compile / doc / javacOptions ++= Seq("-Xdoclint:none"),
     Test / testOptions ++= reporterOptions,
     resolvers += "jitpack" at "https://jitpack.io",
-    version := "0.3.0",
+    version := "0.4.0",
     fork := true,
     Test / parallelExecution := false,
     autoCompilerPlugins := true,

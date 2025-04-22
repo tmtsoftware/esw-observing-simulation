@@ -21,8 +21,7 @@ jobs:
       - uses: coursier/setup-action@v1.2.0
         with:
           jvm: temurin:1.21
-          apps: sbt sbtn
-      - uses: coursier/cache-action@v6.3
+          apps: sbt
 
       - name: Install Redis
         run: sudo apt-get install redis-server
@@ -37,8 +36,8 @@ jobs:
       - name: Build
         working-directory: integration
         run: |
-          sbtn clean
-          sbtn scalafmtCheck
+          sbt clean
+          sbt scalafmtCheck
 
       - name: Check port
         run: |
