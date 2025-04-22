@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
-export ESW_VERSION=4d97ed9
-export CSW_VERSION=2f05249
-export SEQ_SCRIPT_VERSION=204f3e4
-export TCS_VERSION=0.11
-export ENG_UI_VERSION=82b542e
-export CHANNEL="https://raw.githubusercontent.com/tmtsoftware/osw-apps/Allan/pekko-scala3-update/apps.json"
+export ESW_VERSION=f9cbac5
+#export ESW_VERSION=1.0.0-RC6
+export CSW_VERSION=6.0.0-RC6
+export SEQ_SCRIPT_VERSION=1a80475
+export TCS_VERSION=0.12
+export ENG_UI_VERSION=1.0.0-RC1
+export CHANNEL="https://raw.githubusercontent.com/tmtsoftware/osw-apps/branch-6.0.x/apps.json"
