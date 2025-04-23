@@ -6,13 +6,13 @@ import sbt._
 import scala.util.control.NonFatal
 
 object Libs {
-  val ScalaVersion = "3.6.2"
+  val ScalaVersion = "3.6.4"
 
   val `scalatest` = "org.scalatest" %% "scalatest" % "3.2.19" // Apache License 2.0
 //  val `dotty-cps-async`           = "com.github.rssh"        %% "dotty-cps-async"           % "0.9.23"
   val `junit-4-13`                = "org.scalatestplus"          %% "junit-4-13"                % "3.2.19.0"
-  val `pekko-actor-testkit-typed` = "org.apache.pekko"           %% "pekko-actor-testkit-typed" % "1.1.2"
-  val `nom-tam-fits`              = "gov.nasa.gsfc.heasarc"       % "nom-tam-fits"              % "1.20.2"
+  val `pekko-actor-testkit-typed` = "org.apache.pekko"           %% "pekko-actor-testkit-typed" % "1.1.3"
+  val `nom-tam-fits`              = "gov.nasa.gsfc.heasarc"       % "nom-tam-fits"              % "1.21.0"
   val `tmt-test-reporter`         = "com.github.tmtsoftware.rtm" %% "rtm"                       % "0.4.1"
 }
 
