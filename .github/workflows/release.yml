@@ -17,7 +17,7 @@ jobs:
       - uses: coursier/setup-action@v1.2.0
         with:
           jvm: temurin:1.21
-          apps: sbt sbtn
+          apps: sbt
       - uses: actions/setup-node@v4
         with:
           node-version: "22.14.0"
@@ -40,8 +40,8 @@ jobs:
       - name: Integration - Build 
         working-directory: integration
         run: |
-          sbtn clean
-          sbtn scalafmtCheck
+          sbt clean
+          sbt scalafmtCheck
 
       - name: Check port
         run: |
@@ -67,8 +67,8 @@ jobs:
       - name: IRIS- Build
         working-directory: iris
         run: |
-          sbtn clean
-          sbtn scalafmtCheck
+          sbt clean
+          sbt scalafmtCheck
     
       - name: IRIS - Tests 
         working-directory: iris

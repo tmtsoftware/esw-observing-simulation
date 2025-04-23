@@ -48,7 +48,7 @@ jobs:
         working-directory: iris
         run: |
           sbt -DenableCoverage=true coverageReport
-          sbtn coverageAggregate
+          sbt coverageAggregate
 
       - name: Upload RTM
         if: always()
