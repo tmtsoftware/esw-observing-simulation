@@ -13,7 +13,7 @@ object Libs {
   val `junit-4-13`                = "org.scalatestplus"          %% "junit-4-13"                % "3.2.19.0"
   val `pekko-actor-testkit-typed` = "org.apache.pekko"           %% "pekko-actor-testkit-typed" % "1.1.3"
   val `nom-tam-fits`              = "gov.nasa.gsfc.heasarc"       % "nom-tam-fits"              % "1.21.0"
-  val `tmt-test-reporter`         = "com.github.tmtsoftware.rtm" %% "rtm"                       % "0.4.1"
+  val `tmt-test-reporter`         = "com.github.tmtsoftware.rtm" %% "rtm"                       % "0.4.3"
 }
 
 object CSW {
